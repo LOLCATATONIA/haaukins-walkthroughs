@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Friendly Image — tutorial (EWF disk forensics)</title>
+<meta name="description" content="Guide til Haaukins Friendly Image: montér et E01/EWF-image med ewfmount, genskab en slettet instruktionsfil, og byg flaget af brudstykker.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Friendly Image</h1>
+<p class="subtitle">Montér et EWF-image, genskab en slettet instruktion, og saml flaget af brudstykker.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Et EWF-diskimage (<code>.E01</code>) med en billedfil og instruktioner. En
+             <code>Instructions2.txt</code> er <strong>slettet</strong> og indeholder sidste halvdel af en opskrift på
+             hvordan flaget bygges.</p>
+<h2>Trin for trin</h2>
+<pre><code>ewfmount Friendly.E01 mnt/
+fls -rp mnt/ewf1                      # slettet Instructions2.txt markeret med *
+icat mnt/ewf1 &lt;inode&gt; > Instructions2.txt</code></pre>
+             <p>Opskriften: byg flaget af brudstykker fra tre filer i alfabetisk rækkefølge — en hex-kodet
+             fil-endelse (<code>77696E6E696E67</code> → <code>winning</code>), første 5 tegn af den enes indhold, og
+             sidste 3 af den andens.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p><code>DDC{</code> + <code>keep_</code> + <code>on_</code> + <code>winning</code> + <code>}</code>:</p>
+        <p>Flag (afleveres som DDC): <span class="flag">DDC{keep_on_winning}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>EWF/<code>.E01</code> monteres med <code>ewfmount</code> (eller <code>-i ewf</code> til fls/icat).</li><li>Slettede instruktions-filer rummer tit halvdelen af opskriften — genskab dem.</li><li>Nogle opgaver afleveres med <code>DDC{}</code>-præfiks direkte.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

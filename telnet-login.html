@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Telnet Login — tutorial</title>
+<meta name="description" content="Guide til Haaukins Telnet Login: brug de telnet-credentials du sniffede til selv at logge ind og hente flag-filen.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Telnet Login</h1>
+<p class="subtitle">Log selv ind med de sniffede credentials og hent flaget.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<h2>Hvad går opgaven ud på?</h2>
+<p>Fortsættelsen af <a href="follow-telnet-stream.html">Follow Telnet Stream</a>: de credentials du
+             fangede godtages <em>ikke</em> som flag i klartekst — du skal <strong>selv logge ind</strong> og hente
+             en flag-fil.</p>
+<h2>Trin for trin</h2>
+<pre><code>telnet &lt;server&gt;        # login: JensMP   password: PepsiMax
+$ cat flag.txt          # flaget ligger i brugerens hjemmemappe</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (eksempel): <span class="flag">HKN{Vp-tY-WqrQOt}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Klassisk to-trins-mønster: sniff credentials → log selv ind → find mere.</li><li>Sniffede logins er genbrugelige mod selve tjenesten.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: PWN Strings — tutorial</title>
+<meta name="description" content="Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata — ingen live service nødvendig.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>PWN Strings</h1>
+<p class="subtitle">Flaget ligger i .rodata — fuldt offline.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<pre><code>strings pwn_strings | grep -E '(HKN|DDC)\{'</code></pre>
+             <p>Ingen live service nødvendig. Se den sværere variant <a href="pwn-strings-gdb.html">PWN Strings GDB</a>,
+             hvor flaget beregnes ved runtime.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{JpF-WIl-EJlM}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>strings | grep</code> afslører ofte hele opgaven uanset hvor kompleks binæren ser ud.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

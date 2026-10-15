@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Intmonster — tutorial (char-overflow)</title>
+<meta name="description" content="Guide til Haaukins Intmonster: vind et &#x27;uvindbart&#x27; nc-spil ved at udnytte en char-overflow og rækkefølgen af win-tjekket.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Intmonster</h1>
+<p class="subtitle">Vind et 'uvindbart' spil via en char-overflow.</p>
+<div class="badges"><span class="badge cat">Misc / Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p><code>nc intmonster.hkn 9000</code>: du gør 10 skade/runde, monsteret 15 — du dør først. Men
+             kildekoden afslører: <code>char myHealth</code> (8-bit, max 127), og
+             <code>myHealth = (char)abs(myHealth - poison)</code> lader dig sætte health til 127 ved
+             <code>poison = health + 127</code> (gratis heal). Monster-død tjekkes <em>før</em> monsteret slår.</p>
+<h2>Exploit</h2>
+<p>Angrib til lav health, drik gift (reset til 127), gentag — 9 angreb kræves (monster 90/10).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag udskrives når monsterHealth ≤ 0 (per-instans).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Læs kildekoden når den udleveres — bugs står i klartekst.</li><li><code>char</code>/<code>short</code> til spil-værdier = overflow-guld.</li><li>Logik-rækkefølge (hvornår win tjekkes) kan være lige så udnyttelig som overflow'et.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

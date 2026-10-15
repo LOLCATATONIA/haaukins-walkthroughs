@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Why are people still using defaults? (MQTT) — tutorial</title>
+<meta name="description" content="Guide til Haaukins MQTT-opgaven (+ Unsecure IoT Traffic): default credentials + wildcard-subscribe på en MQTT-broker giver alle topics inkl. flagene.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Why are people still using defaults? (MQTT)</h1>
+<p class="subtitle">Default-creds + wildcard-subscribe lækker alle MQTT-topics.</p>
+<div class="badges"><span class="badge cat">IoT / MQTT</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>mosquitto_sub -h myggen.hkn -p 1883 -u operator -P catalina -t 'flags/#' -v</code></pre>
+             <p><code>operator</code>/<code>catalina</code> er en klassisk Tomcat-default (findes også i unix-ordlister).
+             Wildcard <code>#</code> = fuld læseadgang; flagene publiceres retained på <code>flags/</code>-topics. Samme
+             subscribe afslører bonus-opgaven <strong>Unsecure IoT Traffic</strong>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<ul>
+        <li>Why are people still using defaults?: <span class="flag">HKN{jJ-4u-g2p25N}</span></li>
+        <li>Unsecure IoT Traffic: <span class="flag">HKN{yv-1wQ-q4csa}</span></li>
+        </ul><p>(per-instans)</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>IoT-broker med default-creds + wildcard-subscribe (<code>#</code>) = fuld læseadgang.</li><li><code>mosquitto_sub</code> (eller en rå MQTT-klient) læser flagene.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

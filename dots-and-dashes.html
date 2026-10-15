@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Dots and Dashes — tutorial (morse i lyd)</title>
+<meta name="description" content="Guide til Haaukins Dots and Dashes: afkod morsekode gemt som tonepulser i en WAV-fil.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Dots and Dashes</h1>
+<p class="subtitle">Rytmiske pulser i en lydfil = morsekode.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En kort WAV med rytmiske pulser = morse. Hurtigst: en online morse-<strong>audio</strong>-decoder
+             (auto-tempo) → <code>MOMMYSBOY</code>.</p>
+<h2>Vil du forstå signalet?</h2>
+<p>Læs PCM-samples (<code>wave</code>), udjævn støj, tærskel til on/off, run-length-encode, og
+             klassificér varigheder (prik ≈1 enhed, streg ≈3, pauser 1/3/7) → slå op i morse-tabellen.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Opgaven krævede lowercase.</p><p>Flag: <span class="flag">HKN{mommysboy}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Lyd med rytmiske pulser → morse; en audio-decoder er hurtigst.</li><li>Format: opgaven krævede lowercase.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

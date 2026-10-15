@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: AD Security is Great (PW3) — tutorial (NTLM-crack)</title>
+<meta name="description" content="Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + &#x27;AD&#x27;) og knæk den — NTLM = MD4(UTF-16LE(password)).">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>AD Security is Great (PW3)</h1>
+<p class="subtitle">Uppercase 32-hex + 'AD' = NTLM; knæk MD4(UTF-16LE(pw)).</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p><code>43239E3A0AF748020D5B426A4977D7E5</code> — 32 hex <strong>uppercase</strong>, og "AD"
+             (Active Directory) i titlen = <strong>NTLM</strong> = <code>MD4(UTF-16LE(password))</code>.</p>
+<h2>Fremgangsmåde</h2>
+<p><code>hashcat -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4 — brug
+             OpenSSL legacy-provider (sanity-check) eller en egen MD4 (verificér mod RFC 1320):</p>
+             <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | openssl dgst -md4 -provider legacy -provider default
+# 31d6cfe0...089c0 = NTLM af tomt password</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{supersecret}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Uppercase 32-hex ≈ NTLM; casing er et spor.</li><li><code>hashcat -m 1000</code>, eller egen MD4 verificeret mod RFC-vektorer.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Caught in the Net — tutorial (OSINT)</title>
+<meta name="description" content="Guide til Haaukins Caught in the Net: tæl ofrene i victims.csv — og skriv tallet med bogstaver.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Caught in the Net</h1>
+<p class="subtitle">Tæl ofrene — og pas på talformatet.</p>
+<div class="badges"><span class="badge cat">Forensics (OSINT)</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Denne opgave hører til et <strong>bevis-bundt</strong> (en forensisk dump af en mistænkts laptop).
+Kortlæg altid hele bundtet først — <code>find . -type f | sort</code> — og hold øje med <code>journal.md</code>,
+chatlogs og skjulte mapper (<code>.trash/</code>, <code>.backup/</code>). Halvdelen af kampen er at ramme
+<strong>flag-formatet</strong> præcist.</p>
+<h2>Find svaret</h2>
+<pre><code>tail -n +2 attacks/ph1sh1ng_g0ne_wr0ng/victims.csv | wc -l      # 25</code></pre>
+       <p>Bekræftes af chatloggen.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p><strong>Format-fælde:</strong> skrevne tal, ikke cifre (<code>HKN{twenty-five}</code>, ikke <code>HKN{25}</code>).</p><p>Flag: <span class="flag">HKN{twenty-five}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Kortlæg hele bundtet; krydstjek mod gerningsmandens egne noter/chatlogs.</li><li>Skjulte/slettede mapper (<code>.trash</code>, <code>.backup</code>) rummer de sværeste svar.</li><li>Læs flag-format-kravet ord for ord (skrevne tal, bestemt felt, casing, HKN/DDC).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

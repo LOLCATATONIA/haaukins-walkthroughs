@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Is Hashing Illegal? (PW2) — tutorial (MD5-crack)</title>
+<meta name="description" content="Guide til Haaukins Is Hashing Illegal (PW2): identificér en MD5-hash og knæk den med en rockyou dictionary-attack.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Is Hashing Illegal? (PW2)</h1>
+<p class="subtitle">Identificér MD5 (32 hex) og knæk med rockyou.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En ulæselig credential: <code>380fbafd2a92eb8d442b419f18e43fce</code> = 32 hex-tegn = <strong>MD5</strong>.</p>
+             <pre><code>hashcat -m 0 -a 0 hash.txt rockyou.txt        # eller john --format=raw-md5
+# python: hashlib.md5(word).hexdigest() == target</code></pre>
+             <p>En lille dansk ordliste gav intet — den fulde <code>rockyou.txt</code> (14,3M ord) knækkede den.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{canttouchme}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>32 hex-tegn (lowercase) = MD5. Identificér hashen på længde/format først.</li><li>Standard dictionary = rockyou; <code>hashcat -m 0</code> / <code>john --format=raw-md5</code>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

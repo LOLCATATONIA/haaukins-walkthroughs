@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hasher 2 — tutorial</title>
+<meta name="description" content="Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister — brug en engelsk ordbog filtreret til 7-bogstavs ord.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hasher 2</h1>
+<p class="subtitle">Når rockyou ikke virker: brug en rigtig ordbog.</p>
+<div class="badges"><span class="badge cat">Cryptography</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En MD5 af et "7-bogstavs engelsk ord, ikke i password-lister". Så drop rockyou — brug en engelsk
+             ordbog (<code>words_alpha.txt</code>) filtreret til 7 bogstaver.</p>
+             <pre><code>for w in open("words_alpha.txt"):
+    if len(w.strip())==7 and md5(w.strip())==target: print(w)   # -> address</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{address}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Læs hintet: 'ikke i password-lister' → brug en ordbog, ikke rockyou.</li><li>Filtrér søgerummet (fx på ordlængde) når opgaven giver en begrænsning.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

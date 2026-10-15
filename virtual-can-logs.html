@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Virtual CAN Logs — tutorial (CAN-bus)</title>
+<meta name="description" content="Guide til Haaukins Virtual CAN Logs: find flaget i en CAN-bus trace — strings-først, og saml fragmenterne på samme CAN-ID i tidsrækkefølge.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Virtual CAN Logs</h1>
+<p class="subtitle">strings-først på en CAN-trace; saml fragmenter på samme ID.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En trace fra et virtuelt CAN-interface (<code>vcan0</code>). Fristelsen er at lære hele protokollen —
+             men flaget ligger som rå bytes i støjen.</p>
+<h2>Fremgangsmåde</h2>
+<pre><code>strings -a trace | grep -aoiE '(HKN|DDC)\{[^}]*\}'   # fandt straks "HKN{virt" (8 bytes = én payload)
+tshark -r trace -T fields -e can.id -e data.data > all.txt
+awk -F'\t' '$1==1 {print NR": "$2}' all.txt | uniq   # alle payloads for CAN-ID 1, i filrækkefølge</code></pre>
+             <p>Tre rigtige fragmenter var spredt blandt fuzzing-støj på samme ID; saml i <strong>kronologisk</strong>
+             rækkefølge.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>"HKN{virt" + "uel_canb" + "us_logs}" (bemærk dansk stavning):</p>
+        <p>Flag: <span class="flag">HKN{virtuel_canbus_logs}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>strings -a &lt;fil&gt; | grep HKN{</code> er altid første træk — også på eksotiske/binære traces.</li><li>Isolér den rette ID og læs payloads som bytes; saml fragmenter i tidsrækkefølge.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

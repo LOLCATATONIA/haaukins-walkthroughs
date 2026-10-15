@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Covert Channels DNS — tutorial</title>
+<meta name="description" content="Guide til Haaukins Covert Channels: DNS — data exfiltreret som hex i DNS-subdomæner; udtræk opslagene og hex-afkod i tidsrækkefølge.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Covert Channels: DNS</h1>
+<p class="subtitle">Data smuglet ud som hex forrest i DNS-opslag.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Alle tre opgaver løses på <strong>samme</strong> <code>capture.pcap</code>. Start altid med
+protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefølge:</p>
+<pre><code>tshark -r capture.pcap -q -z io,phs</code></pre><p>En kompromitteret host slår mærkelige domæner op. Dataene ligger som hex forrest i hvert subdomæne
+             hos <code>canarytokens.com</code>.</p>
+<h2>Trin for trin</h2>
+<pre><code>tshark -r capture.pcap -Y 'dns.flags.response==0 &amp;&amp; dns.qry.name contains "canarytokens"' \
+  -T fields -e frame.time_relative -e dns.qry.name</code></pre>
+             <p>Sortér på tid, tag hex-labelen fra hvert navn, og afkod: <code>484b4e7b</code> → <code>HKN{</code>,
+             <code>77333172</code> → <code>w31r</code> … <code>7d</code> → <code>}</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{w31rd_5ubd0m41n5}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>DNS-exfiltrering pakker data i opslags-navne til en server angriberen styrer.</li><li>Saml altid i tidsrækkefølge (ikke alfabetisk).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

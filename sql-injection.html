@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: SQL injection &amp; Web server login — tutorial (second-order SQLi)</title>
+<meta name="description" content="Guide til Haaukins SQL injection (netsec-forum) og Web server login: log ind med sniffede credentials, og lav second-order SQLi i kommentarfeltet med &quot; + || .">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>SQL injection (+ Web server login)</h1>
+<p class="subtitle">Second-order SQLi i et kommentarfelt med " + ||-konkatenering.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Web server login</h2>
+<p>Log ind med sniffede credentials (<code>carsten@netsec.aau.dk</code>/<code>mormor1932</code>). Appen
+             bouncer http↔https: giv curl både <code>--resolve ...:80:</code> og <code>:443:</code>, send cookien, følg
+             redirects. Det autentificerede forum viser flaget + en kommentar-form.</p>
+<h2>SQL injection — second-order i kommentarfeltet</h2>
+<p>Login-formen er parameteriseret, men en gemt kommentar er injectable. INSERT'en bruger
+             <strong>dobbelt</strong>-citationstegn, så <code>'</code>-breakout fejler; brug <code>"</code> + SQLite
+             <code>||</code>:</p>
+             <pre><code>" || (SELECT group_concat(sql,0x0a) FROM sqlite_master))--
+" || (SELECT group_concat(email||0x3a||password,0x0a) FROM users))--</code></pre>
+             <p>→ en skjult bruger <code>you@found.it</code> hvis "password" er flaget.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<ul>
+        <li>Web server login: <span class="flag">HKN{ga-wR-jNtYnh}</span></li>
+        <li>SQL injection: <span class="flag">HKN{zN-Q3-g42fcS}</span></li>
+        </ul><p>(per-instans)</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Injektion er ikke altid i login-formen — tænk second-order (data gemt nu, brugt i en query senere).</li><li>Variér breakout-tegnet: <code>'</code> vs <code>"</code> afhænger af hvordan serveren bygger SQL'en.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

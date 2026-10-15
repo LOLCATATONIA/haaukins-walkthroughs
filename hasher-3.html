@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hasher 3 — tutorial (salted SHA-256)</title>
+<meta name="description" content="Guide til Haaukins Hasher 3: find preimage til en &#x27;salted&#x27; SHA-256 — ordet i citationstegn ER saltet.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hasher 3</h1>
+<p class="subtitle">Preimage = salt + ord; ordet i citationstegn er bogstaveligt saltet.</p>
+<div class="badges"><span class="badge cat">Cryptography</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En SHA-256 hvor preimage = salt + et ord fra en wiki-side, og man afleverer HELE preimage. Den dobbelte
+             pun var nøglen: <code>'salted'</code> i citationstegn → saltet er bogstaveligt ordet <code>salted</code>;
+             ordet fra siden er <code>situation</code>.</p>
+             <pre><code>sha256(b"saltedsituation") == target   # True</code></pre></p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{saltedsituation}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et ord i citationstegn er tit <em>bogstaveligt</em> en del af løsningen.</li><li>Brug tidsperiodens datakilde (her 2021-revisionen af wiki-siden).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

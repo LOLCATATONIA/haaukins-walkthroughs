@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: PWN Strings GDB — tutorial (statisk rekonstruktion)</title>
+<meta name="description" content="Guide til Haaukins PWN Strings GDB: flaget bygges ved runtime, men kan udledes fuldt statisk i radare2 ved at følge en strcat-kæde af .data-fragmenter.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>PWN Strings GDB</h1>
+<p class="subtitle">Flaget bygges ved runtime — men udledes fuldt statisk.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Samme binær som PWN Strings, men flaget beregnes ved runtime (opgaven antyder gdb-patching).
+             Med statisk analyse behøver du ikke køre noget:</p>
+             <pre><code>r2 -A pwn_strings
+[0x...]> pdf @ sym.correctcrack      # strcat'er 7 .data-fragmenter sammen</code></pre>
+             <p>Fragmenterne samles til en hex-streng → hex-afkod:</p>
+             <pre><code>bytes.fromhex("484B4E7B586E6F2D5152342D445934517D").decode()   # HKN{Xno-QR4-DY4Q}</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Xno-QR4-DY4Q}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et 'runtime-beregnet' flag kan være fuldt bestemt af statiske data + en kendt dekoder.</li><li>Følg <code>strcat</code>/<code>memcpy</code>-kæder (<code>lea</code>+<code>push</code>+<code>call</code>) i radare2's <code>pdf</code>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

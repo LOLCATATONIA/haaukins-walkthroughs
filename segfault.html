@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: segfault — tutorial (off-by-one / fencepost)</title>
+<meta name="description" content="Guide til Haaukins &#x27;sindssyg super sikker sigsev segfault&#x27;: udnyt en off-by-one (&lt;=) kopi-løkke til at overskrive en sentinel og trigge en SIGSEGV-handler der printer flaget.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>sindssyg super sikker sigsev segfault</h1>
+<p class="subtitle">En off-by-one kopi-løkke overskriver en sentinel → SIGSEGV → flag.</p>
+<div class="badges"><span class="badge cat">Binary / Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Kildekoden: <code>char buf[223]; sentinel=buf+223;</code> og en kopi-løkke
+             <code>for(i=0;i&lt;=strlen;i++)</code> — <code>&lt;=</code> kopierer én byte for meget. Ved præcis
+             <code>strlen==223</code> passerer valideringen, men den ekstra byte (input'ets <code>\0</code>) overskriver
+             sentinel → <code>raise(SIGSEGV)</code> → handleren printer <code>flag.txt</code>.</p>
+             <pre><code>python3 -c "print('A'*222)" | nc segfault.hkn 1337   # 222 tegn + \n = strlen 223</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Afleveres som DDC.</p><p>Flag: <span class="flag">DDC{hvorfor_goer_du_dog_det}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>&lt;=</code> hvor der skulle stå <code>&lt;</code> overskriver præcis én byte for meget.</li><li>Med kildekode ved siden af binæren er ren statisk læsning ofte hurtigst.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

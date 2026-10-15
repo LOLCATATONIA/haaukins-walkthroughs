@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Network Scanning — tutorial (recon-pipeline)</title>
+<meta name="description" content="Guide til Haaukins Network Scanning: find hosten med port 8080 åben via nmap og hent flaget fra forsiden. Grundlæggende recon-pipeline.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Network Scanning</h1>
+<p class="subtitle">Find hosten med den søgte port og hent flaget. Ren recon.</p>
+<div class="badges"><span class="badge cat">Forensics / Network</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>nmap -sn -n &lt;subnet&gt;/24                    # host-discovery
+nmap -Pn -n -p8080 --open &lt;subnet&gt;/24       # find hosten med 8080 åben
+curl -s http://&lt;ip&gt;:8080/                    # flaget står i HTML</code></pre>
+             <p>Dette er hele recon-pipelinen (start → scan → extract → submit) som gentager sig i alle lab-interne opgaver.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{u3-7U-Lae4yx}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>nmap -sn</code> → <code>-p&lt;port&gt; --open</code> → hent er fundamentet for lab-interne opgaver.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

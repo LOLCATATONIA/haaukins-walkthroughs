@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Base54-Bavl — tutorial</title>
+<meta name="description" content="Guide til Haaukins Base54-Bavl: nc-service spytter base64 i 5 indrykkede kolonner; afkod hver, udtræk binær og saml i indrykningsrækkefølge.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Base54-Bavl?</h1>
+<p class="subtitle">base64 i 5 kolonner, med flaget som binær gemt i ASCII-art.</p>
+<div class="badges"><span class="badge cat">Cryptography</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p><code>nc base54.hkn 54</code> ("Base54" = ordspil på base64) spytter et kranie + 5 kolonner base64,
+             hver indrykket med 2/4/6/8/10 tabs. Hver kolonne afkoder til ASCII-art med en binær sekvens gemt som
+             skygge; "put in proper order" = stigende indrykning.</p>
+<h2>Fremgangsmåde</h2>
+<pre><code># pr. kolonne (grupperet efter tabs): base64-dekod, find binære runs, læs som 8-bit ASCII
+import re, base64
+runs = re.findall(r'[01]{8,}', base64.b64decode(col).decode())
+frag = ''.join(chr(int(r[i:i+8],2)) for r in runs for i in range(0,len(r),8))
+# 2tabs=HKN, 4={JE-, 6=VIr, 8=-uEM, 10=uJ}</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{JE-VIr-uEMuJ}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Indrykning/kolonne-struktur bærer tit rækkefølgen.</li><li>Data kan have flere lag: base64 → binær → ASCII.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

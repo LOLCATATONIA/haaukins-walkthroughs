@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Escalator — tutorial (SUID nano privesc)</title>
+<meta name="description" content="Guide til Haaukins Escalator: anonym FTP → credentials → SSH → privesc via SUID nano (GTFObins fil-læsning som root).">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Escalator</h1>
+<p class="subtitle">FTP-anon → SSH → SUID nano læser en root-fil.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Foothold</h2>
+<pre><code>nmap escalator.hkn                    # 21/ftp + 22/ssh
+ftp anonymous@escalator.hkn           # LIST -> credentials.txt (alex:r341mvpc3rt)
+ssh alex@escalator.hkn</code></pre>
+<h2>Privesc via SUID nano</h2>
+<pre><code>find / -perm -4000 -type f 2>/dev/null    # /usr/bin/nano (SUID root!)</code></pre>
+             <p>I nano 6.2 kører <code>^R^X</code>-shellen som din uid — men nanos <strong>fil-læsning</strong> bruger
+             euid=root. Brug <code>^R</code> (Read File) til at indsætte <code>/root/flag.txt</code> i bufferen og gem en
+             kopi (automatisér med <code>expect</code>).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget indeholder et <strong>mellemrum</strong> (verificeret med <code>od -c</code>):</p>
+        <p>Flag: <span class="flag">HKN{ups3t_th3 e5tab1ish3d_0rd3r}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Foothold-mønster: anonym FTP med en <code>credentials.txt</code>.</li><li>SUID-binære: slå dem op på GTFObins; nanos fil-operationer kører som root.</li><li>Verificér flagets eksakte bytes (her et mellemrum) med <code>od -c</code>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

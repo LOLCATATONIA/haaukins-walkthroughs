@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Campfire Stories — tutorial (LLM prompt-injection)</title>
+<meta name="description" content="Guide til Haaukins Campfire Stories: ikke brute force, men prompt-injection mod en AI-chatbot der lækker FTP-credentials.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Campfire Stories</h1>
+<p class="subtitle">Ligner boot2root — er LLM prompt-injection.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En VM med FTP + en Flask-webapp. Vejen er <strong>ikke</strong> brute force, men at narre appens
+             AI-chatbot (prompt-injection) til at lække FTP-credentials. <code>robots.txt</code> hinter om det.</p>
+<h2>Trin for trin</h2>
+<ol class="steps">
+             <li>Prompt chatbotten til at udskrive config/FTP-detaljer → den lækker base64 <code>Z3B0OTAwMA==</code> →
+             <code>gpt9000</code>.</li>
+             <li>FTP-login <code>admin:gpt9000</code>, hent det store træningsdatasæt, og grep efter flaget:
+             <pre><code>curl --user 'admin:gpt9000' ftp://&lt;ip&gt;/train.txt -o train.txt
+grep -aoE 'DDC\{[^}]*\}' train.txt</code></pre></li>
+             </ol>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Im-happy-Dave-I-see-you-found-the-flag}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Genkend opgave-typen før værktøjsvalg — gentagne fejl af én metode = skift tilgang, ikke skalér den.</li><li>Spor: en AI-chatbot, CORS <code>*</code>-API uden normale ruter, robots.txt-hint.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

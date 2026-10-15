@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hashle — tutorial</title>
+<meta name="description" content="Guide til Haaukins Hashle: en Wordle-på-MD5-service; brug feedbacken til at filtrere rockyou ned til én kandidat.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hashle</h1>
+<p class="subtitle">Brug Wordle-feedback til at filtrere rockyou — ikke gætte.</p>
+<div class="badges"><span class="badge cat">Cryptography</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p><code>nc hashle.hkn 1337</code> viser MD5(gæt) + Wordle-feedback på hex-cifrene mod target-MD5.
+             Behold kun rockyou-ord hvor <code>Wordle(MD5(gæt), MD5(ord)) == observeret feedback</code>. MD5 spreder
+             ændringer, så ét gæt (<code>password</code>) skar 14M ord ned til <strong>én</strong> kandidat.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Gæt 1 <code>password</code> → filtrerede til <code>trimoney</code> → gæt 2 = korrekt.</p>
+        <p>Flag: <span class="flag">DDC{1_l1k3_y0ur_Funny_w0rd5_m4g1c_m4n}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Feedback-orakler lader dig <em>filtrere</em> søgerummet massivt.</li><li>Offline MD5-filtrering af rockyou frem for at prøve alle gæt mod serveren.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

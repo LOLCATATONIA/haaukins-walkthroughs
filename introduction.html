@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Introduction — tutorial (DCIS-bevis-bundt)</title>
+<meta name="description" content="Guide til Haaukins Introduction: det første (gratis) flag, og en orientering i DCIS-OSINT-bundtet som fodrer 12+ andre opgaver.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Introduction</h1>
+<p class="subtitle">Det gratis startflag — og kortet over hele bevis-bundtet.</p>
+<div class="badges"><span class="badge cat">Forensics (OSINT)</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Flaget står <strong>direkte i opgaveteksten</strong> (<code>HKN{l3ts_st4rt_h4ck1ng}</code>). Det
+             vigtige er selve ZIP-filen: et simuleret laptop-filsystem under <code>evidence/</code> som fodrer mange
+             andre opgaver (Public WiFi, Spot the Host, Name and Shame, Trashed Secrets, Winter Snow, m.fl.).</p>
+<h2>Kortlæg bundtet</h2>
+<pre><code>unzip -q forensics_dcis-osint.zip -d evidence &amp;&amp; cd evidence
+find . -type f | sort       # logs/, communications/, disk/, .trash/, journal.md ...</code></pre>
+             <p>Ignorér de ~600 tomme decoy-filer under <code>experiments/misc/</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{l3ts_st4rt_h4ck1ng}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Nogle flag gives gratis i teksten — læs den.</li><li>Ét bevis-bundt kan fodre 12+ opgaver; byg et mentalt kort over hvor hver type info bor.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

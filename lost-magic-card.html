@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Lost Magic Card — tutorial (PNG-metadata)</title>
+<meta name="description" content="Guide til Haaukins Lost Magic Card: find et base64-flag gemt i en ikke-standard PNG tEXt-chunk.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Lost Magic Card</h1>
+<p class="subtitle">Et mistænkeligt stort PNG gemmer flaget i en metadata-chunk.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Et simpelt kortbillede på 1,5 MB er mistænkeligt stort. PNG består af "chunks", og data kan gemmes
+             i en ikke-standard <code>tEXt</code>-chunk.</p>
+<h2>Trin for trin</h2>
+<pre><code>exiftool magiccard.png        # eller strings -- kig efter en tEXt-chunk / base64
+# base64-værdien afkodes:
+echo "SEtOe2..." | base64 -d</code></pre>
+             <p>Uforklarlig filstørrelse = kig efter en payload i metadata.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>tEXt-chunken (nøgle <code>zzzzz</code>) indeholdt en base64-streng der afkoder til flaget.</p>
+        <p>Flag: <span class="flag">HKN{br0_ju57_h1d3_th3_fl4g_iN_th3_c4rd}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>exiftool</code>/<code>strings</code> finder data i billed-metadata hurtigt.</li><li>Uforklarlig filstørrelse er et fingeraftryk på en skjult payload.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

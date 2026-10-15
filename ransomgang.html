@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: RansomGang — tutorial (crackme: betingelser &amp; XOR)</title>
+<meta name="description" content="Guide til Haaukins RansomGang: løs et betingelses-puslespil (stage 1) og gendan en XOR-nøgle (stage 2) via statisk analyse i radare2.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>RansomGang</h1>
+<p class="subtitle">Løs et betingelses-puslespil og gendan en XOR-nøgle.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Stage 1 — betingelses-puslespil</h2>
+<p>En hjemmerullet login justerer en tæller ud fra 6 betingelser på input-bytes og accepterer kun hvis
+             tælleren rammer <strong>præcis 7</strong>. To tjek scorer højere ved <em>fejl</em> (bevidst twist). Løs for
+             max → <code>Ba010b</code>.</p>
+<h2>Stage 2 — XOR-nøgle</h2>
+<p>Programmet XOR'er input med en nøgle i <code>.data</code> og sammenligner mod en forventet buffer.
+             Begge ligger i binæren, så svaret er <code>expected ^ key</code>:</p>
+             <pre><code>bytes(e ^ k for e, k in zip(expected, key))     # -> b'DogeCoinToTheMoon1337'</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Login med <code>Ba010b</code> + <code>DogeCoinToTheMoon1337</code> → root-shell → flag.</p>
+        <p>Flag: <span class="flag">HKN{P45_PAA_M3D_HJ3MM3L4V3T_S1KK3RH3D}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Crackmes løses ved at læse betingelserne og regne baglæns, ikke brute force.</li><li>XOR med en nøgle i binæren er trivielt reversibel (<code>expected ^ key</code>).</li><li>Stol på disassembly frem for udseende; bekræft mod den kørende service.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
