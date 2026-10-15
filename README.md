@@ -1,16 +1,16 @@
-# Haaukins CTF — tutorials (HTML-site)
+# Haaukins CTF — walkthroughs & tutorials
 
-Standalone HTML-tutorials for Haaukins-kursister. Åbn [`index.html`](index.html) for den søgbare forside, eller
-en enkelt opgave, fx [`heartbleed.html`](heartbleed.html).
+Pædagogiske, trin-for-trin guides til [Haaukins](https://haaukins.com/) CTF-opgaver (AAU / De Danske
+Cybermesterskaber). Én side pr. lab: koncept → fremgangsmåde → og flag/løsning gemt i en "spoiler" du selv åbner.
 
-**Dette writeup-repo er privat.** Sitet offentliggøres ved at synkronisere *kun* denne mappe til et separat
-offentligt repo (så `../docs/` og resten forbliver privat):
+🌐 **Læs dem her:** https://lolcatatonia.github.io/haaukins-walkthroughs/
 
-```bash
-scripts/build_tutorials/publish.sh git@github.com:LOLCATATONIA/haaukins-walkthroughs.git
-```
+- Åbn **[forsiden](https://lolcatatonia.github.io/haaukins-walkthroughs/)** og brug søgefeltet — slå dit
+  lab-navn op og hop direkte til guiden.
+- Søgte du *"Haaukins &lt;lab-navn&gt;"*? Hver side hedder det samme som opgaven, fx `heartbleed.html`.
 
-Det offentlige repo serveres så via GitHub Pages (Settings → Pages → Deploy from a branch → main / root).
+Guiderne er tænkt som **støtte undervejs** i et autoriseret trænings-/CTF-forløb — brug dem til at lære, ikke til
+at springe læringen over. Mange Haaukins-flag er per-instans, så eksemplerne matcher ikke nødvendigvis din instans;
+det er fremgangsmåden der tæller.
 
-> Siderne genereres fra `scripts/build_tutorials/` (`python3 gen.py`). Rediger indholdet dér og kør scriptet;
-> de færdige `.html`-filer her er resultatet. Tutorials er bevidst **uafhængige af `../docs/`** (vores interne noter).
+> En rå `.html` i GitHubs filvisning vises som kildekode — brug sitet ovenfor for den renderede udgave.
