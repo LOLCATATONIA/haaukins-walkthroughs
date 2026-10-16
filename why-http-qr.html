@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Why is this running HTTP? — tutorial (stjæl en QR fra trafikken)</title>
+<meta name="description" content="Guide til Haaukins Why is this running HTTP: en klient logger ind over ren HTTP ved at uploade et QR-billede; impersonér den (fraværende) server, fang uploadet, carve QR-PNG&#x27;en ud af pcap&#x27;en og afkod den.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/why-http-qr.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Why is this running HTTP? — tutorial (stjæl en QR fra trafikken)">
+<meta property="og:description" content="Guide til Haaukins Why is this running HTTP: en klient logger ind over ren HTTP ved at uploade et QR-billede; impersonér den (fraværende) server, fang uploadet, carve QR-PNG&#x27;en ud af pcap&#x27;en og afkod den.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/why-http-qr.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Why is this running HTTP?", "description": "Guide til Haaukins Why is this running HTTP: en klient logger ind over ren HTTP ved at uploade et QR-billede; impersonér den (fraværende) server, fang uploadet, carve QR-PNG'en ud af pcap'en og afkod den.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/why-http-qr.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Why is this running HTTP?</h1>
+<p class="subtitle">Impersonér en fraværende server, fang klientens QR-upload, og afkod QR'en.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Hintet: <em>"…you forgot your ID with the QR code at home… the site is just running HTTP so maybe you
+             can steal one from the network traffic."</em> En klient-maskine logger periodisk ind på en hospital-webapp
+             over <strong>ren HTTP</strong> ved at uploade sit login-QR (<code>POST /api/v1/users/login</code>, multipart).
+             Du skal fange det QR-billede.</p>
+<h2>Bliv serveren (impersonering)</h2>
+<p>I praksis var serveren død/langsom, så klienten <strong>ARP'ede forgæves</strong> efter dens IP. Claim
+             den ubesvarede IP selv og lyt på port 80 — klienten sender så sin POST til <em>dig</em> (svar den, så dens
+             HTTP-request fuldføres):</p>
+             <pre><code>sudo ip addr add &lt;server-ip&gt;/24 dev eth0     # svar på klientens ARP
+# en lille HTTP-responder på :80 (fx python/nc) der svarer 200 og logger requesten
+# -> POST /api/v1/users/login, multipart field name="qr" = en QR-PNG</code></pre>
+             <p>Capturer samtidig med <code>tcpdump -s0 -w cap.pcap 'tcp port 80'</code> som ground truth.</p>
+<h2>Carve &amp; afkod QR&#x27;en</h2>
+<p>QR-PNG'en ligger i POST-body'en (ét TCP-segment). Carve den ud mellem PNG-signaturen og IEND, og afkod:</p>
+             <pre><code>python3 -c "d=open('cap.pcap','rb').read(); i=d.find(bytes.fromhex('89504e470d0a1a0a')); j=d.find(b'IEND',i)+8; open('qr.png','wb').write(d[i:j])"
+zbarimg --raw qr.png        # -> QR'ens indhold</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>QR-indhold (JSON): <code>{"username":"BlackNurse","password":"CVE-2011-1871","flag":"HKN{…}"}</code>
+        — flaget lå <em>direkte</em> i QR'en, plus en nurse-login til <a href="becomming-a-doctor.html">Becomming a doctor</a>.</p>
+        <p>Flag (per-instans): <span class="flag">HKN{ci1-g3I-e3ly}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Ren HTTP lækker alt — inkl. et uploadet billede i en multipart-body.</li><li>Er serveren fraværende? <strong>Impersonér</strong> den: claim dens ubesvarede IP (<code>ip addr add</code>) + lyt, så klientens request lander hos dig.</li><li>Carve filer direkte fra en pcap via magic bytes (PNG = <code>89 50 4E 47</code>) når stream-dissektion driller.</li><li>Et QR-billede er bare data — det kan bære credentials (og her: flaget).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

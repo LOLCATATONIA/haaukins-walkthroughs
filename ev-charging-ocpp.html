@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: EV Charging Hater — tutorial (OCPP WebSocket-sniff)</title>
+<meta name="description" content="Guide til Haaukins EV Charging Hater: sniff OCPP-WebSocket-trafikken mellem et ladepunkt og central-systemet, af-maskér klient-frames manuelt, og find flaget skjult i en BootNotification.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ev-charging-ocpp.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: EV Charging Hater — tutorial (OCPP WebSocket-sniff)">
+<meta property="og:description" content="Guide til Haaukins EV Charging Hater: sniff OCPP-WebSocket-trafikken mellem et ladepunkt og central-systemet, af-maskér klient-frames manuelt, og find flaget skjult i en BootNotification.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ev-charging-ocpp.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "EV Charging Hater", "description": "Guide til Haaukins EV Charging Hater: sniff OCPP-WebSocket-trafikken mellem et ladepunkt og central-systemet, af-maskér klient-frames manuelt, og find flaget skjult i en BootNotification.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ev-charging-ocpp.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>EV Charging Hater</h1>
+<p class="subtitle">"Monitor the traffic" = sniff OCPP-WebSocket'en og af-maskér klient-beskederne.</p>
+<div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Hintet: <em>"poorly set up OCPP, monitor the traffic."</em> <strong>OCPP</strong> (Open Charge Point
+             Protocol) er sproget mellem en el-billader og et central-system — <strong>JSON-RPC over WebSocket</strong>.
+             Et ladepunkt holder en WS-forbindelse åben og sender beskeder (BootNotification, Heartbeat, MeterValues …);
+             flaget er gemt i én af dem.</p>
+<h2>Recon &amp; capture</h2>
+<pre><code>nmap -Pn -sT -p- &lt;central-system&gt;      # fx 8887/tcp = OCPP central system
+# trafikken er ofte synlig passivt på lab-segmentet — ingen MITM nødvendig:
+sudo tcpdump -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</code></pre>
+<h2>Af-maskér WebSocket-frames (nøgletrinnet)</h2>
+<p>To fælder: (1) capturer du <em>midt i</em> en etableret WS, så tshark ikke dissekerer den (den så ikke
+             HTTP-upgrade-handshaket); (2) <strong>klient→server-frames er maskerede</strong> (XOR med en 4-byte nøgle pr.
+             frame) — kun server→klient er læsbar med <code>strings</code>. Af-masker klient-frames manuelt:</p>
+             <pre><code># WS-frame: [FIN+opcode][MASK+len][evt. ext-len][4-byte nøgle][maskeret payload]
+# payload[i] XOR nøgle[i % 4]  giver klarteksten
+tshark -r ocpp.pcap -Y 'ip.src==&lt;charger&gt; &amp;&amp; tcp.len&gt;0' -T fields -e tcp.payload
+# -> for hver frame: læs længde (byte1 &amp; 0x7f), tag de 4 nøgle-bytes, XOR resten</code></pre>
+             <p>Resultatet er OCPP-JSON som <code>[2,"&lt;id&gt;","BootNotification",{…}]</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget lå i <strong>BootNotification</strong>'s <code>chargePointVendor</code>-felt, base64-kodet
+        (<code>SEtOe2gzNHJ0LWIzNHR9</code> → <code>base64 -d</code>). BootNotification sendes kun ved (re)connect, så
+        fang en forbindelses-genstart (ladepunktets transaktion cykler).</p>
+        <p>Flag: <span class="flag">HKN{h34rt-b34t}</span> ("heartbeat" — OCPP har netop Heartbeat-beskeder).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>OCPP = JSON-RPC over WebSocket; "monitor the traffic" = sniff den (ofte synlig passivt on-segment).</li><li>Frames fanget midt-stream: tshark dissekerer ikke uden handshaket → af-masker klient-frames selv (<code>^ nøgle[i%4]</code>).</li><li>"Poorly set up" = en hemmelighed i et frit tekstfelt (vendor) — tjek ALLE felter i protokol-beskederne.</li><li>Flaget var kun i den sjældne BootNotification → fang en (re)connect, ikke kun de periodiske MeterValues.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
