@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Haaukins: Ice Cream Overflow — tutorial (gets struct-overflow)</title>
 <meta name="description" content="Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Ice Cream Overflow — tutorial (gets struct-overflow)">
+<meta property="og:description" content="Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Ice Cream Overflow", "description": "Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,7 +19,7 @@
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Ice Cream Overflow</h1>
 <p class="subtitle">gets() overflow af et nabofelt i samme struct (SUID-root).</p>
-<div class="badges"><span class="badge cat">Binary / Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>

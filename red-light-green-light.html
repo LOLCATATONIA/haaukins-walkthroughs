@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Red light green light — tutorial (timing-gate &amp; PRNG)</title>
+<meta name="description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Red light green light — tutorial (timing-gate &amp; PRNG)">
+<meta property="og:description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Red light, green light", "description": "Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Red light, green light</h1>
+<p class="subtitle">Forudsig en tids-seedet lys-timer og løb kun i grønt.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Vinde-logikken (statisk RE)</h2>
+<p>Et <code>SIGALRM</code> flipper <code>greenlight</code> hvert <code>(rand()%7)+3</code> sek. At køre
+             (<code>isRunning==1</code>) når lyset bliver rødt = instant tab (tjekkes synkront i handleren — kun
+             forebyggelse virker). <code>distanceRun</code> akkumulerer over grønne vinduer; &gt;7 → <code>cat /root/flag.txt</code>.</p>
+<h2>Exploit: forudsig timeren + styr send-kadencen</h2>
+<p><code>srand(time(NULL))</code> gør hver forsinkelse forudsigelig hvis du kender serverens klokke-sekund.
+             Observér første grønne vindues længde → pin klokke-skew (±10s) med en glibc-<code>random()</code>-reimpl →
+             forudsig alle vinduer → <code>runFast</code> kun med sikker margin.</p>
+             <p><strong>Kritisk fælde:</strong> skriv <em>langsommere</em> end serverens ~1Hz <code>fgets()</code>-forbrug
+             (fx hver 1.2s). Flooder du, bygger der en FIFO-kø af gamle beslutninger → fasen desynkroniserer og du taber
+             live (selvom du vinder lokalt uden netværks-latens).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{C0NTEST4NT_1337_P4SSED}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Tids-seedet PRNG er forudsigeligt for en modstander der kan se/observere tidspunktet.</li><li>'Vinder lokalt' ≠ 'vinder live' — test timing-exploits mod den rigtige RTT.</li><li>At skrive hurtigere end modtageren læser = en kø, ikke hurtigere respons; match forbrugstakten.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

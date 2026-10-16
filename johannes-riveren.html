@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Johannes Riveren — tutorial (zip-cracking)</title>
+<meta name="description" content="Guide til Haaukins Johannes Riveren: navnet er dansk for &#x27;John the Ripper&#x27; — hent den password-beskyttede zip og knæk den med zip2john + rockyou.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/johannes-riveren.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Johannes Riveren — tutorial (zip-cracking)">
+<meta property="og:description" content="Guide til Haaukins Johannes Riveren: navnet er dansk for &#x27;John the Ripper&#x27; — hent den password-beskyttede zip og knæk den med zip2john + rockyou.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/johannes-riveren.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Johannes Riveren", "description": "Guide til Haaukins Johannes Riveren: navnet er dansk for 'John the Ripper' — hent den password-beskyttede zip og knæk den med zip2john + rockyou.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/johannes-riveren.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Johannes Riveren</h1>
+<p class="subtitle">Navnet = dansk for "John the Ripper" — knæk en password-beskyttet zip.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>curl -o secret.zip http://johannes.hkn/secret.zip     # "Download ZIP" (flag.txt, krypteret)
+zip2john secret.zip > secret.hash                     # $pkzip$-hash
+john --wordlist=rockyou.txt secret.hash               # -> password (fx 12516)
+unzip -P &lt;password&gt; secret.zip &amp;&amp; cat flag.txt</code></pre>
+             <p>Opgavenavnet ER hintet: "Johannes Riveren" = John the Ripper.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{tEI-nc-QKq2l}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>PKZIP-krypteret arkiv → <code>zip2john</code> → <code>$pkzip$</code>-hash → john + rockyou.</li><li>Håndtér downloadede arkiver i deres egen mappe (untrusted data).</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

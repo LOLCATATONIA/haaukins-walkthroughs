@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Powering HAAUKINS — tutorial (MQTT SCADA-spoof)</title>
+<meta name="description" content="Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Powering HAAUKINS — tutorial (MQTT SCADA-spoof)">
+<meta property="og:description" content="Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Powering HAAUKINS", "description": "Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Powering HAAUKINS</h1>
+<p class="subtitle">Spoof retained MQTT-status på et vindmølle-grid til et præcist effekt-target.</p>
+<div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Recon</h2>
+<p><code>Danwind.hkn</code>: MQTT 1883 + web-dashboard (WebSocket). Subscribe <code>#</code> →
+             6 møller <code>windmills/{id}/status</code> = <code>{ID,Speed,Running,Power}</code>. Dashboard-JS åbner
+             <code>ws://host/ws</code> og modtager <code>{..,HaaukinsPower,Flag}</code> — Flag sættes når HaaukinsPower
+             rammer target.</p>
+<h2>Spoof med retained messages</h2>
+<p>Møllerne reagerer ikke pålideligt på <code>/cmd</code>, men du kan <strong>spoofe status-topics
+             direkte</strong>. KRITISK: publicér med <code>-r</code> (retained), ellers bliver aflæsningen stale/0.
+             Kalibrér HP ved at sætte samme Power på alle og aflæse via WebSocket → lineær
+             <code>HP% = total × (20/9) − 100</code>.</p>
+<h2>Ram target HP=100%</h2>
+<pre><code># total=90 -> 15 Power pr. mølle:
+for m in cph tyboron esbjerg sprogo samso anholt; do
+  mosquitto_pub -r -t windmills/$m/status -m '{"ID":"'$m'","Speed":50,"Running":true,"Power":15}'
+done</code></pre>
+             <p>WebSocket viser <code>HaaukinsPower:100%</code> + flaget.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{ZO-ss-kFDXXF}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>MQTT uden auth: subscribe <code>#</code> og spoof status-topics; brug <strong>retained</strong> (<code>-r</code>) ellers sticker værdien ikke.</li><li>Win er et PRÆCIST target (HP=100%), ikke maksimal effekt — overpower gav intet flag.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

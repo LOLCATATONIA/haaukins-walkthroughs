@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hackable App part 2 — tutorial (blind boolean SQLi)</title>
+<meta name="description" content="Guide til Haaukins Hackable App part 2: &#x27;blind guesses&#x27; = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Hackable App part 2 — tutorial (blind boolean SQLi)">
+<meta property="og:description" content="Guide til Haaukins Hackable App part 2: &#x27;blind guesses&#x27; = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hackable App part 2", "description": "Guide til Haaukins Hackable App part 2: 'blind guesses' = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hackable App part 2</h1>
+<p class="subtitle">"Blind guesses" = blind boolean SQL injection med et Good/Bad-orakel.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En notes-app (<code>hackable2.hkn</code>) med <code>/guessnotes</code> ("guess a private note of a
+             given user", felter <code>user_name</code>+<code>note</code>, svar "Good Guess"/"Bad Guess"). "Blind
+             guesses" = blind boolean SQLi (SQLite).</p>
+<h2>Exploit</h2>
+<p>Query'en er ca. <code>... WHERE user_name='&lt;user&gt;' AND note='&lt;note&gt;'</code>. Injicér i
+             <code>note</code> med et <strong>eksisterende</strong> user_name (ellers kortslutter logikken):</p>
+             <pre><code>user_name=&lt;rigtig-bruger&gt;  note=zzz' OR (&lt;condition&gt;) --    # "Good Guess" hvis sand</code></pre>
+             <p>Lokalisér flaget og ekstrahér det tegn-for-tegn (binær søgning, ~7 req/tegn):</p>
+             <pre><code>SUB="(SELECT note FROM notes WHERE note LIKE '%HKN{%' LIMIT 1)"
+# length(SUB)>mid ; unicode(substr(SUB,i,1))>mid  -> rekonstruér flaget</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{p4ran0ia_mak3s_y0u_go0d_a7_gue5s1ng_g4me5}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Blind boolean SQLi: et binært orakel (Good/Bad) + <code>substr/unicode/length</code> → fuld ekstraktion.</li><li>Fælde: injektionsfeltet når kun query'en hvis det ANDET felt (user_name) matcher en rigtig bruger.</li><li>Jf. UNION-varianten i <a href="sneaky-reviews.html">Sneaky Reviews</a> — her er output blindt.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

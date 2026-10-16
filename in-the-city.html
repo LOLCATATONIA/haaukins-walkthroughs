@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: In the City — tutorial (pcap → billede → zip-password)</title>
+<meta name="description" content="Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: In the City — tutorial (pcap → billede → zip-password)">
+<meta property="og:description" content="Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "In the City", "description": "Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>In the City</h1>
+<p class="subtitle">"Look closely" var bogstaveligt — zip-passwordet er malet ind i et billede.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>tshark -r trace.pcap --export-objects http,out    # 5 JPG'er + secret.zip (ZipCrypto)
+# "look closely" = kig VISUELT på billederne; passwordet står på hyperreality_wormhole.jpg
+unzip -P SALAMISLICE secret.zip     # -> secret.txt = flaget</code></pre>
+             <p><strong>Fælde:</strong> pcap'en har også en iøjnefaldende 1-byte "I/M" covert-kanal — det er en
+             <em>afledning</em>; den koder ikke passwordet. Se på billederne FØR du dykker i pakke-niveau.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Zip-password <code>SALAMISLICE</code> → flag <span class="flag">HKN{4n-0p3n-d00r}</span>.</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>--export-objects http</code> henter exfiltrerede filer ud af en pcap.</li><li>Ved 'file transmissions' + 'look closely': åbn og SE de ekstraherede billeder (zoom svag/overlejret tekst) før dyb pakke-analyse.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

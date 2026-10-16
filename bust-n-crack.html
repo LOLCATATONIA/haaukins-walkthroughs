@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Haaukins: Bust-N-Crack — tutorial (Bust &amp; Crack)</title>
 <meta name="description" content="Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Bust-N-Crack — tutorial (Bust &amp; Crack)">
+<meta property="og:description" content="Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Bust-N-Crack", "description": "Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,7 +19,7 @@
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Bust-N-Crack</h1>
 <p class="subtitle">Directory listing → en krypteret nøgle → ssh2john → pivot ind.</p>
-<div class="badges"><span class="badge cat">Web / Cracking</span><span class="badge">Haaukins CTF</span></div>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Bust — directory listing</h2>

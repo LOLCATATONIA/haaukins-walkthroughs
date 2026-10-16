@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Water to the people — tutorial (Modbus vandnet)</title>
+<meta name="description" content="Guide til Haaukins Water to the people: kortlæg et Modbus-styret vandnet, åbn de rigtige ventiler (coils) og sæt pumperne &gt;200 uden at lede vand i kloakken; flaget pushes via socket.io.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/water-to-the-people.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Water to the people — tutorial (Modbus vandnet)">
+<meta property="og:description" content="Guide til Haaukins Water to the people: kortlæg et Modbus-styret vandnet, åbn de rigtige ventiler (coils) og sæt pumperne &gt;200 uden at lede vand i kloakken; flaget pushes via socket.io.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/water-to-the-people.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Water to the people", "description": "Guide til Haaukins Water to the people: kortlæg et Modbus-styret vandnet, åbn de rigtige ventiler (coils) og sæt pumperne >200 uden at lede vand i kloakken; flaget pushes via socket.io.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/water-to-the-people.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Water to the people</h1>
+<p class="subtitle">Styr et Modbus-vandnet: åbn de rigtige ventiler + pumper >200, undgå kloakkerne.</p>
+<div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Recon &amp; logik</h2>
+<p>"Modifying <strong>the bus</strong>" = Modbus. <code>water-city.hkn</code>: web (80) + Modbus (502).
+             Frontend-JS afslører: <code>{registers:[pump1,pump2], coils:[10 junctions]}</code>; begge pumper &gt;200 +
+             vand til alle huse (uden kloak) → socket.io <code>win</code> med flaget. "lose" (vand i kloak) er
+             recoverable → sikkert at eksperimentere.</p>
+<h2>Kritisk: adresse-offset (empirisk)</h2>
+<p>Map addr→enhed ved at skrive én ad gangen og aflæse displayet: <code>addr 0</code> og <code>11</code>
+             er ubrugte; junction <code>Jn</code> = coil <code>n</code>; pumperne = holding-register 1 og 2.</p>
+<h2>Vind-konfiguration</h2>
+<pre><code># åbn stien til alle 3 huse, hold kloak-junctions (J3,J7,J10) LUKKET:
+for a in 1 2 4 5 6 8 9: write_coil(a, True)      # FC5
+write_reg(1,250); write_reg(2,250)               # FC6, begge pumper >200
+# lyt med en socket.io(v4)-klient -> 'win' med data.flag</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{1_l0v3_4_c0ld_6l455_0f_w473r}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Modbus-adresser er tit forskudt — map addr→coil/register empirisk ved at skrive og aflæse.</li><li>Flaget kommer via socket.io <code>win</code>-eventet — lyt med en klient mens du skriver Modbus.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

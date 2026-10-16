@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Git logs — tutorial (secrets i git-historik)</title>
+<meta name="description" content="Guide til Haaukins Git logs: SSH ind og find et password der blev &#x27;fjernet&#x27; i et commit, men stadig ligger i git-historikken.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/git-logs.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Git logs — tutorial (secrets i git-historik)">
+<meta property="og:description" content="Guide til Haaukins Git logs: SSH ind og find et password der blev &#x27;fjernet&#x27; i et commit, men stadig ligger i git-historikken.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/git-logs.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Git logs", "description": "Guide til Haaukins Git logs: SSH ind og find et password der blev 'fjernet' i et commit, men stadig ligger i git-historikken.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/git-logs.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Git logs</h1>
+<p class="subtitle">En 'fjernet' hemmelighed ligger stadig i commit-historikken.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>sshpass -p haaukins ssh -o StrictHostKeyChecking=no user@&lt;ip&gt;
+git -C ~/project log --oneline        # commit "Removed password from main.go" peger på stedet
+git -C ~/project log -p --all | grep -aoE '(HKN|DDC)\{[^}]*\}'</code></pre>
+             <p>Samme kerneidé som <a href="iac-privatekey.html">IaC privatekey</a>: en slettet hemmelighed er stadig
+             i historikken. Commit-beskeder ("Removed password…") peger direkte på de interessante commits.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{A3-nl-woElDW}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><code>git log -p --all</code> viser alle diffs i hele historikken (alle branches).</li><li>Commit-beskeder lækker hvor hemmeligheder blev 'fjernet'; <code>gitleaks</code>/<code>trufflehog</code> automatiserer.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

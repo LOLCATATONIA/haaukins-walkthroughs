@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: RansomGang Returns — tutorial (UPX + PRNG-prædiktion)</title>
+<meta name="description" content="Guide til Haaukins RansomGang Returns: &#x27;no section header&#x27; var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: RansomGang Returns — tutorial (UPX + PRNG-prædiktion)">
+<meta property="og:description" content="Guide til Haaukins RansomGang Returns: &#x27;no section header&#x27; var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "RansomGang Returns", "description": "Guide til Haaukins RansomGang Returns: 'no section header' var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>RansomGang Returns</h1>
+<p class="subtitle">"No section header" = UPX-packing; login-koden kommer fra et seed serveren selv lækker.</p>
+<div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>&#x27;The new trick&#x27; = UPX, ikke rigtig stripping</h2>
+<p>Binæren ser statisk linket + uden section headers ud (ligner stripping). Men:</p>
+             <pre><code>grep -a UPX ransomgangreturns      # -> "UPX 3.96"-signatur
+upx -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-info</code></pre>
+             <p>Tjek altid for en packer-signatur før manuel symbol-fri RE.</p>
+<h2>Login-logikken (statisk på den udpakkede binær)</h2>
+<p>En tråd beregner login-koden ud fra boot-epoch'en — som <strong>printes direkte i banneret</strong>:</p>
+             <pre><code>srandom(epoch); r1=rand(); r2=rand();
+kode = epoch - (r1 % 10000) + (r2 % 10000);</code></pre>
+             <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk
+             med en glibc-<code>random()</code>-reimplementering (byte-verificeret mod ægte libc). Send koden → match →
+             <code>system("/bin/sh")</code> på <code>nc …:1338</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{F0RBRYDELSE_B3TALER_S1G_1KK3}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>'No section header'/'statically linked' kan være UPX — <code>grep -a UPX</code> er et sekunds tjek.</li><li>Et tids-seedet PRNG der printer sit eget seed er ikke en hemmelighed — genskab sekvensen.</li><li>Daemon-tråde dør med hovedtråden; join en output-drain-tråd eksplicit når du henter flaget over socket.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

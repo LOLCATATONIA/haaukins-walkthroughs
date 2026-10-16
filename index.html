@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Haaukins CTF — tutorials & guides</title>
 <meta name="description" content="Pædagogiske trin-for-trin tutorials til Haaukins CTF-opgaver (AAU/DCIS). Søg dit lab-navn og hop direkte til guiden: forensics, web exploitation, reverse engineering, pwn, boot2root, netværk og IoT.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Haaukins CTF — tutorials & guides">
+<meta property="og:description" content="Søg dit Haaukins-lab-navn og hop direkte til en pædagogisk trin-for-trin guide.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/">
+<meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -13,9 +19,10 @@
 <p class="subtitle">Pædagogiske, selvbærende guides til Haaukins-opgaver. Find dit lab og hop direkte til guiden.</p>
 <div class="callout">🎓 <strong>Til dig der sidder fast lige nu:</strong> prøv selv først! Guiderne forklarer
 metoden; det konkrete flag ligger i en spoiler du selv åbner. Mange Haaukins-flag er per-instans — det er
-fremgangsmåden der genbruges. (Autoriseret trænings-/CTF-kontekst.)</div>
+fremgangsmåden der genbruges.</div>
 
 <input class="search" id="q" type="search" placeholder="🔎 Søg efter lab-navn, kategori eller teknik …" autocomplete="off">
+<div class="chips"><span class="chip" onclick="q.value='';q.dispatchEvent(new Event('input'))">Alle</span><span class="chip" onclick="q.value='Forensics';q.dispatchEvent(new Event('input'))">Forensics</span><span class="chip" onclick="q.value='Crypto';q.dispatchEvent(new Event('input'))">Crypto</span><span class="chip" onclick="q.value='Web exploitation';q.dispatchEvent(new Event('input'))">Web exploitation</span><span class="chip" onclick="q.value='Starters';q.dispatchEvent(new Event('input'))">Starters</span><span class="chip" onclick="q.value='Operational Technologies';q.dispatchEvent(new Event('input'))">Operational Technologies</span><span class="chip" onclick="q.value='Reverse Engineering';q.dispatchEvent(new Event('input'))">Reverse Engineering</span><span class="chip" onclick="q.value='Pwn';q.dispatchEvent(new Event('input'))">Pwn</span><span class="chip" onclick="q.value='Boot2Root';q.dispatchEvent(new Event('input'))">Boot2Root</span><span class="chip" onclick="q.value='Network / Recon';q.dispatchEvent(new Event('input'))">Network / Recon</span></div>
 
 <table id="labs">
 <thead><tr><th>Haaukins-opgave</th><th>Kategori</th><th>Teknik</th></tr></thead>
@@ -26,7 +33,7 @@ fremgangsmåden der genbruges. (Autoriseret trænings-/CTF-kontekst.)</div>
 <tr><td><a href="unhealthy-ftp.html">The unhealthy FTP</a></td><td>Forensics</td><td>FTP-sniffing, binwalk, file carving, zip-cracking</td></tr>
 <tr><td><a href="health-level-stalker.html">Health Level Stalker</a></td><td>Forensics</td><td>HL7/MLLP, MITM, protokol-analyse</td></tr>
 <tr><td><a href="http-everywhere.html">HTTP Everywhere</a></td><td>Forensics</td><td>pcap, TLS-dekryptering, RSA key exchange</td></tr>
-<tr><td><a href="bad-librarian.html">Bad librarian</a></td><td>Network forensics</td><td>pcap, SSLKEYLOGFILE, TLS-dekryptering</td></tr>
+<tr><td><a href="bad-librarian.html">Bad librarian</a></td><td>Forensics</td><td>pcap, SSLKEYLOGFILE, TLS-dekryptering</td></tr>
 <tr><td><a href="recovering-files.html">Recovering Files</a></td><td>Forensics</td><td>Sleuth Kit, slettede filer, mmls/fls/icat</td></tr>
 <tr><td><a href="friendly-image.html">Friendly Image</a></td><td>Forensics</td><td>EWF/E01, ewfmount, slettede filer, flag-fragmenter</td></tr>
 <tr><td><a href="the-ransomware-image.html">The Ransomware Image</a></td><td>Forensics</td><td>EWF/E01, slettede filer, flag-format</td></tr>
@@ -39,30 +46,30 @@ fremgangsmåden der genbruges. (Autoriseret trænings-/CTF-kontekst.)</div>
 <tr><td><a href="covert-channels-dns.html">Covert Channels: DNS</a></td><td>Forensics</td><td>DNS-exfiltrering, tshark, hex</td></tr>
 <tr><td><a href="covert-channels-http.html">Covert Channels: HTTP</a></td><td>Forensics</td><td>HTTP-header-casing, RFC 2616, bit-packing</td></tr>
 <tr><td><a href="covert-channels-tcp.html">Covert Channels: TCP</a></td><td>Forensics</td><td>TCP reserved bits, tshark, bit-packing</td></tr>
-<tr><td><a href="introduction.html">Introduction</a></td><td>Forensics (OSINT)</td><td>bevis-bundt, orientering</td></tr>
-<tr><td><a href="public-wifi.html">Public WiFi</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
-<tr><td><a href="spot-the-host.html">Spot the Host</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
-<tr><td><a href="whos-in-charge.html">Who&#x27;s in Charge?</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
-<tr><td><a href="name-and-shame.html">Name and Shame</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
-<tr><td><a href="caught-in-the-net.html">Caught in the Net</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
-<tr><td><a href="crypto-wallet.html">Crypto Wallet</a></td><td>Forensics (OSINT)</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="introduction.html">Introduction</a></td><td>Forensics</td><td>bevis-bundt, orientering</td></tr>
+<tr><td><a href="public-wifi.html">Public WiFi</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="spot-the-host.html">Spot the Host</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="whos-in-charge.html">Who&#x27;s in Charge?</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="name-and-shame.html">Name and Shame</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="caught-in-the-net.html">Caught in the Net</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
+<tr><td><a href="crypto-wallet.html">Crypto Wallet</a></td><td>Forensics</td><td>log-analyse, korrelation, flag-format</td></tr>
 <tr><td><a href="based-passwords.html">Based Passwords (PW1)</a></td><td>Forensics</td><td>base64</td></tr>
-<tr><td><a href="base54-bavl.html">Base54-Bavl?</a></td><td>Cryptography</td><td>base64 i kolonner, binær-i-ASCII-art</td></tr>
+<tr><td><a href="base54-bavl.html">Base54-Bavl?</a></td><td>Crypto</td><td>base64 i kolonner, binær-i-ASCII-art</td></tr>
 <tr><td><a href="dots-and-dashes.html">Dots and Dashes</a></td><td>Forensics</td><td>morse, lyd-analyse</td></tr>
-<tr><td><a href="the-ddc-papers.html">The DDC Papers</a></td><td>Cryptography</td><td>whitespace-stego, AES-128, nøgle-i-bilag</td></tr>
+<tr><td><a href="the-ddc-papers.html">The DDC Papers</a></td><td>Crypto</td><td>whitespace-stego, AES-128, nøgle-i-bilag</td></tr>
 <tr><td><a href="spaghetti-hex.html">Spaghetti Hex (-0 til -4)</a></td><td>Forensics</td><td>EXIF, Baconian cipher, WinZip-AES, flag-format</td></tr>
 <tr><td><a href="is-hashing-illegal-pw2.html">Is Hashing Illegal? (PW2)</a></td><td>Forensics</td><td>MD5, dictionary-attack, rockyou</td></tr>
 <tr><td><a href="ad-security-pw3.html">AD Security is Great (PW3)</a></td><td>Forensics</td><td>NTLM, MD4, UTF-16LE, dictionary-attack</td></tr>
-<tr><td><a href="hasher-2.html">Hasher 2</a></td><td>Cryptography</td><td>MD5, ordbogs-attack (ikke password-liste)</td></tr>
-<tr><td><a href="hasher-3.html">Hasher 3</a></td><td>Cryptography</td><td>SHA-256, salt, pun-læsning</td></tr>
-<tr><td><a href="hashle.html">Hashle</a></td><td>Cryptography</td><td>MD5, Wordle-orakel, filtrering af rockyou</td></tr>
-<tr><td><a href="bust-n-crack.html">Bust-N-Crack</a></td><td>Web / Cracking</td><td>directory listing, ssh2john, krypteret PEM-nøgle</td></tr>
+<tr><td><a href="hasher-2.html">Hasher 2</a></td><td>Crypto</td><td>MD5, ordbogs-attack (ikke password-liste)</td></tr>
+<tr><td><a href="hasher-3.html">Hasher 3</a></td><td>Crypto</td><td>SHA-256, salt, pun-læsning</td></tr>
+<tr><td><a href="hashle.html">Hashle</a></td><td>Crypto</td><td>MD5, Wordle-orakel, filtrering af rockyou</td></tr>
+<tr><td><a href="bust-n-crack.html">Bust-N-Crack</a></td><td>Web exploitation</td><td>directory listing, ssh2john, krypteret PEM-nøgle</td></tr>
 <tr><td><a href="virtual-can-logs.html">Virtual CAN Logs</a></td><td>Forensics</td><td>CAN-bus, strings, tshark, fragment-samling</td></tr>
 <tr><td><a href="flag-in-tree.html">Flag in Tree</a></td><td>Starters</td><td>recursive grep, regex, decoy-filtrering</td></tr>
 <tr><td><a href="micro-cms.html">Micro CMS (Robots / URL / XSS)</a></td><td>Web exploitation</td><td>robots.txt, broken access control (IDOR), stored XSS</td></tr>
 <tr><td><a href="sneaky-reviews.html">Sneaky Reviews</a></td><td>Web exploitation</td><td>SQL injection, UNION SELECT, schema-dump</td></tr>
 <tr><td><a href="comment-all-you-want.html">comment-all-you-want</a></td><td>Web exploitation</td><td>SSTI, Jinja2, RCE</td></tr>
-<tr><td><a href="fartcorp.html">FartCorp (More Power / Give us the Gas)</a></td><td>Web / OT</td><td>JWT-forgery, secret-læk, Modbus/TCP</td></tr>
+<tr><td><a href="fartcorp.html">FartCorp (More Power / Give us the Gas)</a></td><td>Operational Technologies</td><td>JWT-forgery, secret-læk, Modbus/TCP</td></tr>
 <tr><td><a href="heartbleed.html">Heartbleed</a></td><td>Web exploitation</td><td>CVE-2014-0160, TLS heartbeat, memory leak</td></tr>
 <tr><td><a href="secure-shellshock.html">Secure Shellshock</a></td><td>Web exploitation</td><td>CVE-2014-6271, legacy SSH, ForceCommand-bypass</td></tr>
 <tr><td><a href="jwt.html">JWT</a></td><td>Web exploitation</td><td>JWT HS256, secret-cracking, forgery</td></tr>
@@ -72,24 +79,38 @@ fremgangsmåden der genbruges. (Autoriseret trænings-/CTF-kontekst.)</div>
 <tr><td><a href="exposed-logging.html">Exposed Logging Login Blogging</a></td><td>Web exploitation</td><td>robots.txt, eksponeret log, MD5-crack</td></tr>
 <tr><td><a href="ninja-sstimulation.html">Ninja SSTImulation</a></td><td>Web exploitation</td><td>SSTI, Jinja2, request-globals RCE</td></tr>
 <tr><td><a href="sql-injection.html">SQL injection (+ Web server login)</a></td><td>Web exploitation</td><td>second-order SQLi, dobbelt-citationstegn, || konkatenering</td></tr>
+<tr><td><a href="web-exploitation-ladder.html">Web Exploitation-stigen (cybertraining)</a></td><td>Web exploitation</td><td>recon, source, robots, metadata, cookies, SQLi, traversal, brute, crypto, IDOR</td></tr>
 <tr><td><a href="see-my-strings.html">See my strings</a></td><td>Reverse Engineering</td><td>strings, ELF, flag i .rodata</td></tr>
 <tr><td><a href="pwn-strings.html">PWN Strings</a></td><td>Reverse Engineering</td><td>strings, offline-udledning</td></tr>
 <tr><td><a href="pwn-strings-gdb.html">PWN Strings GDB</a></td><td>Reverse Engineering</td><td>radare2, statisk analyse, strcat-kæde</td></tr>
 <tr><td><a href="the-game.html">The Game</a></td><td>Reverse Engineering</td><td>statisk RE, hardcodede værdier, kontrolflow-fælde</td></tr>
 <tr><td><a href="ransomgang.html">RansomGang</a></td><td>Reverse Engineering</td><td>crackme, betingelses-løsning, XOR-nøgle</td></tr>
-<tr><td><a href="intmonster.html">Intmonster</a></td><td>Misc / Pwn</td><td>integer/char-overflow, kildekode-læsning, logik-bug</td></tr>
-<tr><td><a href="ice-cream-overflow.html">Ice Cream Overflow</a></td><td>Binary / Pwn</td><td>gets(), struct-adjacency overflow, SUID-root</td></tr>
-<tr><td><a href="segfault.html">sindssyg super sikker sigsev segfault</a></td><td>Binary / Pwn</td><td>off-by-one, fencepost, sentinel-overwrite</td></tr>
+<tr><td><a href="intmonster.html">Intmonster</a></td><td>Pwn</td><td>integer/char-overflow, kildekode-læsning, logik-bug</td></tr>
+<tr><td><a href="ice-cream-overflow.html">Ice Cream Overflow</a></td><td>Pwn</td><td>gets(), struct-adjacency overflow, SUID-root</td></tr>
+<tr><td><a href="segfault.html">sindssyg super sikker sigsev segfault</a></td><td>Pwn</td><td>off-by-one, fencepost, sentinel-overwrite</td></tr>
+<tr><td><a href="browserauth.html">BrowserAuth</a></td><td>Web exploitation</td><td>pcap-analyse, HTTP-headers, User-Agent som token</td></tr>
+<tr><td><a href="tonic-counter.html">Tonic counter</a></td><td>Web exploitation</td><td>skjult HTTP-metode, REST, IDOR</td></tr>
+<tr><td><a href="rocking-ssh.html">Rocking SSH</a></td><td>Forensics</td><td>SSH brute force, hydra, rockyou</td></tr>
+<tr><td><a href="the-event.html">The Event</a></td><td>Forensics</td><td>subnet-scan, content-discovery, eksponeret datastore</td></tr>
 <tr><td><a href="campfire-stories.html">Campfire Stories</a></td><td>Boot2Root</td><td>LLM prompt-injection, robots.txt, FTP</td></tr>
 <tr><td><a href="escalator.html">Escalator</a></td><td>Boot2Root</td><td>FTP-anon, SUID nano, GTFObins, privesc</td></tr>
 <tr><td><a href="elevator.html">Elevator</a></td><td>Boot2Root</td><td>FTP-anon, custom SUID-shell, privesc</td></tr>
 <tr><td><a href="shadow.html">Shadow</a></td><td>Boot2Root</td><td>world-readable /etc/shadow, sha512crypt, john</td></tr>
 <tr><td><a href="cron-my-tab.html">Cron My Tab</a></td><td>Boot2Root</td><td>group-writable root-cron-script, privesc</td></tr>
-<tr><td><a href="network-scanning.html">Network Scanning</a></td><td>Forensics / Network</td><td>nmap, host-discovery, recon-pipeline</td></tr>
-<tr><td><a href="flag-transfer-protocol.html">Flag Transfer Protocol</a></td><td>Network</td><td>FTP, hydra, credential brute</td></tr>
-<tr><td><a href="its-samba-time.html">It&#x27;s Samba time!</a></td><td>Web / Network</td><td>Samba, CVE-2007-2447, impacket, exfil via åben kanal</td></tr>
-<tr><td><a href="mqtt-defaults.html">Why are people still using defaults? (MQTT)</a></td><td>IoT / MQTT</td><td>MQTT, default credentials, wildcard-subscribe</td></tr>
-<tr><td><a href="iac-privatekey.html">IaC privatekey (in history)</a></td><td>Forensics / IaC</td><td>git-forensics, ssh2john, legacy RSA, decoy</td></tr>
+<tr><td><a href="network-scanning.html">Network Scanning</a></td><td>Forensics</td><td>nmap, host-discovery, recon-pipeline</td></tr>
+<tr><td><a href="flag-transfer-protocol.html">Flag Transfer Protocol</a></td><td>Network / Recon</td><td>FTP, hydra, credential brute</td></tr>
+<tr><td><a href="its-samba-time.html">It&#x27;s Samba time!</a></td><td>Web exploitation</td><td>Samba, CVE-2007-2447, impacket, exfil via åben kanal</td></tr>
+<tr><td><a href="mqtt-defaults.html">Why are people still using defaults? (MQTT)</a></td><td>Operational Technologies</td><td>MQTT, default credentials, wildcard-subscribe</td></tr>
+<tr><td><a href="iac-privatekey.html">IaC privatekey (in history)</a></td><td>Forensics</td><td>git-forensics, ssh2john, legacy RSA, decoy</td></tr>
+<tr><td><a href="ransomgang-returns.html">RansomGang Returns</a></td><td>Reverse Engineering</td><td>UPX-unpacking, time-seeded PRNG, glibc random reimpl</td></tr>
+<tr><td><a href="red-light-green-light.html">Red light, green light</a></td><td>Reverse Engineering</td><td>timing-gate, srand(time), PRNG-prædiktion, send-kadence</td></tr>
+<tr><td><a href="git-logs.html">Git logs</a></td><td>Forensics</td><td>git-historik, slettede secrets, SSH</td></tr>
+<tr><td><a href="hack-swag-shop.html">Hack Swag Shop</a></td><td>Boot2Root</td><td>NoSQL auth-bypass, blind $regex, SUID date, GTFObins</td></tr>
+<tr><td><a href="in-the-city.html">In the City</a></td><td>Forensics</td><td>pcap, export HTTP objects, se-på-billedet, ZipCrypto</td></tr>
+<tr><td><a href="powering-haaukins.html">Powering HAAUKINS</a></td><td>Operational Technologies</td><td>MQTT, retained messages, WebSocket-dashboard, SCADA</td></tr>
+<tr><td><a href="water-to-the-people.html">Water to the people</a></td><td>Operational Technologies</td><td>Modbus/TCP, coils &amp; holding-registers, socket.io, adresse-offset</td></tr>
+<tr><td><a href="hackable-app-part2.html">Hackable App part 2</a></td><td>Web exploitation</td><td>blind boolean SQL injection, orakel, binær ekstraktion</td></tr>
+<tr><td><a href="johannes-riveren.html">Johannes Riveren</a></td><td>Forensics</td><td>password-beskyttet zip, zip2john, john, rockyou</td></tr>
 </tbody>
 </table>
 <p id="noresult" style="display:none;color:var(--muted)">Ingen opgaver matcher — prøv et andet søgeord.</p>

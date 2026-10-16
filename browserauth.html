@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: BrowserAuth — tutorial (User-Agent auth-bypass)</title>
+<meta name="description" content="Guide til Haaukins BrowserAuth: en pcap afslører at den &#x27;passwordless&#x27; auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: BrowserAuth — tutorial (User-Agent auth-bypass)">
+<meta property="og:description" content="Guide til Haaukins BrowserAuth: en pcap afslører at den &#x27;passwordless&#x27; auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "BrowserAuth", "description": "Guide til Haaukins BrowserAuth: en pcap afslører at den 'passwordless' auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>BrowserAuth</h1>
+<p class="subtitle">"Passwordless" auth der blot tjekker en statisk User-Agent-header.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En "passwordless" auth på <code>browserauth.hkn</code> + en udleveret <code>capture.pcap</code>.
+             Hintet: "what is http headers and what is a user agent?"</p>
+<h2>Trin for trin</h2>
+<pre><code>tshark -r capture.pcap -Y http.request -O http
+#  GET /secrets/YWdlbnRfMDA3/flag
+#  User-Agent: BrowserAuth/9472.2843.8275.1753   <- fungerer som token
+#  YWdlbnRfMDA3 = base64("agent_007") = bruger-id</code></pre>
+             <p>Replikér mod hosten med samme User-Agent:</p>
+             <pre><code>curl -H "User-Agent: BrowserAuth/9472.2843.8275.1753" http://&lt;ip&gt;/secrets/YWdlbnRfMDA3/flag</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>"Access granted. Welcome back Alice …" → <span class="flag">HKN{…}</span> (per-instans).</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En auth der kun tjekker en statisk header-streng er triviel at forfalske — headeren lækkes i al trafik.</li><li>Analysér pcap'en: <code>tshark -Y http.request -O http</code> viser hele requesten inkl. headers.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

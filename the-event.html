@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: The Event — tutorial (eksponeret gæstebogs-datastore)</title>
+<meta name="description" content="Guide til Haaukins The Event: find en gæstebogs rå datafil via content-discovery; flaget er en skjult post i den.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/the-event.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: The Event — tutorial (eksponeret gæstebogs-datastore)">
+<meta property="og:description" content="Guide til Haaukins The Event: find en gæstebogs rå datafil via content-discovery; flaget er en skjult post i den.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/the-event.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "The Event", "description": "Guide til Haaukins The Event: find en gæstebogs rå datafil via content-discovery; flaget er en skjult post i den.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/the-event.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>The Event</h1>
+<p class="subtitle">Flaget er en skjult gæstebogspost i en web-læsbar datafil.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>nmap &lt;subnet&gt;.0/24 -p 80,8080 --open     # :8080 "This is a Trap" = decoy; :80 = The Event
+gobuster dir -u http://&lt;host&gt;/ -w common.txt -x php,txt,bak
+#  finder /guestbook/data/data.txt (Yellabook's rå datastore)
+curl http://&lt;host&gt;/guestbook/data/data.txt</code></pre>
+             <p>Datafilen rummer en skjult post (id 1, fra "god"/"Heaven") med flaget i farvet/"usynlig" tekst:</p>
+             <pre><code>1#|#god#|#Heaven#|#&lt;p style="color:#1DB700"&gt;HKN{...}&lt;/p&gt;#|#...</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{w3Lc0me_7o_th3_ev3nT_tH1s_i5_y0uR_iNv1t3_4nD_Fl4g}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>CMS'er/gæstebøger gemmer ofte data i en web-læsbar flatfil — <code>gobuster -x txt,bak,php</code> finder dem.</li><li>Læs den RÅ datafil (skjult/farvet tekst) — ikke kun den renderede side. Ignorér decoy-sider (:8080-'Trap').</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

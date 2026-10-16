@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Haaukins: IaC privatekey in history — tutorial (git-secrets)</title>
 <meta name="description" content="Guide til Haaukins IaC privatekey: hent en &#x27;slettet&#x27; krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: IaC privatekey in history — tutorial (git-secrets)">
+<meta property="og:description" content="Guide til Haaukins IaC privatekey: hent en &#x27;slettet&#x27; krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "IaC privatekey (in history)", "description": "Guide til Haaukins IaC privatekey: hent en 'slettet' krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,7 +19,7 @@
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>IaC privatekey (in history)</h1>
 <p class="subtitle">Hent en 'slettet' nøgle ud af git-historikken og knæk den.</p>
-<div class="badges"><span class="badge cat">Forensics / IaC</span><span class="badge">Haaukins CTF</span></div>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Trin for trin</h2>

