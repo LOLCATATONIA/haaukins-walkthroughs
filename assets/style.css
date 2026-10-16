@@ -96,5 +96,11 @@ th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--bor
 th { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
 tr:hover td { background: var(--card); }
 
+/* screenshots / billed-assets */
+figure.shot { margin: 16px 0; }
+figure.shot img { max-width: 100%; height: auto; display: block;
+  border: 1px solid var(--border); border-radius: 10px; }
+figure.shot figcaption { color: var(--muted); font-size: 13.5px; margin-top: 6px; }
+
 footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--border);
   color: var(--muted); font-size: 13.5px; }

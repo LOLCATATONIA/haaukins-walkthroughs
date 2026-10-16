@@ -34,6 +34,10 @@ icat -i ewf -f ntfs payload.E01 43 > logo.bmp   # åbn -> pirat-logo med teksten
 <p><strong>Format-fælde:</strong> kun <code>DDC{cyber_pirates}</code> virkede — <code>HKN{...}</code>,
         uppercase og andre varianter blev alle afvist.</p>
         <p>Flag: <span class="flag">DDC{cyber_pirates}</span></p>
+        <figure class="shot">
+        <img src="assets/the-ransomware-image-flag.jpg" alt="Det carvede logo.bmp: et grønt pirat-logo (dødningehoved) med teksten CYBER_PIRATES.">
+        <figcaption>Den genskabte, slettede <code>logo.bmp</code>: firmanavnet <code>CYBER_PIRATES</code> ER flaget (afleveres lowercase som <code>DDC{cyber_pirates}</code>).</figcaption>
+        </figure>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>-i ewf -f ntfs</code> til fls/icat på et E01-NTFS-image.</li><li>Flaget kan være simpelt synligt indhold (firmanavn på et logo), ikke stego.</li><li>Når det oplagte flag afvises: variér systematisk præfiks (HKN/DDC) OG casing.</li></ul>
