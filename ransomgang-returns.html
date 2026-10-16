@@ -31,9 +31,13 @@ upx -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-in
 <p>En tråd beregner login-koden ud fra boot-epoch'en — som <strong>printes direkte i banneret</strong>:</p>
              <pre><code>srandom(epoch); r1=rand(); r2=rand();
 kode = epoch - (r1 % 10000) + (r2 % 10000);</code></pre>
-             <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk
-             med en glibc-<code>random()</code>-reimplementering (byte-verificeret mod ægte libc). Send koden → match →
-             <code>system("/bin/sh")</code> på <code>nc …:1338</code>.</p>
+             <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk.
+             <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc. Reimplementér
+             glibc's <code>random()</code> — en TYPE_3 additiv generator med 31-ords state-tabel, seedet som
+             <code>srandom</code> (<code>r[0]=seed</code>; <code>r[i] = 16807·r[i-1] mod (2³¹−1)</code>), output =
+             <code>(r[i-31] + r[i-3]) &gt;&gt; 1</code>, og smid de første 310 outputs væk. Verificér din reimpl byte-for-byte
+             mod ægte libc før du stoler på den. Send koden → match → <code>system("/bin/sh")</code> på
+             <code>nc …:1338</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{F0RBRYDELSE_B3TALER_S1G_1KK3}</span></p>
 </details>

@@ -35,6 +35,7 @@
 /search?s=x' UNION SELECT id,text,note,4,5 FROM reviews WHERE draft=1-- -</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget lå i <code>note</code>-kolonnen på en <code>draft=1</code>-review (skjult i UI'et).</p>
+        <p>Flag (afleveres som DDC): <span class="flag">DDC{1_c0uld_h4v3_dr0pp3d_3v3ryth1ng_but_1_4m_n1c3}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>'</code>→fejl = injection; <code>ORDER BY N</code> finder kolonne-antal; <code>UNION SELECT</code> finder synlige kolonner.</li><li><code>sqlite_master.sql</code> giver hele schemaet.</li><li>Kig efter skjulte felter/rækker (draft, note, is_admin).</li></ul>

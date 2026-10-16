@@ -31,11 +31,18 @@ curl -b "jwt=&lt;forged&gt;" http://fartcorp.hkn/   # flag + ny rute /gasgrid</c
 <p><code>/gasgrid</code> er read-only, men en portscan afslører <strong>port 502 (Modbus/TCP)</strong>.
              Valvene styres via Modbus holding-registre:</p>
              <pre><code>nmap -p- fartcorp.hkn                 # 80 + 502/mbap
-mbpoll -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs 5 valve-vinkler
-mbpoll -m tcp -a 1 -t 4 -r 1 fartcorp.hkn 0 330 275 275 275   # ram måltryk uden overtryk</code></pre>
+mbpoll -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs de 5 valve-vinkler (holding-regs r1..r5)</code></pre>
+             <p>Kortlæg modellen ved at skrive værdier og aflæse WebSocket-staten (<code>ws://host/ws</code>):
+             <strong>r1</strong> = afbrændings-station (luk = <code>0</code>), <strong>r2</strong> = outlet til verden
+             (åbn = <code>330</code>), og <strong>r3/r4/r5</strong> = tre gaskilder hvor
+             <code>worldPressure = r3+r4+r5</code>. Alle tre helt åbne (3×330 = 990) → <code>danger:true</code> = BOOM.
+             Kunderne betalte for <strong>825</strong>, så fordel det: 825 / 3 = <strong>275</strong> pr. kilde.</p>
+             <pre><code>mbpoll -m tcp -a 1 -t 4 -r 1 fartcorp.hkn 0 330 275 275 275   # r1=0 r2=330 r3=r4=r5=275 -> 825, danger=false</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Begge flag: #1 fra admin-siden efter JWT-forgery; #2 pushes via WebSocket når måltrykket rammes
-        uden danger.</p>
+<ul>
+        <li>More Power (JWT-forgery): <span class="flag">HKN{1v3_607_7h3_p0w3r}</span></li>
+        <li>Give us the Gas (Modbus, pushes via WebSocket ved måltryk uden danger): <span class="flag">HKN{f4r7_c0rp_c4n_60_p00p_7h3m53lv35}</span></li>
+        </ul>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>JWT: prøv <code>alg:none</code> først; ellers find/knæk secret'en og forfalsk claims.</li><li>Read-only dashboard + åben port 502 = OT/ICS-opgave; scan ALLE porte.</li><li>Modbus-recon med <code>mbpoll</code>; vindet krævede intermediate register-værdier (275).</li></ul>

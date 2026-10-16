@@ -29,7 +29,9 @@
 <h2>Exploit: forudsig timeren + styr send-kadencen</h2>
 <p><code>srand(time(NULL))</code> gør hver forsinkelse forudsigelig hvis du kender serverens klokke-sekund.
              Observér første grønne vindues længde → pin klokke-skew (±10s) med en glibc-<code>random()</code>-reimpl →
-             forudsig alle vinduer → <code>runFast</code> kun med sikker margin.</p>
+             forudsig alle vinduer → <code>runFast</code> kun med sikker margin. (glibc's <code>rand()</code> bruger
+             samme TYPE_3-generator som <code>random()</code>, så Pythons <code>random</code> matcher ikke — brug samme
+             reimpl som i <a href="ransomgang-returns.html">RansomGang Returns</a>.)</p>
              <p><strong>Kritisk fælde:</strong> skriv <em>langsommere</em> end serverens ~1Hz <code>fgets()</code>-forbrug
              (fx hver 1.2s). Flooder du, bygger der en FIFO-kø af gamle beslutninger → fasen desynkroniserer og du taber
              live (selvom du vinder lokalt uden netværks-latens).</p>

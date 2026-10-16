@@ -32,7 +32,8 @@ ssh -i key.enc -o PubkeyAcceptedKeyTypes=+ssh-rsa root@&lt;ip&gt; 'cat /root/fla
              <p>Decoy: en ukrypteret nøgle giver også root men et forkert flag. Titlen siger "<strong>protected</strong>"
              → det er den krypterede nøgle der har det rigtige.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Flaget ligger i <code>/root/flag.txt</code> på den droplet den krypterede nøgle hører til (per-instans).</p>
+<p>Flaget ligger i <code>/root/flag.txt</code> på den droplet den krypterede nøgle hører til.</p>
+        <p>Flag (per-instans): <span class="flag">HKN{1iV-Fek-cfzN}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>git rev-list --all --objects</code> + <code>git cat-file</code> henter 'slettede' hemmeligheder frem.</li><li>Passphrase-beskyttede nøgler → <code>ssh2john</code> + john; nyere OpenSSH kræver <code>+ssh-rsa</code>.</li><li>Læs titlen for at vælge den rigtige nøgle (decoy-fælde).</li></ul>

@@ -32,7 +32,8 @@
              <code>env</code>, <code>cat /path</code>. Stored SSTI kan 'brick'e en side ved en malformet payload — brug
              et frisk post, ét rent payload ad gangen. Flaget lå i en env-var, ikke en fil.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Flag: <span class="flag">HKN{...}</span> (per-instans; fundet via <code>env</code>).</p>
+<p>Flaget lå i en env-var (fundet via <code>env</code>), afleveret som DDC:</p>
+        <p>Flag: <span class="flag">DDC{c0mments_4r3_4_n4sty_th1ng}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>{{7*7}}</code>→49 = SSTI-fingeraftryk.</li><li>Jinja2-escape: <code>{{cycler.__init__.__globals__.os.popen('cmd').read()}}</code>.</li><li>Hold kommandoer brace-/quote-fri; flaget i Flask-apps er tit en env-var.</li></ul>
