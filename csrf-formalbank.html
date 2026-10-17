@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Cross-site Request Forgery — tutorial (klik-bot via chat-link)</title>
+<meta name="description" content="Guide til Haaukins Cross-site Request Forgery (Formal Bank): flaget købes med penge, transfer er CSRF-sårbar (GET, ingen token), og offeret er en KLIK-bot — post et transfer-link i trading-chatten som bot&#x27;en klikker.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/csrf-formalbank.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Cross-site Request Forgery — tutorial (klik-bot via chat-link)">
+<meta property="og:description" content="Guide til Haaukins Cross-site Request Forgery (Formal Bank): flaget købes med penge, transfer er CSRF-sårbar (GET, ingen token), og offeret er en KLIK-bot — post et transfer-link i trading-chatten som bot&#x27;en klikker.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/csrf-formalbank.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Cross-site Request Forgery (Formal Bank)", "description": "Guide til Haaukins Cross-site Request Forgery (Formal Bank): flaget købes med penge, transfer er CSRF-sårbar (GET, ingen token), og offeret er en KLIK-bot — post et transfer-link i trading-chatten som bot'en klikker.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/csrf-formalbank.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Cross-site Request Forgery (Formal Bank)</h1>
+<p class="subtitle">"The name says it all." Offeret KLIKKER links i chatten — post et CSRF-transfer-link, ikke et render-payload.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaven ud på?</h2>
+<p>En trading-bank (<code>formalbank.com</code>). Dashboardet har en <strong>"FLAG"-sektion med en
+             "Buy"-knap</strong> — flaget <em>købes</em> med penge (<code>GET /flag</code> giver flaget når
+             <code>balance ≥ pris</code>, ellers "not enough money"). Du starter med <strong>$0</strong>.</p>
+             <p>Overførsler sker via <code>GET /transfer?amount=X&amp;email=Y</code> — <strong>uden CSRF-token</strong>.
+             Der er ingen aktie-handel, så eneste penge-kilde er en <em>indgående</em> transfer. Klassisk CSRF.</p>
+<h2>Nøgle-indsigt: offeret KLIKKER (det renderer ikke)</h2>
+<p>Trading-chatten <strong>auto-linkificerer URL'er</strong> i beskeder til klikbare
+             <code>&lt;a href&gt;</code>-links. Offeret er en simuleret "naiv trader" der <strong>klikker links</strong>
+             i chatten — ikke en bot der auto-loader billeder. Derfor virker et auto-firing
+             <code>&lt;img src=/transfer&gt;</code> <em>ikke</em> (det kræver en render-bot); et <strong>plain link</strong>
+             gør (klik → top-level <code>GET /transfer</code> med bot'ens egen session → CSRF).</p>
+<h2>Exploit</h2>
+<p>Post et transfer-link i chatten (serveren linkificerer det). Cyklér beløb, så et klik rammer uanset
+             bot'ens saldo:</p>
+             <pre><code># send som chat-besked (WebSocket wss://host/chat), cyklende beløb:
+https://formalbank.com/transfer?amount=1000000&amp;email=&lt;dig&gt;
+https://formalbank.com/transfer?amount=1000&amp;email=&lt;dig&gt;
+https://formalbank.com/transfer?amount=100&amp;email=&lt;dig&gt;   ...
+# bot'en klikker -> din saldo stiger (se wss://host/account {"balance":N})
+# når nok: GET /flag  ->  {"flag":"HKN{...}"}</code></pre>
+             <p>Få sekunders link-spam gav her balance nok (~$147) til at <code>GET /flag</code> leverede flaget.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{Q9-kk-DnyWJq}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et CSRF-offer kan være en <strong>klik-bot</strong>, ikke en render-bot — så post et <em>link</em> det klikker, ikke kun et auto-firing <code>&lt;img&gt;</code>.</li><li>Nærstudér den <strong>renderede</strong> app (ikke kun curl/JS): her afslørede dashboardet at flaget købes, og at transfer er eneste penge-kilde.</li><li>State-ændring via <code>GET</code> uden CSRF-token = lærebogs-CSRF.</li><li>Jf. andre web-opgaver: <a href="becomming-a-doctor.html">Becomming a doctor</a>, <a href="sql-injection.html">SQL injection</a>.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
