@@ -21,7 +21,7 @@
 <p class="subtitle">Samba 3.0.20 RCE (CVE-2007-2447) + exfil via en åben share.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
 <pre><code>nmap -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20 = CVE-2007-2447
 smbclient -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>

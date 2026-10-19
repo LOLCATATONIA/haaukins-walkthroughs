@@ -21,7 +21,7 @@
 <p class="subtitle">Flaget er en skjult gæstebogspost i en web-læsbar datafil.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
 <pre><code>nmap &lt;subnet&gt;.0/24 -p 80,8080 --open     # :8080 "This is a Trap" = decoy; :80 = The Event
 gobuster dir -u http://&lt;host&gt;/ -w common.txt -x php,txt,bak

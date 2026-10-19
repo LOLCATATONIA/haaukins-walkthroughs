@@ -21,7 +21,7 @@
 <p class="subtitle">SSTI → RCE via request-objektet når standard-gadgets mangler.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En GET-param <code>name</code> reflekteres i en Jinja2-template. <code>{{7*7}}</code>→49 bekræfter
              SSTI — men <code>cycler</code>/<code>lipsum</code> findes ikke her, så brug <code>request</code>:</p>

@@ -21,7 +21,7 @@
 <p class="subtitle">gets() overflow af et nabofelt i samme struct (SUID-root).</p>
 <div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En SETUID-root binær <code>icecream-shop</code> (med kildekode) læser felter med <code>gets()</code>
              (ingen længde-check) ind i en struct, og giver flaget hvis <code>relationship == "my boss"</code>. Felterne

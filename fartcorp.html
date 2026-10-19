@@ -21,7 +21,7 @@
 <p class="subtitle">Forfalsk en JWT med lækket secret, og styr et PLC-anlæg via Modbus.</p>
 <div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>More Power — forfalsk en JWT</h2>
 <p>JWT'en har <code>{"admin":false}</code> (HS256). <code>robots.txt</code> → en fil der lækker secret'en
              (<code>BurnItAll</code>). Forfalsk <code>{"admin":true}</code> signeret med den:</p>

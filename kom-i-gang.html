@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Kom i gang — VPN, Hosts og lab-opsætning</title>
+<meta name="description" content="Forudsætningen for alle netværksopgaver på Haaukins: login, start af lab, WireGuard-VPN-opsætning, og tilføjelse af hosts. Læs denne før du starter en opgave.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Kom i gang — VPN, Hosts og lab-opsætning">
+<meta property="og:description" content="Forudsætningen for alle netværksopgaver på Haaukins: login, start af lab, WireGuard-VPN-opsætning, og tilføjelse af hosts. Læs denne før du starter en opgave.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kom i gang: VPN, Hosts og lab-opsætning", "description": "Forudsætningen for alle netværksopgaver på Haaukins: login, start af lab, WireGuard-VPN-opsætning, og tilføjelse af hosts. Læs denne før du starter en opgave.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Kom i gang: VPN, Hosts og lab-opsætning</h1>
+<p class="subtitle">Læs denne side FØRST. Alle netværksopgaver (dvs. de fleste) forudsætter at du har gjort dette.</p>
+<div class="badges"><span class="badge cat">Forudsætning</span><span class="badge">Haaukins CTF</span></div>
+
+
+<h2>1. Log ind og find din opgave</h2>
+<p>Haaukins-eventet du deltager i har sin egen underdomæne-hub, fx <code>hardcore.haaukins.dk</code> eller <code>special.haaukins.dk</code>. Log ind med de credentials du har fået udleveret. På forsiden (<code>/challenges</code>) ser du listen over opgaver for dét event — hver opgave har sin egen pointsum og kategori.</p><p><strong>Vigtigt:</strong> et event-login giver dig <em>kun</em> adgang til det events egne opgaver og VPN. Deltager du i flere events samtidig (fx både "hardcore" og "special"), skal du logge ind og konfigurere VPN separat for hvert event — de har hver sin konfigurationsfil og sit eget IP-subnet.</p>
+<h2>2. Start lab&#x27;et for din opgave</h2>
+<p>Opgaver er ikke altid "tændt" som standard — nogle platforme kræver at du eksplicit starter/claimer labbet for den specifikke opgave (ofte et "Start"-ikon ud for opgaven i listen). Først når lab'et er startet, får serverne bag opgaven et IP og bliver nåelige over VPN'en.</p><div class="callout">⚠️ <strong>Lab-timeren er load-bearing.</strong> Et startet lab har typisk en udløbstid (fx 1 time ad gangen). Udløber den midt i en opgave, mister du forbindelsen til serverne — og uden adgang til platformens admin-funktioner kan du ikke selv genoprette den. Hold øje med tiden, og forlæng/genstart lab'et i god tid, især hvis du er midt i noget der tager lang tid (brute force, download af store filer).</div>
+<h2>3. Download og installér WireGuard</h2>
+<p>Haaukins bruger <a href="https://www.wireguard.com/" target="_blank" rel="noopener">WireGuard</a> til VPN-adgang ind i lab-netværket. Download din <code>.conf</code>-fil fra platformens VPN-side (ofte under en "Lab"- eller "VPN"-fane på eventets hub) — den indeholder din private nøgle, serverens public key, og hvilket subnet dit lab kører på.</p><pre><code># Debian/Ubuntu/Kali
+sudo apt-get install wireguard
+
+# Arch/CachyOS
+sudo pacman -S wireguard-tools</code></pre><p>Hvis du får <code>resolvconf: command not found</code> ved <code>wg-quick up</code>, se WireGuards egen <a href="https://www.wireguard.com/install/" target="_blank" rel="noopener">installationsguide</a> for din distro.</p>
+<h2>4. Bring VPN-forbindelsen op</h2>
+<pre><code>sudo wg-quick up /sti/til/din-konfigfil.conf</code></pre><div class="callout">⚠️ <strong>Faldgrube: interfacenavnet må højst være 15 tegn.</strong> <code>wg-quick</code> bruger filnavnet (uden <code>.conf</code>) som Linux-netværksinterfacets navn, og kernen tillader kun 15 tegn (<code>IFNAMSIZ</code>). Hedder din fil fx <code>wg-conf-1-hardcore.conf</code> (19 tegn), fejler kommandoen med <code>"must be a valid interface name"</code>. Løsning: kopiér filen til et kortere navn først: <code>cp wg-conf-1-hardcore.conf wg-hardcore.conf</code>, og brug den i stedet.</div><p>Bekræft at forbindelsen er oppe:</p><pre><code>ip link show | grep wg          # skal vise dit wg-interface som UP
+wg show                         # kræver evt. sudo; viser peer + handshake-tidspunkt</code></pre><p>Ingen handshake efter et minuts tid? Tjek at UDP-porten i din konfigs <code>Endpoint</code>-linje ikke er blokeret af en firewall, og at din systemtid er nogenlunde korrekt (WireGuard er følsom over for store tidsforskelle).</p>
+<h2>5. Find host-IP&#x27;erne og opdatér din Hosts-fil</h2>
+<p>Selvom din VPN er oppe, kender din computer endnu ikke navnene på labbets servere (fx <code>magic-key.hkn</code>) — kun platformen ved hvilket IP de har fået tildelt <em>denne gang</em> (det kan ændre sig hver gang labbet genstartes). To måder at finde dem på:</p><ol class="steps"><li><strong>Platformens egen Hosts-side</strong> (hvis tilgængelig) — viser hostname → IP direkte efter du har startet lab'et.</li><li><strong>Scan selv subnettet.</strong> Din <code>.conf</code>-fil fortæller dig subnettet i en kommentar (fx <code>YOUR LAB SUBNET IS: 77.222.61.0/24</code>). Scan det:
+<pre><code>sudo nmap -sn 77.222.61.0/24          # find hvilke IP'er der svarer
+# match dem op mod hostnavnet ved at teste HTTP/SSH/osv. på hver kandidat, fx:
+curl -s http://77.222.61.193/ -H "Host: secret-server.hkn" | head</code></pre></li></ol><p>Tilføj derefter mapningerne til <code>/etc/hosts</code> (kræver sudo, da filen normalt ikke er skrivbar for din bruger):</p><pre><code>sudo sh -c 'echo "77.222.61.38  magic-key.hkn" &gt;&gt; /etc/hosts'</code></pre><p>eller redigér filen direkte med en editor. Verificér til sidst:</p><pre><code>curl -s -o /dev/null -w "%{http_code}\n" http://magic-key.hkn/</code></pre><div class="callout">⚠️ <strong>Faldgrube: IP'et ændrer sig ved lab-genstart.</strong> Genstarter du lab'et (fx fordi timeren udløb, eller du nulstillede det for at få en frisk instans), får serverne ofte <em>nye</em> IP'er på et helt andet subnet. Dine gamle linjer i <code>/etc/hosts</code> peger så på et dødt/forkert IP — husk at opdatere dem igen, ikke bare tilføje nye linjer oveni.</div>
+<h2>Tjekliste før du går i gang med en opgave</h2>
+<ul><li>☑ VPN-interface er UP (<code>ip link show</code>) og har en handshake (<code>wg show</code>).</li><li>☑ Lab'et for netop denne opgave er startet (ikke kun eventet generelt).</li><li>☑ <code>/etc/hosts</code> indeholder de hostnavne opgaven nævner, med IP'er fra <em>denne</em> lab-instans.</li><li>☑ Du har tjekket hvor lang tid der er tilbage på lab-timeren, hvis opgaven kan tage et stykke tid.</li></ul>
+
+<h2>Hvad du har lært</h2>
+<ul><li>Et event-login og et startet lab er to forskellige ting — pointsum-oversigten viser ikke nødvendigvis om labbet kører.</li><li><code>wg-quick</code> afleder interfacenavnet af filnavnet, og Linux's 15-tegns-grænse kan overraske dig — hold konfigfil-navne korte.</li><li>Host-IP'er er instans-specifikke og ændrer sig ved genstart; behandl din <code>/etc/hosts</code>-fil som noget du løbende vedligeholder, ikke noget du sætter én gang.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
