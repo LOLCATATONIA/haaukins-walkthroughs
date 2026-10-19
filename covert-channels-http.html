@@ -29,10 +29,26 @@ protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefø
              <strong>1 bit pr. header</strong> uden at ændre requesten. 8 faste headers = 1 byte pr. request.</p>
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'http.request &amp;&amp; ip.dst==100.117.87.84' -T text -V   # se casing</code></pre>
-             <p>For hver request, i headernes faste rækkefølge: stort forbogstav = <code>1</code>, lille =
-             <code>0</code> → 8 bit → ét ASCII-tegn. 20 requests = 20 bytes.</p>
-             <p><strong>Faldgrube:</strong> filtrér ikke på ordet "Request" — headeren
-             <code>upgrade-insecure-requests</code> indeholder selv "request".</p>
+             <p>De 20 requests bruger alle de samme 8 headers i samme rækkefølge, kun casingen varierer. Noget i
+             stil med denne liste for én request (bemærk at <code>Accept-Encoding</code> og
+             <code>upgrade-insecure-requests</code> har forskellig casing):</p>
+             <pre><code>user-agent: ...
+Accept-Encoding: ...
+accept: ...
+connection: ...
+Host: ...
+upgrade-insecure-requests: 1
+cache-control: ...
+accept-language: ...</code></pre>
+             <p>For hver request: stort forbogstav = <code>1</code>, lille = <code>0</code>, i headernes faste
+             rækkefølge, giver 8 bit, altså ét ASCII-tegn. 20 requests = 20 bytes:</p>
+             <pre><code>python3 -c "
+headers_order = ['user-agent','Accept-Encoding','accept','connection',
+                  'Host','upgrade-insecure-requests','cache-control','accept-language']
+bits = ''.join('1' if name[0].isupper() else '0' for name in headers_order)
+print(chr(int(bits, 2)))"   # ét tegn; gentag for hver request og sæt sammen i rækkefølge</code></pre>
+             <p><strong>Faldgrube:</strong> filtrér ikke på ordet "Request" i tsharks tekstoutput. Headeren
+             <code>upgrade-insecure-requests</code> indeholder selv "request" og matcher ved et uheld.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{3nc0d3d_1n_c4ps}</span></p>
 </details>

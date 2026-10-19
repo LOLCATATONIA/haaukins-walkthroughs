@@ -30,8 +30,16 @@ protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefø
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0 &amp;&amp; ip.dst==18.157.68.73' \
   -T fields -e frame.number -e tcp.flags</code></pre>
-             <p>Træk <code>(flags &amp; 0xe00) &gt;&gt; 9</code> (3 bit) ud af hver pakke, saml i rækkefølge, og del i
-             8-bit grupper → ASCII. 67×3 bit = 201 bit = 25 bytes.</p>
+             <p><code>tcp.flags</code> er hele flags-byten som hex, fx <code>0x0e02</code>. De 3 reserverede bits
+             sidder på plads 9-11, så du trækker dem ud med en maske og et skift. Saml dem fra alle 67 pakker i
+             kronologisk rækkefølge og del i 8-bit grupper:</p>
+             <pre><code>python3 -c "
+rows = [(123, 0x0e02), (124, 0x0402)]   # (frame.number, int(tcp.flags, 16)) for hver pakke, i rækkefølge
+bits = ''.join(format((flags &amp; 0xe00) &gt;&gt; 9, '03b') for _, flags in rows)
+chars = [chr(int(bits[i:i+8], 2)) for i in range(0, len(bits) - 7, 8)]
+print(''.join(chars))"</code></pre>
+             <p>67 pakker × 3 bit = 201 bit = 25 hele bytes. Med alle 67 rækker fra den rigtige fangst giver det
+             flaget.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{unus3d_r35erv3d_b1ts}</span></p>
 </details>

@@ -28,11 +28,19 @@
              hvordan flaget bygges.</p>
 <h2>Trin for trin</h2>
 <pre><code>ewfmount Friendly.E01 mnt/
-fls -rp mnt/ewf1                      # slettet Instructions2.txt markeret med *
-icat mnt/ewf1 &lt;inode&gt; > Instructions2.txt</code></pre>
-             <p>Opskriften: byg flaget af brudstykker fra tre filer i alfabetisk rækkefølge — en hex-kodet
-             fil-endelse (<code>77696E6E696E67</code> → <code>winning</code>), første 5 tegn af den enes indhold, og
-             sidste 3 af den andens.</p>
+fls -rp mnt/ewf1</code></pre>
+             <p>Output viser hele filsystemet, inklusive filer der normalt er usynlige:</p>
+             <pre><code>r/r 12-128-1:  Instructions.txt
+* r/r 14-128-3:  Instructions2.txt      &lt;- slettet (stjernen)
+r/r 15-128-1:  ini.txt
+r/r 16-128-1:  This is not a pipe.bmp
+r/r 17-128-1:  zebra.77696E6E696E67</code></pre>
+             <p>Tallet før filnavnet (fx <code>14-128-3</code>) er inode-nummeret. Genskab den slettede fil med det:</p>
+             <pre><code>icat mnt/ewf1 14-128-3 > Instructions2.txt</code></pre>
+             <p>De to instruktionsfiler forklarer opskriften tilsammen: byg flaget af brudstykker fra de tre
+             <em>resterende</em> filer (<code>ini.txt</code>, <code>This is not a pipe.bmp</code>, <code>zebra.*</code>)
+             i alfabetisk rækkefølge, en hex-kodet fil-endelse (<code>77696E6E696E67</code> → <code>winning</code>),
+             første 5 tegn af den enes indhold, og sidste 3 af den andens.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p><code>DDC{</code> + <code>keep_</code> + <code>on_</code> + <code>winning</code> + <code>}</code>:</p>
         <p>Flag (afleveres som DDC): <span class="flag">DDC{keep_on_winning}</span></p>

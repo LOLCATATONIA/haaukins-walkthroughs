@@ -30,8 +30,13 @@ protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefø
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'dns.flags.response==0 &amp;&amp; dns.qry.name contains "canarytokens"' \
   -T fields -e frame.time_relative -e dns.qry.name</code></pre>
-             <p>Sortér på tid, tag hex-labelen fra hvert navn, og afkod: <code>484b4e7b</code> → <code>HKN{</code>,
-             <code>77333172</code> → <code>w31r</code> … <code>7d</code> → <code>}</code>.</p>
+             <p>Hvert opslag ser ud som <code>484b4e7b.fj4ll5kiql1...canarytokens.com</code>: hex-labelen er det
+             <em>første</em> led i navnet. Sortér på tid (<code>frame.time_relative</code>), saml labels i
+             rækkefølge, og afkod:</p>
+             <pre><code>python3 -c "
+labels = ['484b4e7b','77333172','645f3575','6264306d','34316e35','7d']
+print(''.join(bytes.fromhex(l).decode() for l in labels))"
+# -> HKN{w31rd_5ubd0m41n5}</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{w31rd_5ubd0m41n5}</span></p>
 </details>

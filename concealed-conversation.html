@@ -26,11 +26,11 @@
 <p>En pcap med 12 UDP-pakker hvis payload starter med <code>PK\x03\x04</code> (ZIP-magic) — hver pakke
              er en ZIP-fil med et PNG. Billederne er en chat; ét billede "kan ikke læses".</p>
 <h2>Find de 12 ZIP&#x27;er i UDP-trafikken</h2>
-<p>Wireshark genkender ikke indholdet på denne UDP-port — se derfor selv på de rå payload-bytes
+<p>Wireshark genkender ikke indholdet på denne UDP-port, så se selv på de rå payload-bytes
              for hver pakke:</p>
              <pre><code>tshark -r packages.pcap -T fields -e frame.number -e udp.payload
 # hver linje er én pakkes payload som hex, fx 504b0304...</code></pre>
-             <p>Hver linje starter med <code>504b0304</code> (= <code>PK\x03\x04</code> i hex) — hele UDP-payloaden
+             <p>Hver linje starter med <code>504b0304</code> (= <code>PK\x03\x04</code> i hex), så hele UDP-payloaden
              er altså en gyldig ZIP-fil. Skriv dem til disk og pak ud:</p>
              <pre><code>python3 - &lt;&lt;'PY'
 import zipfile
@@ -44,7 +44,7 @@ for i, h in enumerate(hexlines, 1):
 PY
 ls extracted/        # -> 1-from-x.png ... 12-from-y.png, en billedbaseret chat</code></pre>
 <h2>Reparér det ene billede der ikke kan åbnes</h2>
-<p>Gennemgå billederne i rækkefølge — det er en samtale der optrapper til at én part beder om et
+<p>Gennemgå billederne i rækkefølge. Det er en samtale der optrapper til at én part beder om et
              admin-password. Ét billede ("I can't read your last message") nægter at åbne. Et billede der ikke kan
              åbnes har tit én ødelagt byte i signaturen. PNG starter altid med <code>89 50 4E 47</code>
              (<code>.PNG</code>). Her var 3. byte <code>0xEE</code> i stedet for <code>0x4E</code> ('N'):</p>

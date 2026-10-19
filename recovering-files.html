@@ -30,9 +30,12 @@
 <pre><code>7z x drive.7z                         # -> drive1.vhd
 mmls drive1.vhd                       # NTFS-partition @ sektor 128
 fls -r -o 128 drive1.vhd | grep '\*'  # slettede poster markeret med *
+# -> * r/r 211-128-1:     Pictures/picsfrominternet/cryptolocker.exe
 icat -o 128 drive1.vhd 211-128-1 | head   # carve filen -> ren tekst, ikke en rigtig .exe</code></pre>
-             <p><code>-o</code> = partitionens offset (fra <code>mmls</code>). Kør altid <code>file</code>/kig på
-             resultatet — "<code>cryptolocker.exe</code>" var i virkeligheden ren tekst med falsk endelse.</p>
+             <p><code>-o</code> = partitionens offset (fra <code>mmls</code>). Tallet du giver <code>icat</code>
+             (her <code>211-128-1</code>) er inode-nummeret fra <code>fls</code>-outputtets anden kolonne: det er
+             den du skal bruge, ikke filnavnet. Kør altid <code>file</code>/kig på resultatet. "<code>cryptolocker.exe</code>"
+             var i virkeligheden ren tekst med falsk endelse.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Den carvede fil var Lorem Ipsum + flaget. Flaget stod <code>DDC{...}</code> men skulle afleveres
         med <code>HKN{}</code> (opgaven bad eksplicit om det):</p>

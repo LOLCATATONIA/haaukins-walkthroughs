@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: WireGuard-VPN på Linux (opsætning og fejlsøgning)</title>
+<meta name="description" content="Dybdegående guide til Haaukins&#x27; WireGuard-VPN på Linux: installation, split tunnel vs. full tunnel, routing-diagnose, og den hyppigste fælde af alle: stale /etc/hosts efter en lab-genstart.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/wireguard-vpn.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: WireGuard-VPN på Linux (opsætning og fejlsøgning)">
+<meta property="og:description" content="Dybdegående guide til Haaukins&#x27; WireGuard-VPN på Linux: installation, split tunnel vs. full tunnel, routing-diagnose, og den hyppigste fælde af alle: stale /etc/hosts efter en lab-genstart.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/wireguard-vpn.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "WireGuard-VPN på Linux: fuld opsætning og fejlsøgning", "description": "Dybdegående guide til Haaukins' WireGuard-VPN på Linux: installation, split tunnel vs. full tunnel, routing-diagnose, og den hyppigste fælde af alle: stale /etc/hosts efter en lab-genstart.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/wireguard-vpn.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>WireGuard-VPN på Linux: fuld opsætning og fejlsøgning</h1>
+<p class="subtitle">Den fulde WireGuard-gennemgang: installation, verificering af forbindelsen, og fejlsøgning når noget ikke virker.</p>
+<div class="badges"><span class="badge cat">Forudsætning</span><span class="badge">Haaukins CTF</span></div>
+
+
+<h2>1. Installér WireGuard</h2>
+<p>Installér via din distributions pakkehåndtering:</p><pre><code># Arch Linux / CachyOS
+sudo pacman -S wireguard-tools
+
+# Debian / Ubuntu
+sudo apt install wireguard
+
+# Fedora
+sudo dnf install wireguard-tools</code></pre><p>For andre distributioner, se WireGuards egen <a href="https://www.wireguard.com/install/" target="_blank" rel="noopener">installationsside</a>. Du skal normalt ikke installere <code>resolvconf</code> manuelt. Det er kun relevant hvis konfigurationen bruger en <code>DNS =</code>-indstilling, hvilket Haaukins-konfigurationer typisk ikke gør.</p>
+<h2>2. Download og installér din konfiguration</h2>
+<p>Download <code>.conf</code>-filen fra Haaukins' event-side. Den ligner noget i stil med:</p><pre><code>[Interface]
+Address = 25.17.240.251/32
+PrivateKey = ...
+MTU = 1420
+
+[Peer]
+PublicKey = ...
+AllowedIPs = 77.205.40.0/24,25.17.240.1/32
+Endpoint = special.sec04.haaukins.dk:5385
+PersistentKeepalive = 25</code></pre><div class="callout">⚠️ <strong>Brug altid den aktuelle konfiguration.</strong> VPN-konfigurationer er ikke permanente. En ny fil kan have en anden adresse, privat nøgle og lab-subnet, selvom endpoint og serverens public key er uændret. Et team har typisk én konfigurationsfil pr. medlem; del aldrig din private nøgle med andre.</div><p>Kopiér filen til <code>/etc/wireguard/</code> og begræns rettighederne, så kun root kan læse den private nøgle:</p><pre><code>sudo install -m 600 ./&lt;navn&gt;.conf /etc/wireguard/</code></pre><p>Et alternativ er at køre <code>wg-quick up</code> direkte på filens sti uden at kopiere den først (det virker også, se trin 3), men at samle konfigurationerne i <code>/etc/wireguard/</code> holder dem ét sted med korrekte rettigheder.</p>
+<h2>3. Forbind</h2>
+<pre><code>sudo wg-quick up &lt;navn&gt;      # uden .conf, fx: sudo wg-quick up wg-conf-1</code></pre><div class="callout">⚠️ <strong>Faldgrube: interfacenavnet må højst være 15 tegn.</strong> <code>wg-quick</code> bruger filnavnet som Linux-netværksinterfacets navn, og kernen tillader kun 15 tegn (<code>IFNAMSIZ</code>). Hedder din fil fx <code>wg-conf-1-hardcore.conf</code> (19 tegn), fejler kommandoen med <code>"must be a valid interface name"</code>. Kopiér filen til et kortere navn og brug det i stedet: <code>cp wg-conf-1-hardcore.conf wg-hardcore.conf</code>.</div>
+<h2>4. Verificér forbindelsen</h2>
+<pre><code>sudo wg show &lt;navn&gt;    # eller bare: sudo wg show</code></pre><p>Kig efter en nylig <code>latest handshake</code>. Tjek derefter routing:</p><pre><code>ip route</code></pre><p>Ved en normal split-tunnel-opsætning er kun lab-netværket routet gennem WireGuard, mens din almindelige internettrafik stadig går via din egen forbindelse. Eksempel:</p><pre><code>default via 192.168.20.1 dev wlan0
+77.205.40.0/24 dev wg-conf-1</code></pre><p>Test routing til en konkret lab-IP:</p><pre><code>ip route get 77.205.40.73
+# forventet: 77.205.40.73 dev wg-conf-1 src 25.17.240.251
+ip route get 1.1.1.1
+# forventet: fortsat via din egen forbindelse, IKKE wg-interfacet</code></pre>
+<h2>Split tunnel vs. full tunnel</h2>
+<p>Rør aldrig <code>AllowedIPs</code> i den udleverede konfiguration, medmindre du ved hvorfor. Særligt bør du aldrig erstatte den med:</p><pre><code>AllowedIPs = 0.0.0.0/0</code></pre><p>Haaukins' egen konfiguration angiver normalt kun lab-subnettet i <code>AllowedIPs</code>, hvilket giver split tunneling: kun lab-trafik går gennem WireGuard. <code>0.0.0.0/0</code> laver i stedet en full tunnel, hvor al din IPv4-trafik (browser, Teams, alt) pludselig sendes gennem Haaukins-VPN'en.</p>
+<h2>5. Find og brug Hosts-oplysningerne</h2>
+<p>Haaukins viser en <strong>Hosts / DNS Records</strong>-sektion på event-siden, når du starter en opgave: hostname og IP for de aktive challenge-hosts. Disse records tilføjes dynamisk, så tjek sektionen igen hver gang du starter en ny opgave eller skifter lab.</p><pre><code>sudoedit /etc/hosts
+# tilføj: 77.205.40.73 sanity-plus.hkn</code></pre><p>Bekræft opslaget:</p><pre><code>getent hosts sanity-plus.hkn
+curl http://sanity-plus.hkn/</code></pre>
+<h2>6. Test targetet</h2>
+<p>Start med routing, ikke ping:</p><pre><code>ip route get &lt;lab-ip&gt;</code></pre><p>Virker routingen, så test grundlæggende forbindelse:</p><pre><code>ping -c 3 &lt;lab-ip&gt;</code></pre><p>Svarer targetet ikke på ICMP, betyder det ikke nødvendigvis at det er utilgængeligt. Ping kan være blokeret selvom en service kører fint. Test derfor servicen selv, fx:</p><pre><code>curl -v http://&lt;hostname&gt;/
+nmap -Pn &lt;lab-ip&gt;   # -Pn springer host discovery over</code></pre>
+<h2>Fejlsøgning: den forvirrende klassiker (stale /etc/hosts)</h2>
+<p>Dette er den hyppigste fælde, og den ligner at VPN'en er i stykker, selvom den ikke er det.</p><p><strong>Symptom:</strong> <code>ping</code> til den <em>aktuelle</em> lab-IP virker fint (0% tab), men <code>curl http://&lt;hostname&gt;/</code> eller browseren timeouter.</p><p><strong>Årsag:</strong> når du Stop/Reset'er eller genstarter en opgave, tildeler Haaukins typisk en <strong>ny IP</strong>, synlig på Hosts-siden. Din <code>/etc/hosts</code> peger stadig på den gamle. Den gamle IP ligger ofte i et helt andet subnet end dit nuværende lab-subnet, så den dækkes ikke af <code>AllowedIPs</code>, routes ikke gennem WireGuard, og sendes i stedet ud ad din normale forbindelse hvor den rammer intet.</p><p><strong>Diagnose:</strong></p><pre><code>getent hosts &lt;hostname&gt;         # fx 77.101.126.31 (gammelt subnet?)
+ip route get 77.101.126.31      # peger den på wlan0/default i stedet for wg-interfacet?</code></pre><p>Viser opslaget en IP uden for dit nuværende lab-subnet, og <code>ip route get</code> viser din normale forbindelse i stedet for WireGuard, er det netop denne fælde:</p><pre><code>77.101.126.31 via 192.168.1.1 dev wlan0   # forkert: går ud ad normal internet</code></pre><p><strong>Fix:</strong> opdatér entryen til den aktuelle IP, enten manuelt eller som en hurtig erstatning:</p><pre><code>sudo sed -i 's#^.*&lt;hostname&gt;.*$#&lt;aktuel-ip&gt; &lt;hostname&gt;#' /etc/hosts
+getent hosts &lt;hostname&gt;         # skal nu vise den aktuelle IP
+ip route get &lt;aktuel-ip&gt;        # skal nu vise dev wg-...</code></pre><div class="callout">💡 <strong>Vane der sparer timer:</strong> hver gang du har Stop/Reset'et eller genstartet en opgave, så re-synk <code>/etc/hosts</code> fra Hosts-siden, før du arbejder videre. IP'en ændrer sig, og der er ingen dynamisk DNS til at fange det. Haaukins-modellen er manuel <code>/etc/hosts</code>.</div><p>Og husk hvad en lykkedes ping faktisk beviser: kun ICMP og routing til dén konkrete IP. Det beviser hverken at et hostname peger på den rigtige IP, eller at selve servicen svarer. Verificér altid på det niveau opgaven faktisk bruger:</p><pre><code>getent hosts &lt;hostname&gt;         # resolver navnet korrekt?
+ip route get &lt;ip&gt;               # routes det via WireGuard?
+curl -v http://&lt;hostname&gt;/       # svarer selve servicen?</code></pre>
+<h2>Anden fejlsøgning</h2>
+<p><strong>Ingen handshake</strong> (<code>sudo wg show</code> viser ingen <code>latest handshake</code>): tjek <code>ip addr</code> og <code>ip route</code>, og bekræft at du rent faktisk bruger den <em>aktuelle</em> konfiguration fra event-siden, ikke en gammel.</p><p><strong>Internet eller andre apps stopper med at virke:</strong> tjek <code>ip route get 1.1.1.1</code>. Går den gennem WireGuard-interfacet i stedet for din normale forbindelse, kig på <code>AllowedIPs</code> i konfigurationen (se split tunnel-afsnittet ovenfor).</p><p><strong>Skiftet lab og intet virker længere:</strong> download den aktuelle konfiguration, genstart forbindelsen, og opdatér <code>/etc/hosts</code> til det nye subnet.</p>
+<h2>Hurtig reference</h2>
+<pre><code># Installér konfigurationen
+sudo install -m 600 ./&lt;navn&gt;.conf /etc/wireguard/
+
+# Forbind / afbryd
+sudo wg-quick up &lt;navn&gt;
+sudo wg-quick down &lt;navn&gt;
+
+# Status og routing
+sudo wg show
+ip route
+ip route get &lt;lab-ip&gt;
+ip route get 1.1.1.1              # skal IKKE gå via wg-interfacet</code></pre>
+<h2>Sikkerhed</h2>
+<p>Konfigurationsfilen indeholder en privat nøgle der autentificerer dig mod Haaukins. Del aldrig <code>PrivateKey = ...</code>-linjen, og behandl hele filen som følsom information. Bliver din private nøgle eksponeret, så hent en ny konfiguration fra Haaukins i stedet for at fortsætte med den kompromitterede.</p>
+
+<h2>Hvad du har lært</h2>
+<ul><li>Installér konfigurationen i <code>/etc/wireguard/</code> med <code>install -m 600</code>, så kun root kan læse din private nøgle.</li><li>Rør aldrig <code>AllowedIPs</code>, og især ikke til <code>0.0.0.0/0</code>. Det laver en full tunnel og kan tage al din anden trafik med.</li><li>Den hyppigste fejl er ikke VPN'en: det er en stale <code>/etc/hosts</code>-entry fra før sidste lab-genstart. Re-synk den hver gang du Stop/Reset'er.</li><li>En lykkedes <code>ping</code> beviser kun ICMP og routing, ikke at hostname eller service er korrekte. Verificér på servicens eget niveau.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>
