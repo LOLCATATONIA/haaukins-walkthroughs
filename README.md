@@ -1,16 +1,19 @@
-# Haaukins CTF — walkthroughs & tutorials
+# Haaukins CTF — walkthroughs
 
-Pædagogiske, trin-for-trin guides til [Haaukins](https://haaukins.com/) CTF-opgaver (AAU / De Danske
-Cybermesterskaber). Én side pr. lab: koncept → fremgangsmåde → og flag/løsning gemt i en "spoiler" du selv åbner.
+Trin-for-trin guides til [Haaukins](https://haaukins.com/)-opgaverne fra AAU og De Danske Cybermesterskaber.
+Hver opgave har sin egen side: hvad går den ud på, hvordan griber du den an, og til sidst flaget — gemt bag
+en spoiler du selv vælger at åbne.
 
-🌐 **Læs dem her:** https://lolcatatonia.github.io/haaukins-walkthroughs/
+**Sitet:** https://lolcatatonia.github.io/haaukins-walkthroughs/
 
-- Åbn **[forsiden](https://lolcatatonia.github.io/haaukins-walkthroughs/)** og brug søgefeltet — slå dit
-  lab-navn op og hop direkte til guiden.
-- Søgte du *"Haaukins &lt;lab-navn&gt;"*? Hver side hedder det samme som opgaven, fx `heartbleed.html`.
+Kender du opgavens navn, så søg efter det på forsiden eller gå direkte til `<navn>.html`, fx `heartbleed.html`.
+Første gang du er i gang med et Haaukins-event, er [Kom i gang](https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html)
+værd at læse først — den dækker VPN-opsætning og de andre praktiske ting guiderne ellers forudsætter.
 
-Guiderne er tænkt som **støtte undervejs** i et autoriseret trænings-/CTF-forløb — brug dem til at lære, ikke til
-at springe læringen over. Mange Haaukins-flag er per-instans, så eksemplerne matcher ikke nødvendigvis din instans;
-det er fremgangsmåden der tæller.
+Flagene i guiderne er eksempler. Haaukins genererer mange af dem per instans, så dit eget flag vil typisk se
+anderledes ud end det der står her — det er fremgangsmåden, ikke den konkrete streng, der genbruges.
 
-> En rå `.html` i GitHubs filvisning vises som kildekode — brug sitet ovenfor for den renderede udgave.
+Brug siderne som hjælp undervejs i et autoriseret trænings- eller CTF-forløb, ikke som en genvej uden om selv
+at løse opgaven.
+
+(En rå `.html`-fil vist i GitHubs filbrowser er kildekode, ikke den rigtige side — besøg sitet ovenfor.)
