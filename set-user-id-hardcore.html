@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Set User ID (hardcore-eventet) — tutorial (SUID find → root via GTFOBins)</title>
+<meta name="description" content="Guide til Haaukins Set User ID (hardcore-eventet): en SUID-flagget find-binær giver direkte root-privesc via dens -exec-flag, det klassiske GTFOBins-mønster.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/set-user-id-hardcore.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Set User ID (hardcore-eventet) — tutorial (SUID find → root via GTFOBins)">
+<meta property="og:description" content="Guide til Haaukins Set User ID (hardcore-eventet): en SUID-flagget find-binær giver direkte root-privesc via dens -exec-flag, det klassiske GTFOBins-mønster.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/set-user-id-hardcore.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Set User ID (hardcore)", "description": "Guide til Haaukins Set User ID (hardcore-eventet): en SUID-flagget find-binær giver direkte root-privesc via dens -exec-flag, det klassiske GTFOBins-mønster.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/set-user-id-hardcore.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Set User ID (hardcore)</h1>
+<p class="subtitle">find med SUID-bit er næsten altid en gratis root-shell.</p>
+<div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Find den SUID-flaggede binary</h2>
+<p>Efter SSH-login (<code>user</code>/<code>haaukins</code>), led efter binaries med
+             SUID-bit sat:</p>
+             <pre><code>find / -perm -4000 -type f 2&gt;/dev/null</code></pre>
+             <p>Blandt den sædvanlige standardliste springer <code>/usr/bin/find</code> selv i øjnene —
+             SUID-flagget og ejet af root.</p>
+<h2>GTFOBins: find -exec arver SUID-processens rettigheder</h2>
+<p><code>find</code>'s <code>-exec</code>-flag kører en kommando som en barneproces, der
+             arver den EFFEKTIVE uid fra den SUID-flaggede <code>find</code>-proces selv (root), ikke den
+             reelle uid der startede den:</p>
+             <pre><code>find . -maxdepth 0 -exec /bin/sh -p -c 'cat /bin/supersecretdir/fl4g.txt' \;</code></pre>
+             <p><code>-p</code> på <code>sh</code> er afgørende: den beder shellen om at BEVARE de
+             forhøjede rettigheder i stedet for automatisk at droppe dem ved opstart (moderne shells
+             dropper privilegier som standard hvis reel og effektiv uid ikke matcher).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flaget (per-instans, genbrug METODEN, ikke værdien) lå i
+        <code>/bin/supersecretdir/fl4g.txt</code> (kun læsbar for root): <span class="flag">HKN{ED-JM-Ty52Rv}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>find -perm -4000 er det første du kører for SUID-privesc-recon.</li><li>GTFOBins.github.io har en klar liste over hvilke binaries der har kendte SUID/sudo-escape-tricks — find er et af de mest almindelige.</li><li>-p på sh/bash er nødvendigt for at BEVARE forhøjede rettigheder når reel ≠ effektiv uid.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

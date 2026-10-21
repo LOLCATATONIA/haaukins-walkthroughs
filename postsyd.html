@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Postsyd — tutorial (kald en glemt debug-funktion direkte via gdb)</title>
+<meta name="description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Postsyd — tutorial (kald en glemt debug-funktion direkte via gdb)">
+<meta property="og:description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Postsyd", "description": "Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb's egen call-kommando til at eksekvere den direkte og afsløre flaget.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Postsyd</h1>
+<p class="subtitle">Debug-symboler + en ubrugt funktion i en SUID-binary = gratis funktionsliste over det udvikleren glemte at fjerne.</p>
+<div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Recon: SUID-binary + password-fri sudo gdb</h2>
+<p>Efter SSH-login (<code>DDC</code>/<code>1</code>):</p>
+             <pre><code>ls -la ~
+# -rwsr-xr-x root root ... pakkesystem      (SUID binary)
+sudo -l
+# (ALL) NOPASSWD: /usr/bin/gdb</code></pre>
+             <p><code>sudo gdb</code> uden password er i sig selv en triviel root-shell via GTFOBins
+             (<code>sudo gdb -nx -ex '!sh' -ex quit</code>) — men pointen her er at finde den
+             <strong>glemte testfunktion</strong> i binaren, ikke bare at få et skal.</p>
+<h2>Find den glemte funktion</h2>
+<p><code>pakkesystem</code> er bygget MED debug-info (ikke stripped):</p>
+             <pre><code>strings -a ./pakkesystem | grep -iE 'flag|debug|test'
+# DDC{%s}                   &lt;- format-streng afslører flag-formatet
+# /home/DDC/pakkesystem.c   &lt;- kildefil-sti, bekræfter debug-symboler er intakte
+
+gdb -batch -ex 'info functions' ./pakkesystem</code></pre>
+             <p>Listen viser <code>main</code>, <code>opretRetur</code>, <code>sporPakke</code>,
+             <code>opretKlage</code> (de rigtige menupunkter programmet bruger) <strong>plus
+             <code>adminAcces()</code></strong>, som disassembly af <code>main</code> bekræfter aldrig
+             kaldes (kun menuvalg 1-4 er koblet).</p>
+<h2>Kald den direkte via gdb</h2>
+<p><code>adminAcces()</code> XOR-dekoder (<code>+1</code> pr. byte) en streng i
+             <code>.data</code> og <code>printf</code>'er den. Kald den bare manuelt:</p>
+             <pre><code>sudo gdb -batch \
+  -ex 'break main' -ex 'run' \
+  -ex 'call adminAcces()' \
+  -ex 'call (int)fflush(0)' \
+  ./pakkesystem</code></pre>
+             <p><code>gdb</code>'s <code>call &lt;funktion&gt;()</code> eksekverer vilkårlig kode i
+             binarens eget adresserum, uden at skulle finde en reel kaldekæde i programmet selv —
+             output: <code>DDC{dontDoTh4t}</code>.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{dontDoTh4t}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>gdb info functions på en ikke-strippet binary afslører EVERY funktion, også de der aldrig kaldes fra main.</li><li>gdb's call <funktion>() kører funktionen direkte — ingen grund til at finde en reel kaldekæde i programmets normale flow.</li><li>SUID + sudo gdb NOPASSWD er en triviel root-shell i sig selv (GTFOBins), men opgavens pointe var at finde udviklerens glemte testkode, ikke bare rode root.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

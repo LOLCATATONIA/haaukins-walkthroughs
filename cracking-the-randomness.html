@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Cracking the Randomness — tutorial (genskab Pythons random-tilstand og knæk en XOR-pad)</title>
+<meta name="description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Cracking the Randomness — tutorial (genskab Pythons random-tilstand og knæk en XOR-pad)">
+<meta property="og:description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Cracking the Randomness", "description": "Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937's interne tilstand og forudsig resten uden at kende seedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Cracking the Randomness</h1>
+<p class="subtitle">624 rå outputs i træk fra Pythons random = hele den interne tilstand, gratis.</p>
+<div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Opsætningen</h2>
+<p>Kildekoden (<code>main.py</code>) viser alt: programmet skriver 624 rå
+             <code>random.getrandbits(32)</code>-værdier til <code>output.txt</code>, og derefter
+             XOR-krypterer flaget 4 bytes ad gangen med endnu flere <code>getrandbits(32)</code>-kald som
+             engangs-pad. Pythons <code>random</code> bruger <strong>Mersenne Twister (MT19937)</strong> —
+             statistisk god, men slet ikke kryptografisk sikker. Hele dens interne tilstand er
+             <strong>624 stykker 32-bit heltal</strong>; ser man 624 rå outputs i træk, kan man genskabe
+             tilstanden 1:1 og forudsige alt generatoren laver derefter.</p>
+<h2>Untemper outputtene</h2>
+<p>Hvert output går gennem en inverterbar bit-transformation ("tempering") før det
+             returneres:</p>
+             <pre><code>def temper(y):
+    y ^= y &gt;&gt; 11
+    y ^= (y &lt;&lt; 7) &amp; 0x9d2c5680
+    y ^= (y &lt;&lt; 15) &amp; 0xefc60000
+    y ^= y &gt;&gt; 18
+    return y</code></pre>
+             <p>Fordi hvert trin kun bruger XOR, shift og AND-med-konstant, kan man regne baglæns
+             ("untemper") og få det oprindelige state-ord tilbage for hvert af de 624 outputs.</p>
+<h2>Genskab generatoren og dekryptér resten</h2>
+<p>Pythons <code>random.setstate()</code> tager formatet
+             <code>(version, (state_words..., index), gauss_next)</code>. Med de 624 untemprede ord kan du
+             bygge en identisk kopi af generatoren på nøjagtig det punkt hvor originalen havde brugt sine
+             første 624 kald:</p>
+             <pre><code>state = [untemper(v) for v in first_624_values]
+r = random.Random()
+r.setstate((3, tuple(state + [624]), None))
+
+flag_bytes = b''
+for res in remaining_values:
+    otp = r.getrandbits(32)
+    flag_bytes += (res ^ otp).to_bytes(4, 'big')</code></pre>
+             <p><code>r</code> producerer nu nøjagtig den samme sekvens som originalen ville have gjort —
+             XOR'et med de resterende linjer i <code>output.txt</code> giver flag-bytes tilbage.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Not_so_random_anymore_mr_randcrack}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>random (MT19937) er fint til simuleringer/spil, men ALDRIG til noget sikkerhedsrelateret (tokens, nøgler, OTP) — brug secrets/os.urandom.</li><li>≥624 på hinanden følgende rå getrandbits(32)/random()-outputs er altid en invitation til fuld state-recovery, ingen brute force nødvendig.</li><li>Færdige værktøjer som pip-pakken randcrack gør præcis dette automatisk — men implementér det selv første gang for at forstå temper/untemper.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

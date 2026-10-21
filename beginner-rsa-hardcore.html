@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Beginner RSA — tutorial (når p og q er lækket, er RSA allerede ødelagt)</title>
+<meta name="description" content="Guide til Haaukins Beginner RSA: opgaven publicerer p og q direkte i stedet for kun n — RSA&#x27;s sikkerhed hviler på at netop DET er svært, så dekryptering bliver ren modulær aritmetik uden nogen faktorisering.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/beginner-rsa-hardcore.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Beginner RSA — tutorial (når p og q er lækket, er RSA allerede ødelagt)">
+<meta property="og:description" content="Guide til Haaukins Beginner RSA: opgaven publicerer p og q direkte i stedet for kun n — RSA&#x27;s sikkerhed hviler på at netop DET er svært, så dekryptering bliver ren modulær aritmetik uden nogen faktorisering.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/beginner-rsa-hardcore.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Beginner RSA", "description": "Guide til Haaukins Beginner RSA: opgaven publicerer p og q direkte i stedet for kun n — RSA's sikkerhed hviler på at netop DET er svært, så dekryptering bliver ren modulær aritmetik uden nogen faktorisering.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/beginner-rsa-hardcore.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Beginner RSA</h1>
+<p class="subtitle">RSA's eneste sikkerhedsantagelse er at n er svær at faktorisere — lækker du p og q, er der intet tilbage at angribe.</p>
+<div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Opgaven</h2>
+<p>Opgaveteksten giver <code>p</code>, <code>q</code> og <code>e</code> direkte (i stedet
+             for kun den offentlige nøgle <code>n=p·q</code>, <code>e</code>, som den burde), plus en
+             opsnappet ciffertekst <code>c</code>. RSA's sikkerhed hviler <em>udelukkende</em> på at
+             faktorisere <code>n</code> er svært, givet kun <code>n</code> og <code>e</code> — men her er
+             der intet at faktorisere, man kan beregne den private nøgle direkte.</p>
+<h2>Beregn d og dekryptér</h2>
+<pre><code>p = 56071706520419311198103263781
+q = 77706821840278501303995553379
+e = 65537
+c = 3180216847896822642607790534988843792574569579226923103980
+
+n = p * q
+phi = (p - 1) * (q - 1)
+d = pow(e, -1, phi)          # Python ≥3.8: pow() understøtter modulær invers direkte
+
+m = pow(c, d, n)
+flag_bytes = m.to_bytes((m.bit_length() + 7) // 8, 'big')
+print(flag_bytes)            # b'HKN{a_rsa_challenge}'</code></pre>
+             <p>Hele scriptet kører på under et sekund — ingen faktorisering, ingen brute force, kun ren
+             modulær aritmetik.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{a_rsa_challenge}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Tjek altid om en "offentlig nøgle" rent faktisk kun indeholder (n, e) — hvis p/q optræder nogen steder i klartekst (kode, logs, opgavetekst), er RSA'en game over uanset nøglelængde.</li><li>Når du HAR p og q: phi=(p-1)(q-1), d=pow(e,-1,phi), m=pow(c,d,n) — ingen bibliotek nødvendigt udover Pythons indbyggede pow().</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

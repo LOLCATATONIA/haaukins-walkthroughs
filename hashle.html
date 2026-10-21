@@ -23,11 +23,43 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><code>nc hashle.hkn 1337</code> viser MD5(gæt) + Wordle-feedback på hex-cifrene mod target-MD5.
-             Behold kun rockyou-ord hvor <code>Wordle(MD5(gæt), MD5(ord)) == observeret feedback</code>. MD5 spreder
-             ændringer, så ét gæt (<code>password</code>) skar 14M ord ned til <strong>én</strong> kandidat.</p>
+<p><code>nc hashle.hkn 1337</code> viser MD5(gæt) (32 hex-cifre) + en Wordle-feedback på
+             hex-cifrene mod target-MD5: grøn = rigtigt ciffer på rigtig position, gul = ciffer findes et andet
+             sted, sort = fraværende. Du har 6 gæt. Gæt noget (fx <code>password</code>), og brug feedbacken til
+             at <strong>filtrere</strong> rockyou, i stedet for at gætte blindt videre.</p>
+<h2>Filtrér rockyou offline</h2>
+<p>En kandidat <code>T</code> er konsistent med dit gæt <code>G</code> hvis
+             <code>feedback(MD5(G), MD5(T))</code> matcher den feedback du faktisk fik. Implementér Wordles
+             dublet-håndtering korrekt (ellers filtrerer du forkerte ord fra):</p>
+             <pre><code>import hashlib
+
+def feedback(g, t):
+    res = ['B'] * 32
+    cnt = {}
+    for i in range(32):
+        if g[i] == t[i]:
+            res[i] = 'G'
+        else:
+            cnt[t[i]] = cnt.get(t[i], 0) + 1
+    for i in range(32):
+        if res[i] != 'G' and cnt.get(g[i], 0) > 0:
+            res[i] = 'Y'
+            cnt[g[i]] -= 1
+    return ''.join(res)
+
+guess = "password"
+observed = "GG BB YB ..."   # den feedback-streng serveren viste dig, uden mellemrum
+guess_md5 = hashlib.md5(guess.encode()).hexdigest()
+
+candidates = [w.strip() for w in open("rockyou.txt", encoding="latin-1")
+              if feedback(guess_md5, hashlib.md5(w.strip().encode()).hexdigest()) == observed]
+print(candidates)   # typisk ÉT ord tilbage efter første gæt</code></pre>
+             <p>MD5 spreder ændringer kraftigt, så selv ét gæt som <code>password</code> (med 2 grønne cifre)
+             skar 14 millioner rockyou-ord ned til præcis <strong>ét</strong> kandidatord. Send det som dit næste
+             gæt i nc-sessionen.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Gæt 1 <code>password</code> → filtrerede til <code>trimoney</code> → gæt 2 = korrekt.</p>
+<p>Gæt 1 (<code>password</code>) filtrerede til ét kandidatord, <code>trimoney</code>. Gæt 2
+        var korrekt.</p>
         <p>Flag: <span class="flag">DDC{1_l1k3_y0ur_Funny_w0rd5_m4g1c_m4n}</span></p>
 </details>
 <h2>Hvad du har lært</h2>

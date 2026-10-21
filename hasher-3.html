@@ -26,7 +26,8 @@
 <p>En SHA-256 hvor preimage = salt + et ord fra en wiki-side, og man afleverer HELE preimage. Den dobbelte
              pun var nøglen: <code>'salted'</code> i citationstegn → saltet er bogstaveligt ordet <code>salted</code>;
              ordet fra siden er <code>situation</code>.</p>
-             <pre><code>sha256(b"saltedsituation") == target   # True</code></pre></p>
+             <pre><code>import hashlib
+hashlib.sha256(b"saltedsituation").hexdigest() == target   # True</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{saltedsituation}</span></p>
 </details>

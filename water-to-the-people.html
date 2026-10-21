@@ -31,10 +31,27 @@
 <p>Map addr→enhed ved at skrive én ad gangen og aflæse displayet: <code>addr 0</code> og <code>11</code>
              er ubrugte; junction <code>Jn</code> = coil <code>n</code>; pumperne = holding-register 1 og 2.</p>
 <h2>Vind-konfiguration</h2>
-<pre><code># åbn stien til alle 3 huse, hold kloak-junctions (J3,J7,J10) LUKKET:
-for a in 1 2 4 5 6 8 9: write_coil(a, True)      # FC5
-write_reg(1,250); write_reg(2,250)               # FC6, begge pumper >200
-# lyt med en socket.io(v4)-klient -> 'win' med data.flag</code></pre>
+<p>Brug <code>pymodbus</code> (<code>pip install pymodbus</code>) til selve Modbus-delen:</p>
+             <pre><code>python3 -c "
+from pymodbus.client import ModbusTcpClient
+c = ModbusTcpClient('water-city.hkn', port=502)
+c.connect()
+# åbn stien til alle 3 huse, hold kloak-junctions (J3,J7,J10) LUKKET:
+for a in (1, 2, 4, 5, 6, 8, 9):
+    c.write_coil(a, True)      # FC5
+c.write_register(1, 250)       # FC6, pumpe 1 &gt;200
+c.write_register(2, 250)       # pumpe 2 &gt;200
+c.close()"</code></pre>
+             <p>Flaget leveres <em>kun</em> via et <code>win</code>-socket.io-event, ikke på selve siden, så du
+             skal have en socket.io-klient tilsluttet <strong>mens</strong> du skriver Modbus-værdierne:</p>
+             <pre><code>pip install "python-socketio[client]"
+python3 -c "
+import socketio, time
+sio = socketio.Client()
+sio.on('win', lambda data: print('WIN:', data))
+sio.on('lose', lambda data: print('lose (recoverable):', data))
+sio.connect('http://water-city.hkn')
+time.sleep(30)   # hold forbindelsen åben mens du kører Modbus-skriptet ovenfor i et andet vindue"</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{1_l0v3_4_c0ld_6l455_0f_w473r}</span></p>
 </details>

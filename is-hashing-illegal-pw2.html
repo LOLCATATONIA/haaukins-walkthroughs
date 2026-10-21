@@ -23,7 +23,8 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p>En ulæselig credential: <code>380fbafd2a92eb8d442b419f18e43fce</code> = 32 hex-tegn = <strong>MD5</strong>.</p>
+<p><em>Fil: <code>evidence/credentials/pw-02.txt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
+             <p>En ulæselig credential: <code>380fbafd2a92eb8d442b419f18e43fce</code> = 32 hex-tegn = <strong>MD5</strong>.</p>
              <pre><code>hashcat -m 0 -a 0 hash.txt rockyou.txt        # eller john --format=raw-md5
 # python: hashlib.md5(word).hexdigest() == target</code></pre>
              <p>En lille dansk ordliste gav intet — den fulde <code>rockyou.txt</code> (14,3M ord) knækkede den.</p>

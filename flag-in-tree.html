@@ -26,13 +26,17 @@
 <p>Et stort filtræ (8194 filer) hvor hver fil rummer tusindvis af decoy-flag. Mål-filerne matcher et
              filnavns-mønster (starter med 'b', 3-tegns endelse med 'f' i midten).</p>
 <h2>Den afgørende indsigt</h2>
-<p>Decoy-generatoren lavede ALLE sine mønster-gyldige lokkeflag med samme <strong>længde-signatur
-             3-3-6</strong>. Det ægte, håndlagte flag er det eneste med en afvigende signatur <strong>2-3-5</strong>.</p>
+<p>Hver fil er fyldt med sætninger a la <code>This is not the flag: HKN{nq-ty-vq3QYm}</code>. Den
+             del, <code>nq-ty-vq3QYm</code>, er identisk i <em>alle</em> disse sætninger på tværs af hele træet, så
+             filtrér dem fra med <code>grep -v nq-ty</code> først. Blandt de resterende "bare" lokkeflag lavede
+             decoy-generatoren ALLE med samme <strong>længde-signatur 3-3-6</strong> (tre segmenter mellem
+             bindestregerne på hhv. 3, 3 og 6 tegn). Det ægte, håndlagte flag er det eneste med en afvigende
+             signatur <strong>2-3-5</strong>:</p>
              <pre><code>find . -type f -regextype posix-extended -regex '.*/b[^/]*\.[A-Za-z0-9]f[fge]' > targets.txt
 cat targets.txt | tr '\n' '\0' | xargs -0 grep -hoE '^HKN\{[^}]+\}$' | grep -v nq-ty | \
   awk -F'[{}-]' '{if(length($2)==2 &amp;&amp; length($3)==3 &amp;&amp; length($4)==5) print}'</code></pre>
-             <p>Tjek også <code>tar tzf | wc -l</code> mod antal udpakkede filer — en ufuldstændig udpakning kan mangle
-             netop målfilerne.</p>
+             <p>Tjek også <code>tar tzf | wc -l</code> mod antal udpakkede filer. En ufuldstændig udpakning kan
+             mangle netop målfilerne, hvilket skete her (7502 af 8194 filer første gang).</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{fj-kI5-EM5B7}</span></p>
 </details>

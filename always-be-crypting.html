@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Always Be Crypting — tutorial (knæk en substitutionscipher med en crib)</title>
+<meta name="description" content="Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Always Be Crypting — tutorial (knæk en substitutionscipher med en crib)">
+<meta property="og:description" content="Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Always Be Crypting", "description": "Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Always Be Crypting</h1>
+<p class="subtitle">Cifferteksten forklarer sin egen løsningsmetode — du skal bare genkende den.</p>
+<div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad møder du?</h2>
+<p><code>nc abcrypt.hkn 1337</code> stiller nogle ja/nej-spørgsmål om terminalfarver, og viser
+             derefter en lang, krypteret tekst. Teksten er krypteret med en klassisk
+             <strong>monoalfabetisk substitutionscipher</strong> (hvert bogstav A-Z er erstattet 1:1 med et
+             andet bogstav, konsekvent gennem hele teksten).</p>
+<h2>Crib i stedet for frekvensanalyse</h2>
+<p>Cifferteksten er ikke tilfældig — den er en standard-forklaring af, hvordan man knækker
+             netop denne type cipher ("one way to solve an encrypted message, if we know its language, is
+             to find a different plaintext of the same language long enough to..."). Det betyder du kan
+             <strong>gætte de første ord</strong> ("ONE WAY TO SOLVE...") og udvide nøglen bogstav for
+             bogstav, så længe hvert nyt gæt er konsistent med de bogstaver du allerede har låst fast:</p>
+             <pre><code># eksempel på fremgangsmåden, ikke et script du kører
+ciphertext = "VJW ZCB KV AVILW ..."
+# gæt: "ONE WAY TO SOLVE" matcher mønstret "VJW ZCB KV AVILW" i længde
+# => V=O, J=N, W=E, Z=A, C=W, B=Y, K=T, V=O (konsistent!), A=S, I=L, L=V, W=E (konsistent!)
+# udvid ordet for ord indtil hele 26-bogstavs-nøglen er låst</code></pre>
+             <p>Hele teksten giver meningsfuldt engelsk når nøglen er færdig — det er din bekræftelse på at
+             du har ramt rigtigt, uden at skulle køre en eneste frekvenstælling.</p>
+<h2>Byg flaget via serverens protokol</h2>
+<p>Serveren beder derefter om input i formatet <code>CIPHERBOGSTAV:PLAINBOGSTAV</code>
+             (fx <code>A:S</code>), ét par ad gangen. Flaget bygges live som
+             <code>HKN{&lt;26 bogstaver i substitutions-rækkefølge A-Z&gt;}</code> når hele nøglen er
+             indtastet korrekt.</p>
+             <p><strong>Kendt kvirk:</strong> den allerførste kommando sendt lige efter de indledende
+             ja/nej-spørgsmål bliver konsekvent droppet af serveren (en race condition i dens input-læsning).
+             Send et harmløst par først (fx en du er mindre sikker på) for at absorbere dette, eller gem det
+             sidste bogstav til sidst i stedet for at sende det først.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Afkodnings-nøgle (cipher → plain) for denne instans:</p>
+        <pre><code>A→S B→Y C→A D→J E→M F→X G→Z H→Q I→L J→N K→T L→V M→U
+N→D O→R P→H Q→F R→K S→B T→C U→P V→O W→E X→G Y→I Z→W</code></pre>
+        <p>Flag: <span class="flag">HKN{SYAJMXZQLNTVUDRHFKBCPOEGIW}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En "flashy" krypteret tekst er ikke altid tilfældig — tjek om den beskriver sin egen løsning.</li><li>Crib-angreb (gæt et sandsynligt ord, udvid konsistent) slår blind frekvensanalyse når teksten er lang og forudsigelig.</li><li>Interaktive CTF-services kan have reelle race conditions i deres egen input-håndtering — send en no-op først hvis dit første svar konsekvent ignoreres.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

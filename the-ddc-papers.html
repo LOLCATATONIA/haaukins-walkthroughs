@@ -27,12 +27,17 @@
              med <strong>128 navne-linjer</strong>. 128 linjer = 128 bit = <strong>16 bytes = AES-128-nøgle</strong>,
              skjult som trailing space (1) / ingen (0).</p>
 <h2>Fremgangsmåde</h2>
-<pre><code>bits = ''.join('1' if l.endswith(b' ') else '0' for l in lines)   # 128 linjer
-key  = int(bits,2).to_bytes(16,'big')                            # b'z$C&amp;F)J@McQfTjWn'
+<p>Tjek først at mistanken er rigtig. <code>cat -A Deltagerliste.txt</code> viser linjeslut som
+             <code>$</code>; en linje med trailing space før <code>$</code> ser ud som <code>navn $</code>, en uden
+             som <code>navn$</code>. Kræver <code>pycryptodome</code> (<code>pip install pycryptodome</code>):</p>
+             <pre><code>lines = open("Deltagerliste.txt", "rb").readlines()                # 128 linjer, rå bytes
+bits  = ''.join('1' if l.rstrip(b'\n').endswith(b' ') else '0' for l in lines)
+key   = int(bits, 2).to_bytes(16, 'big')                            # b'z$C&amp;F)J@McQfTjWn'
+ciphertext = open("Referat.bin", "rb").read()
 from Crypto.Cipher import AES
-print(AES.new(key, AES.MODE_ECB).decrypt(ciphertext))            # ... DDC{StegosRUs} ...</code></pre>
-             <p>Signal: en fil kaldes udtrykkeligt "harmløs, men del den ikke" → den bærer nøglen. Tjek
-             <code>cat -A</code> for trailing whitespace; 128/256 linjer → præcis en AES-128/256-nøgle.</p>
+print(AES.new(key, AES.MODE_ECB).decrypt(ciphertext))               # ... DDC{StegosRUs} ...</code></pre>
+             <p>Signal: en fil kaldes udtrykkeligt "harmløs, men del den ikke". Det er selve hintet om at den bærer
+             nøglen. 128/256 linjer, der hver kun bidrager 1 bit, giver præcis en AES-128/256-nøgle.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Afleveres som DDC (<code>HKN{...}</code> blev afvist).</p>
         <p>Flag: <span class="flag">DDC{StegosRUs}</span></p>

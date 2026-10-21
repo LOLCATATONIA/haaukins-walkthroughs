@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: PourSoft 1-3 — tutorial (lækkede git-secrets → Drone-maskerings-bypass → global admin)</title>
+<meta name="description" content="Guide til Haaukins PourSoft 1-3: en fuld CI/CD-eksploitationskæde fra en lækket git-historik-nøgle, via en base64-bypass af Drones secret-maskering, til global Gitea-admin og root-SSH på en intern server.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/poursoft-chain.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: PourSoft 1-3 — tutorial (lækkede git-secrets → Drone-maskerings-bypass → global admin)">
+<meta property="og:description" content="Guide til Haaukins PourSoft 1-3: en fuld CI/CD-eksploitationskæde fra en lækket git-historik-nøgle, via en base64-bypass af Drones secret-maskering, til global Gitea-admin og root-SSH på en intern server.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/poursoft-chain.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "PourSoft-kæden (1–3)", "description": "Guide til Haaukins PourSoft 1-3: en fuld CI/CD-eksploitationskæde fra en lækket git-historik-nøgle, via en base64-bypass af Drones secret-maskering, til global Gitea-admin og root-SSH på en intern server.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/poursoft-chain.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>PourSoft-kæden (1–3)</h1>
+<p class="subtitle">Tre trin, samme mønster hver gang: en hemmelighed der SKULLE være skjult, lækker via et sidespor udvikleren ikke tænkte på.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>PourSoft 1 (10p) — en hemmelighed der lever i git-historikken</h2>
+<p>Gitea's REST API kræver ingen auth for at liste OFFENTLIGE repos:</p>
+             <pre><code>curl -sk "https://&lt;ip&gt;/api/v1/repos/search?limit=50" -H "Host: git.poursoft.hkn"</code></pre>
+             <p>Gennemgang af commit-historikken for hver repo (ikke bare HEAD) afslører mistænkelige
+             commit-beskeder som "Add key"/"Remove token" — tegn på at en secret blev committet og
+             senere fjernet, men stadig lever i historikken:</p>
+             <pre><code># diff fra commit 0a920b4c ("Add key") i p.smith/scripts, setup.sh:
++echo "RERDe3RoMHNlX3Azc2t5X3B1YmwxY19naXRfcjNwMHNfMG5fczNsZmgwc3RlZH0=" | base64 -d &gt; ~/key</code></pre>
+             <pre><code>echo "RERDe3RoMHNlX3Azc2t5X3B1YmwxY19naXRfcjNwMHNfMG5fczNsZmgwc3RlZH0=" | base64 -d
+# DDC{th0se_p3sky_publ1c_git_r3p0s_0n_s3lfh0sted}</code></pre>
+             <p><strong>Bonus i samme diff:</strong> et Gitea personal-access-token for p.smith —
+             fungerer som password til BÅDE REST API'en (basic auth) og web-login'et, og afslører en
+             privat repo brugeren har push-adgang til. Det er nøglen til trin 2.</p>
+<h2>PourSoft 2 (35p) — Drone maskerer secrets, men kun den EKSAKTE byte-streng</h2>
+<p>Den private repo har en <code>.drone.yml</code> der printer en "write-only" secret
+             direkte til build-loggen. Drone maskerer automatisk eksakte forekomster af en kendt
+             secret-værdi i output med <code>******</code> — men da du har push-adgang til repoet, kan
+             du simpelthen OMKODE outputtet før print:</p>
+             <pre><code>commands:
+  - echo $SECRET_VALUE | base64</code></pre>
+             <p>Base64-encoding producerer en helt anden byte-streng end selve secret'en, så
+             maskeringsfilteret matcher ikke længere, og den fulde (encodede) værdi lander ucensureret i
+             loggen:</p>
+             <pre><code>RERDe1dhMXRfczNjcjN0c180cjNfbjB0X3MzY3IzdH0K  →  DDC{Wa1t_s3cr3ts_4r3_n0t_s3cr3t}</code></pre>
+             <p><strong>Login til Drone</strong> sker via OAuth2 gennem Gitea — med en gyldig Gitea-
+             session kan hele OAuth-flowet simuleres med ren <code>curl</code> (ingen browser
+             nødvendig): følg redirect'en til Gitea's <code>/login/oauth/authorize</code>, som
+             auto-godkender (appen er allerede autoriseret), redirecter tilbage med en <code>code</code>,
+             og Drone sætter en session-cookie.</p>
+             <p><strong>Bonus-fund:</strong> samme encoding-trick afslørede også repoets
+             <code>docker_username</code>/<code>docker_password</code>-secrets —
+             <code>gitadmin</code>, den GLOBALE Gitea-administrator-konto. Fuld instans-kontrol opnået.</p>
+<h2>PourSoft 3 (65p) — brug admin-adgangen til at finde EN NY privat repo, og omskriv dens deploy</h2>
+<p>Med <code>gitadmin</code> kan du liste ALLE repos inkl. private (admin bypasser
+             permission-checks):</p>
+             <pre><code>curl -sk ".../api/v1/repos/search?limit=50&amp;private=true" -u "gitadmin:&lt;token&gt;"</code></pre>
+             <p>Dette finder en repo med en <code>.drone.yml</code> der deployer via SSH til en intern
+             server med en deploy-nøgle fra en secret. <code>gitadmin</code> har Gitea-skriveadgang til
+             repoet, men ingen Drone-brugersession for netop den repo — løsningen er at bruge
+             gitadmin's admin-API til at tilføje <code>p.smith</code> som collaborator, resynkronisere
+             Drone, og derefter trigge repoet som p.smith (som du allerede kan logge ind som via
+             OAuth).</p>
+             <p>Redigér <code>.drone.yml</code> (via gitadmin's skriveadgang) til at bruge selve
+             deploy-nøglen til at SSH'e ind og læse flaget direkte, i stedet for blot at kopiere filer
+             ud:</p>
+             <pre><code>commands:
+  - echo $key | base64 -d &gt; /sshkey
+  - chmod 600 /sshkey
+  - ssh -i /sshkey -o StrictHostKeyChecking=no root@internalnginxweb.poursoft.hkn "cat /flag*"</code></pre>
+             <p>Build-loggen afslører: <code>DDC{th1s_1s_b3c0ming_s3ri0us}</code> — og du har nu root
+             SSH-adgang til en intern server der ikke er direkte nåbar fra VPN'et, kun via
+             CI-pipelinens egen deploy-nøgle.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag pr. trin:</p>
+        <ul>
+        <li>PourSoft 1 <span class="flag">DDC{th0se_p3sky_publ1c_git_r3p0s_0n_s3lfh0sted}</span></li>
+        <li>PourSoft 2 <span class="flag">DDC{Wa1t_s3cr3ts_4r3_n0t_s3cr3t}</span></li>
+        <li>PourSoft 3 <span class="flag">DDC{th1s_1s_b3c0ming_s3ri0us}</span></li>
+        </ul>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En fjernet secret lever stadig i git-historikken — tjek commit-diffs, ikke kun den aktuelle HEAD.</li><li>Automatisk secret-maskering matcher typisk kun den EKSAKTE byte-streng — enhver omkodning (base64, hex, rot13) af outputtet før print omgår filteret, hvis du har skriveadgang til pipelinen.</li><li>OAuth2-flows kan simuleres fuldt med curl + en cookie-jar, ingen browser nødvendig, så længe du allerede har en gyldig session hos identity provideren.</li><li>Admin-adgang til ÉT system (Gitea) giver ofte en vej ind i et INTEGRERET system (Drone CI) via deres fælles OAuth/service-account-tillid.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

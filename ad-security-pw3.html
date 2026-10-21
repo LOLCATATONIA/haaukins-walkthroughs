@@ -23,7 +23,8 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><code>43239E3A0AF748020D5B426A4977D7E5</code> — 32 hex <strong>uppercase</strong>, og "AD"
+<p><em>Fil: <code>evidence/credentials/pw-03.txt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
+             <p><code>43239E3A0AF748020D5B426A4977D7E5</code> — 32 hex <strong>uppercase</strong>, og "AD"
              (Active Directory) i titlen = <strong>NTLM</strong> = <code>MD4(UTF-16LE(password))</code>.</p>
 <h2>Fremgangsmåde</h2>
 <p><code>hashcat -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4 — brug

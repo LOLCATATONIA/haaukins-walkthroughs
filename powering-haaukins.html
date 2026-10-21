@@ -23,14 +23,22 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Recon</h2>
-<p><code>Danwind.hkn</code>: MQTT 1883 + web-dashboard (WebSocket). Subscribe <code>#</code> →
-             6 møller <code>windmills/{id}/status</code> = <code>{ID,Speed,Running,Power}</code>. Dashboard-JS åbner
-             <code>ws://host/ws</code> og modtager <code>{..,HaaukinsPower,Flag}</code> — Flag sættes når HaaukinsPower
-             rammer target.</p>
+<pre><code>mosquitto_sub -h danwind.hkn -p 1883 -t '#' -v</code></pre>
+             <p>Giver 6 møller på <code>windmills/{id}/status</code> = <code>{ID,Speed,Running,Power}</code>.
+             Dashboard-JS åbner <code>ws://danwind.hkn/ws</code> og modtager <code>{..,HaaukinsPower,Flag}</code>.
+             Flag sættes når HaaukinsPower rammer target. For selv at se WebSocket-strømmen uden at åbne en
+             browser:</p>
+             <pre><code>pip install websocket-client
+python3 -c "
+import websocket
+ws = websocket.create_connection('ws://danwind.hkn/ws')
+while True:
+    print(ws.recv())"</code></pre>
 <h2>Spoof med retained messages</h2>
 <p>Møllerne reagerer ikke pålideligt på <code>/cmd</code>, men du kan <strong>spoofe status-topics
              direkte</strong>. KRITISK: publicér med <code>-r</code> (retained), ellers bliver aflæsningen stale/0.
-             Kalibrér HP ved at sætte samme Power på alle og aflæse via WebSocket → lineær
+             Kalibrér HP ved at sætte samme Power på alle møller og se hvad WebSocket-strømmen (fra scriptet
+             ovenfor) rapporterer som HaaukinsPower for den totale effekt. Sammenhængen er lineær:
              <code>HP% = total × (20/9) − 100</code>.</p>
 <h2>Ram target HP=100%</h2>
 <pre><code># total=90 -> 15 Power pr. mølle:

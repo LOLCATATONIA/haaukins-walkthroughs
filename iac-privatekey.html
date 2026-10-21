@@ -23,7 +23,8 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code>cd ~/infrastructure &amp;&amp; git log --oneline --all     # commit-beskeder = vektor + hint
+<pre><code>sshpass -p haaukins ssh haaukins@securevpn.hkn   # bruger/password: haaukins/haaukins
+cd ~/infrastructure &amp;&amp; git log --oneline --all     # et Terraform-repo; commit-beskeder = vektor + hint
 # hent 'slettede' blobs (slettet fil = stadig et git-objekt):
 git rev-list --all --objects | awk '{print $1}' | while read o; do \
   [ "$(git cat-file -t $o)" = blob ] &amp;&amp; git cat-file -p $o 2>/dev/null | grep -q 'PRIVATE KEY' &amp;&amp; echo $o; done

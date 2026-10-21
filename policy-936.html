@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Policy 936 — tutorial (XKCD-hintet password, men en fælde før den rigtige privesc)</title>
+<meta name="description" content="Guide til Haaukins Policy 936: et XKCD #936-hint giver det &#x27;oplagte&#x27; password direkte, men fører kun til et decoy-flag — den rigtige vej kræver at tjekke sudo -l for FLERE brugere, ikke bare den første der logger ind.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/policy-936.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Policy 936 — tutorial (XKCD-hintet password, men en fælde før den rigtige privesc)">
+<meta property="og:description" content="Guide til Haaukins Policy 936: et XKCD #936-hint giver det &#x27;oplagte&#x27; password direkte, men fører kun til et decoy-flag — den rigtige vej kræver at tjekke sudo -l for FLERE brugere, ikke bare den første der logger ind.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/policy-936.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Policy 936", "description": "Guide til Haaukins Policy 936: et XKCD #936-hint giver det 'oplagte' password direkte, men fører kun til et decoy-flag — den rigtige vej kræver at tjekke sudo -l for FLERE brugere, ikke bare den første der logger ind.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/policy-936.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Policy 936</h1>
+<p class="subtitle">Det oplagte password virker — men kun på de brugere opgaven VIL have dig til at tro er målet.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hintet: XKCD #936</h2>
+<p>Opgaveteksten ("new password policies... policy 936... state-of-the-art") peger direkte
+             på <a href="https://xkcd.com/936/" target="_blank">XKCD #936 "Password Strength"</a> —
+             tegneserien om <code>correct horse battery staple</code> vs. <code>Tr0ub4dor&amp;3</code>.</p>
+             <pre><code>nmap -Pn -p- --open &lt;ip&gt;
+# 21/tcp open ftp    22/tcp open ssh   (ingen HTTP)
+curl -s "ftp://&lt;ip&gt;/" -u "anonymous:anonymous"
+# -rw-r--r-- 1 ftp users 93427 ... backup.zip</code></pre>
+             <p><code>backup.zip</code> indeholder en brugerliste (<code>alice, bob, charlie, ftp,
+             root</code>) og selve XKCD-tegneserien som billede — bekræfter temaet og antyder det reelle
+             password: <code>correcthorsebatterystaple</code>. Zip-filen er selv password-beskyttet;
+             knækket med John (<code>zip2john</code> + rockyou.txt) på under et sekund: <code>whatever</code>.</p>
+<h2>Fælden: et forberedt decoy-flag</h2>
+<p>SSH med <code>correcthorsebatterystaple</code> virker direkte for <strong>alice</strong>
+             og <strong>charlie</strong> (men IKKE <code>bob</code> eller <code>root</code>). Men deres
+             <code>flag.txt</code> indeholder kun:</p>
+             <pre><code>ĐĐC{soooooory-try-again}</code></pre>
+             <p>Bemærk det usædvanlige "Đ" (ikke almindeligt "D") og den useriøse tekst — en bevidst
+             fælde for at straffe den "oplagte" løsning uden videre efterforskning.</p>
+<h2>Den rigtige vej: tjek sudo -l for HVER bruger</h2>
+<p><code>charlie</code> har en reel sudo-rettighed, som kun bliver synlig hvis man rent
+             faktisk kører <code>sudo -l</code> efter login:</p>
+             <pre><code>ssh charlie@936.hkn   # password: correcthorsebatterystaple
+sudo -l
+# User charlie may run the following commands:
+#     (ALL) NOPASSWD: /bin/cat</code></pre>
+             <p><code>charlie</code> kan køre <code>/bin/cat</code> som root uden password.
+             <code>bob</code>'s <code>flag.txt</code> er root-ejet (<code>-r-------- root root 33</code>,
+             modsat alice/charlies egne 27-byte decoy-flag — en filstørrelse-forskel synlig allerede via
+             en almindelig <code>ls -la /home/*/</code>):</p>
+             <pre><code>sudo /bin/cat /home/bob/flag.txt
+# DDC{iae9PpYLFWSls-nbHcXIeRrpwZJ}</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{iae9PpYLFWSls-nbHcXIeRrpwZJ}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et direkte kulturelt hint (XKCD-reference) kan give et ægte, virkende password — men "det virker" betyder ikke automatisk "det er flaget".</li><li>Tjek sudo -l for HVER kompromitteret bruger, ikke kun den første der lykkedes — forskellige brugere kan have helt forskellige privesc-veje.</li><li>Filstørrelse (ls -la) er et billigt, tidligt signal om at noget er anderledes ved én bestemt fil blandt flere ellers-identiske.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

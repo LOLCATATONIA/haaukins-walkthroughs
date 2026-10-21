@@ -32,12 +32,40 @@ upx -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-in
              <pre><code>srandom(epoch); r1=rand(); r2=rand();
 kode = epoch - (r1 % 10000) + (r2 % 10000);</code></pre>
              <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk.
-             <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc. Reimplementér
-             glibc's <code>random()</code> — en TYPE_3 additiv generator med 31-ords state-tabel, seedet som
-             <code>srandom</code> (<code>r[0]=seed</code>; <code>r[i] = 16807·r[i-1] mod (2³¹−1)</code>), output =
-             <code>(r[i-31] + r[i-3]) &gt;&gt; 1</code>, og smid de første 310 outputs væk. Verificér din reimpl byte-for-byte
-             mod ægte libc før du stoler på den. Send koden → match → <code>system("/bin/sh")</code> på
-             <code>nc …:1338</code>.</p>
+             <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc — du skal
+             genimplementere glibc's egen TYPE_3 additive generator (31-ords cirkulær buffer, separation 3):</p>
+             <pre><code>def glibc_random(seed):
+    deg, sep = 31, 3
+    r = [0] * deg
+    word = seed &amp; 0xffffffff
+    if word == 0:
+        word = 1
+    r[0] = word
+    for i in range(1, deg):
+        hi, lo = divmod(word, 127773)
+        word = 16807 * lo - 2836 * hi
+        if word &lt; 0:
+            word += 2147483647
+        r[i] = word
+    fptr, rptr = sep, 0
+    def step():
+        nonlocal fptr, rptr
+        r[fptr] = (r[fptr] + r[rptr]) &amp; 0xffffffff
+        result = r[fptr] &gt;&gt; 1
+        fptr = (fptr + 1) % deg
+        rptr = (rptr + 1) % deg
+        return result
+    for _ in range(deg * 10):   # glibc smider de første 310 outputs væk
+        step()
+    while True:
+        yield step()
+
+g = glibc_random(epoch)   # epoch = det seed serveren lækkede i banneret
+r1, r2 = next(g), next(g)
+kode = epoch - (r1 % 10000) + (r2 % 10000)</code></pre>
+             <p>Jeg har selv verificeret denne implementation byte-for-byte mod en rigtig glibc <code>random()</code>
+             (kompileret et lille C-testprogram og sammenlignet output for samme seed) før den blev sat her. Send
+             koden → match → <code>system("/bin/sh")</code> på <code>nc …:1338</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{F0RBRYDELSE_B3TALER_S1G_1KK3}</span></p>
 </details>

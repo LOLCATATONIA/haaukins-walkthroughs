@@ -37,8 +37,27 @@ sudo tcpdump -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</
              frame) — kun server→klient er læsbar med <code>strings</code>. Af-masker klient-frames manuelt:</p>
              <pre><code># WS-frame: [FIN+opcode][MASK+len][evt. ext-len][4-byte nøgle][maskeret payload]
 # payload[i] XOR nøgle[i % 4]  giver klarteksten
-tshark -r ocpp.pcap -Y 'ip.src==&lt;charger&gt; &amp;&amp; tcp.len&gt;0' -T fields -e tcp.payload
-# -> for hver frame: læs længde (byte1 &amp; 0x7f), tag de 4 nøgle-bytes, XOR resten</code></pre>
+tshark -r ocpp.pcap -Y 'ip.src==&lt;charger&gt; &amp;&amp; tcp.len&gt;0' -T fields -e tcp.payload</code></pre>
+             <p>Af-maskér hver hex-streng fra outputtet ovenfor:</p>
+             <pre><code>python3 -c "
+def unmask(raw: bytes) -> bytes:
+    b1 = raw[1]
+    masked = (b1 &amp; 0x80) != 0
+    length = b1 &amp; 0x7f
+    i = 2
+    if length == 126:
+        length = int.from_bytes(raw[2:4], 'big'); i = 4
+    elif length == 127:
+        length = int.from_bytes(raw[2:10], 'big'); i = 10
+    if not masked:
+        return raw[i:i+length]
+    key = raw[i:i+4]
+    payload = raw[i+4:i+4+length]
+    return bytes(c ^ key[j % 4] for j, c in enumerate(payload))
+
+raw = bytes.fromhex('&lt;hex-streng-fra-tshark&gt;')
+print(unmask(raw).decode(errors='replace'))"
+# -> [2,"&lt;id&gt;","BootNotification",{...}]</code></pre>
              <p>Resultatet er OCPP-JSON som <code>[2,"&lt;id&gt;","BootNotification",{…}]</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget lå i <strong>BootNotification</strong>'s <code>chargePointVendor</code>-felt, base64-kodet
