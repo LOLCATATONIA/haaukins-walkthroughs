@@ -57,7 +57,7 @@ curl "http://hgls-delivery.hkn/index.php?CJSecretPackage=../../../../../../var/l
 <h2>Hvad du har lært</h2>
 <ul><li>En loggende, skrivbar service (FTP, mail, SSH-banner) der også er LFI-inkluderbar er en klassisk log-poisoning-RCE-kombination.</li><li>En SUID-flagget sprogtolk (php, python, perl) giver effektiv root ved start, men almindelige exec-funktioner dropper ofte privilegierne igen — synkronisér uid EKSPLICIT (posix_setuid(0)) før du kalder ud til et shell.</li><li>find / -iname "*flag*" fanger ikke-standard filnavne som ren "find /root -name flag.txt" ville misse.</li></ul>
 <footer>
-Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.com/" target="_blank">Haaukins</a>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
