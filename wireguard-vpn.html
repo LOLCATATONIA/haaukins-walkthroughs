@@ -87,8 +87,11 @@ ip route get 1.1.1.1              # skal IKKE gå via wg-interfacet</code></pre>
 <h2>Hvad du har lært</h2>
 <ul><li>Installér konfigurationen i <code>/etc/wireguard/</code> med <code>install -m 600</code>, så kun root kan læse din private nøgle.</li><li>Rør aldrig <code>AllowedIPs</code>, og især ikke til <code>0.0.0.0/0</code>. Det laver en full tunnel og kan tage al din anden trafik med.</li><li>Den hyppigste fejl er ikke VPN'en: det er en stale <code>/etc/hosts</code>-entry fra før sidste lab-genstart. Re-synk den hver gang du Stop/Reset'er.</li><li>En lykkedes <code>ping</code> beviser kun ICMP og routing, ikke at hostname eller service er korrekte. Verificér på servicens eget niveau.</li></ul>
 <footer>
-Del af <a href="index.html">Haaukins CTF-tutorials</a>. Materialet er løsningsstøtte til en autoriseret
-trænings-/CTF-kontekst — brug det til at lære, ikke til at springe læringen over.
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.com/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
 </footer>
 </div>
 </body>
