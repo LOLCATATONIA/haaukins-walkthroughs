@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: brute2root-race, tutorial (fra IDOR til root via et race condition)</title>
+<meta name="description" content="Guide til Haaukins brute2root-race: en fem-trins kæde fra web-recon over en IDOR og en LFI til et sudo race condition der lækker roots password.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/brute2root-race.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: brute2root-race, tutorial (fra IDOR til root via et race condition)">
+<meta property="og:description" content="Guide til Haaukins brute2root-race: en fem-trins kæde fra web-recon over en IDOR og en LFI til et sudo race condition der lækker roots password.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/brute2root-race.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "brute2root-race", "description": "Guide til Haaukins brute2root-race: en fem-trins kæde fra web-recon over en IDOR og en LFI til et sudo race condition der lækker roots password.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/brute2root-race.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>brute2root-race</h1>
+<p class="subtitle">To flag, user og root, i forlængelse af samme kæde.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<h2>Trin 0: ingen DNS-record, scan selv VPN-subnettet</h2>
+<p>Opgaveteksten ("Find the IP and hack the machine, fast") hinter direkte: der er INGEN
+             forhåndskendt host. Scan VPN-subnettet for åbne SSH/HTTP-porte i stedet for at gætte et
+             hostname:</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p21,22,23,80 --open -T4 &lt;subnet&gt;/24 -oG scan.gnmap</code></pre>
+             <p>Én host skiller sig ud med både ssh(22) og http(80) åbne. HTTP'en redirecter videre til
+             <code>user.brute2root.hkn</code>.</p>
+<h2>Trin 1: en Flask-app med et IDOR, låst af et sikkert session-design, men IKKE af adgangskontrollen</h2>
+<p><code>user.brute2root.hkn</code> er en register/login-app hvor hver bruger har en
+             note-side. Session-cookien er Flask-signeret med en tilfældig <code>os.urandom(32)</code>-nøgle,
+             så den kan IKKE forfalskes udefra. Men selve dataformatet i cookien er informativt:</p>
+             <pre><code>{"logged_in": true, "userid": "&lt;hash&gt;"}
+# hvor userid = MD5(username + ":" + password)</code></pre>
+             <p>Note-siden ligger på <code>/&lt;userid&gt;</code>, og her er den egentlige sårbarhed: der er
+             intet tjek for at <code>userid</code>'et i URL'en rent faktisk tilhører den indloggede bruger,
+             et klassisk IDOR. Enhver indlogget bruger kan læse en anden brugers note ved at ændre
+             userid'et i stien.</p>
+<h2>Trin 2: forsidens eget hint peger på et andet, separat login</h2>
+<p>Forsiden nævner selv: <em>"'moderator', use the other site:
+             moderator.brute2root.hkn"</em>. Det er et separat login med sin egen database (ingen
+             selv-registrering). Brute-force login for brugeren <code>moderator</code>, og brug
+             svar-koden som oracle (302 = succes, 200 = fejl, ikke fejlbeskeden):</p>
+             <pre><code># POST /login/ mod Host: moderator.brute2root.hkn, rockyou.txt
+# -> moderator:slideshow (302 Found)</code></pre>
+             <p>Standardværktøjer som <code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span></code> kan have problemer med at styre
+             <code>Host</code>-headeren korrekt for en virtuel host på denne måde, et simpelt Python-script
+             med fuld kontrol over headeren er mere pålideligt her.</p>
+<h2>Trin 3: moderator-panelet har sit eget, usaniterede filnavn, path traversal</h2>
+<p>Moderator-panelet lader en moderator "inspicere" en brugers note via
+             <code>POST note=&lt;userid&gt;.txt</code>, som returnerer filindholdet direkte i en
+             <code>&lt;div&gt;</code>. Filnavnet er IKKE saniteret:</p>
+             <pre><code>note=../app.py                          # kildekoden, bekræfter MD5-skemaet
+note=../../../../../etc/passwd          # eneste rigtige bruger: moderator (uid 1000)
+note=../../../../../home/moderator/flag.txt   # USER-FLAG</code></pre>
+             <p><code>/proc/self/status</code> bekræfter at selve web-appen kører som uid 1000 (moderator),
+             så traversal-læsningen når ind i moderatorens home-mappe. Der ligger både USER-flaget og to
+             nøgler mere: <code>.ssh/id_rsa</code> (moderatorens private SSH-nøgle) og
+             <code>.bash_history</code> (afslører et sudo-password, <code>0h_b0y_1ts_b4d</code>, og at
+             moderator har en sudo-ret til <code>passwordbackup.py</code>).</p>
+<h2>Trin 4: fra moderator-shell til root via et TOCTOU-race i et sudo-script</h2>
+<p>SSH ind med den fundne private nøgle, og tjek den eksisterende sudo-ret:</p>
+             <pre><code>ssh -i id_rsa moderator@&lt;ip&gt;
+echo '0h_b0y_1ts_b4d' | sudo -S -l
+# (ALL:ALL) /usr/bin/python3 /home/moderator/passwordbackup.py</code></pre>
+             <p>Scriptet kører som root, kopierer <code>/etc/shadow</code> til en ny backup-fil, og sætter
+             først BAGEFTER <code>chmod 0600</code> på den. Imellem <code>open('w')</code> (som opretter
+             filen med standard-umask, altså world-readable 0644) og selve <code>chmod</code>-kaldet er der
+             et kort tidsvindue hvor filen kan læses af alle, et klassisk TOCTOU race condition:</p>
+             <pre><code>( while true; do cat /etc/passbak/*.txt 2>/dev/null >> /tmp/stolen; done ) &amp;
+for i in $(seq 1 40); do
+  echo '0h_b0y_1ts_b4d' | sudo -S /usr/bin/python3 /home/moderator/passwordbackup.py >/dev/null 2>&1
+  grep -q '^root:' /tmp/stolen && break
+done</code></pre>
+             <p>Kør backup-kommandoen mange gange MENS en tight loop konstant forsøger at læse den nyeste
+             backup-fil, i et af forsøgene vinder loopet kapløbet og fanger roots shadow-linje. Knæk
+             <code>$6$</code>-hashen offline (john/hashcat + rockyou) for at få roots rigtige password, log
+             ind som root, og læs ROOT-flaget.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>USER-flag: <span class="flag">HKN{c00l_fl4g_4_u_br0}</span></p>
+        <p>ROOT-flag: <span class="flag">HKN{3v3n_c00l3r_fl4g_0h_mY_d4mN}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Ingen DNS-record betyder ikke ingen host, scan selv VPN-subnettet for åbne porte.</li><li>Et sikkert SIGNERET session-design (umuligt at forfalske) beskytter ikke mod en IDOR i applikationslogikken, der er to forskellige ting.</li><li>Et filnavn der bygges direkte ind i en filsti uden sanering er en path traversal, uanset hvor uskyldigt feature'en ser ud ("vis denne note").</li><li><code>open('w')</code> opretter en fil med standard-umask (ofte world-readable), et efterfølgende <code>chmod</code> har et tidsvindue der kan race'es ved at spamme operationen mens en loop konstant forsøger at læse filen.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Kæden her er et klassisk eksempel på at hvert enkelt trin kan være "sikkert" i
+isolation (signerede cookies, et sudo-script der rent faktisk sætter 0600 til sidst) og stadig
+være usikker i sammenhæng. TOCTOU-mønstret (Time-Of-Check-To-Time-Of-Use) går igen overalt hvor et
+program skriver noget følsomt FØR det låser adgangen ned, ikke kun i filrettigheder, men også i
+database-transaktioner og låse generelt. Og IDOR (Insecure Direct Object Reference, et id i en
+URL/parameter der ikke tjekkes mod den indloggede bruger) er en af de hyppigste webapp-sårbarheder
+i praksis, fordi den ser harmløs ud indtil man rent faktisk prøver at ændre id'et.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

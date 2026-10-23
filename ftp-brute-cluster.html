@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Secure FTP Server &amp; FTP Server Login, tutorial (hydra mod vsftpd)</title>
+<meta name="description" content="Guide til Haaukins Secure FTP Server og FTP Server Login: to næsten identiske vsftpd-brute-force-opgaver, samme metode, forskellig trådindstilling.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ftp-brute-cluster.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Secure FTP Server &amp; FTP Server Login, tutorial (hydra mod vsftpd)">
+<meta property="og:description" content="Guide til Haaukins Secure FTP Server og FTP Server Login: to næsten identiske vsftpd-brute-force-opgaver, samme metode, forskellig trådindstilling.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ftp-brute-cluster.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Secure FTP Server & FTP Server Login", "description": "Guide til Haaukins Secure FTP Server og FTP Server Login: to næsten identiske vsftpd-brute-force-opgaver, samme metode, forskellig trådindstilling.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ftp-brute-cluster.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Secure FTP Server &amp; FTP Server Login</h1>
+<p class="subtitle">To opgaver, samme metode, men én detalje om tråd-antal afgør om det er hurtigt eller smertefuldt.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<h2>Secure FTP Server: standardmetoden</h2>
+<p>Host <code>secure-ftp.com</code>, vsftpd, anonym adgang nægtet. Opgaveteksten giver
+             brugernavnet direkte: <em>"weak login credentials... username admin"</em>.</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l admin -P rockyou.txt -t 8 -f ftp://&lt;ip&gt;
+# admin:123qwe
+ftp &lt;ip&gt;   # login admin / 123qwe
+get oh-no.txt</code></pre>
+             <p>Flaget ligger i <code>oh-no.txt</code> efter login.</p>
+<h2>FTP Server Login: samme opskrift, men langsommere uden justering</h2>
+<p>Host <code>ftplogin.com</code>, samme "Haaukins FTP Server Challenge!"-banner, også
+             anonym nægtet. Opgaveteksten hinter selv ordlisten: <em>"log in as admin ... (Go
+             john!)"</em>, "Go john!" er et praj om John the Ripper-slangets standard-ordliste,
+             rockyou.</p>
+             <pre><code>hydra -l admin -P rockyou.txt -t 16 ftp://&lt;ip&gt;
+# admin:thunderbird
+ftp &lt;ip&gt;   # login admin / thunderbird
+get donotopen.txt</code></pre>
+             <p>Vigtig forskel fra den første opgave: vsftpds <code>delay_failed_login</code> gør
+             bruten mærkbart langsommere ved lavt trådantal. <code>-t 16</code> i stedet for
+             <code>-t 4</code>/<code>-t 8</code> gav her omkring 4x hurtigere gennemløb, uden at
+             tjenesten afviste forbindelserne (modsat SSH, hvor for mange tråde typisk er
+             kontraproduktivt).</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Secure FTP Server: <span class="flag">HKN{Y0u_4re_Th3_k1nG_0f_bRu7ef0rCe}</span></p>
+<p>FTP Server Login (per-instans): <span class="flag">HKN{6O-bBf-hZUrh}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Opgavetekster kan selv hinte ordlisten ('Go john!' = John the Ripper/rockyou-konventionen).</li><li>Antal parallelle tråde er ikke universelt 'færre er bedre', vsftpd med delay_failed_login tåler og belønner flere tråde (-t 16), modsat SSH der ofte straffer det.</li><li>Passwordene er sandsynligvis per-instans, ikke bekræftet statiske på tværs af lab-genstarter, gen-brute hvis de ikke virker ved et nyt besøg.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To næsten identiske opgaver kan stadig have én afgørende, ikke-oplagt forskel,
+her trådantallet. Antag aldrig at samme teknik mod samme tjenestetype opfører sig ens, tjek altid
+om den konkrete instans reagerer anderledes (throttling, lockout-vinduer, rate-limits) før du
+antager din første indstilling var optimal.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

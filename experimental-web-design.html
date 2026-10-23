@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Experimental web design, tutorial (usynlig tekst overlejret på skrald-tegn)</title>
+<meta name="description" content="Guide til Haaukins Experimental web design: en grim personlig webside viser kun skrald-tegn, men JavaScript overlejrer usynlig &#x27;rigtig&#x27; tekst oven på dem.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/experimental-web-design.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Experimental web design, tutorial (usynlig tekst overlejret på skrald-tegn)">
+<meta property="og:description" content="Guide til Haaukins Experimental web design: en grim personlig webside viser kun skrald-tegn, men JavaScript overlejrer usynlig &#x27;rigtig&#x27; tekst oven på dem.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/experimental-web-design.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Experimental web design", "description": "Guide til Haaukins Experimental web design: en grim personlig webside viser kun skrald-tegn, men JavaScript overlejrer usynlig 'rigtig' tekst oven på dem.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/experimental-web-design.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Experimental web design</h1>
+<p class="subtitle">"Noget er skjult" bag grimme skrifttyper og et ødelagt layout, bogstaveligt usynligt.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Siden viser kun skrald, men teksten er der</h2>
+<p>Filen <code>evidence/experiments/open_in_browser.html</code> (DCIS-OSINT-bundtet) viser
+             kun gentagne skrald-tegn (<code>!@#$%^&amp;*()_+</code>) på skærmen. Et kig i selve
+             HTML-kilden afslører hvorfor: et JavaScript bygger DOM'en med et "copy-reveal"-trick. Hvert
+             synlige skrald-tegn har et usynligt "rigtigt" tegn overlejret (<code>opacity:0</code>,
+             <code>position:absolute</code>), som markeres/kopieres sammen med den synlige tekst, selvom det
+             aldrig ses visuelt.</p>
+<h2>De rigtige tegn ligger som rå char-koder i scriptet</h2>
+<p>I stedet for at markere og kopiere siden i browseren (upålideligt, afhænger af
+             DOM-rækkefølgen), er de rigtige tegn allerede synlige i selve <code>&lt;script&gt;</code>-blokken
+             som en talliste:</p>
+             <pre><code>const codes = [115, 111, 109, 97, 110, 121, 119, 97, 121, 115, 116, 111,
+               104, 105, 100, 101, 115, 116, 117, 102, 102];</code></pre>
+             <p>Dekod direkte, uden om browserens DOM:</p>
+             <pre><code>python3 -c "print(''.join(chr(c) for c in [115,111,109,97,110,121,119,97,121,115,116,111,
+104,105,100,101,115,116,117,102,102]))"
+# somanywaystohidestuff</code></pre>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{somanywaystohidestuff}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et 'copy-reveal'-trick (synlig skrald-tekst + usynlig overlejret ægte tekst) er lavet til at narre øjet, ikke kildekoden, læs altid &lt;script&gt;-blokken direkte i stedet for at stole på hvad siden viser visuelt.</li><li>Data gemt som en rå char-code-array i JavaScript er trivielt at dekode uden om browseren overhovedet, man behøver aldrig udføre selve siden for at få svaret.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>CSS-baserede skjule-tricks (<code>opacity:0</code>, <code>display:none</code>,
+<code>position:absolute</code> uden for synsfeltet) går igen i både CTF-forensics og i rigtige
+phishing-/spam-sider (tekst usynlig for mennesker, men læsbar for en kopi-handling eller en
+søgemaskine-crawler). Den generelle lektion er at læse kildekoden/DOM'en direkte frem for at stole
+på det visuelle resultat, uanset om skjulestedet er CSS, en HTML-kommentar, eller som her en rå
+data-array i selve scriptet.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

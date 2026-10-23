@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Attacks over Attacks + Ransomware Hits Hard, tutorial (gerningsmandens egen logbog)</title>
+<meta name="description" content="Guide til Haaukins Attacks over Attacks og Ransomware Hits Hard: gerningsmandens egen journal.md beskriver hele angrebet i klartekst, to flag fra samme fund.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/attacks-over-attacks.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Attacks over Attacks + Ransomware Hits Hard, tutorial (gerningsmandens egen logbog)">
+<meta property="og:description" content="Guide til Haaukins Attacks over Attacks og Ransomware Hits Hard: gerningsmandens egen journal.md beskriver hele angrebet i klartekst, to flag fra samme fund.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/attacks-over-attacks.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Attacks over Attacks / Ransomware Hits Hard", "description": "Guide til Haaukins Attacks over Attacks og Ransomware Hits Hard: gerningsmandens egen journal.md beskriver hele angrebet i klartekst, to flag fra samme fund.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/attacks-over-attacks.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Attacks over Attacks / Ransomware Hits Hard</h1>
+<p class="subtitle">Gerningsmanden førte sin egen logbog over angrebet, det er den du skal læse.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Begge opgaver peger på samme fil</h2>
+<p>Begge opgaver hører til DCIS-OSINT-bundtet (se <a href="introduction.html">Introduction</a>)
+             og handler om den samme hændelse: et ransomware-angreb gerningsmanden selv har dokumenteret. Filen
+             <code>evidence/journal.md</code> er gerningsmandens egen logbog, en naturlig første ting at læse
+             når man efterforsker en person, ikke kun et system.</p>
+             <pre><code>cat evidence/journal.md
+# Injected payload into WebFormBuilder v3.2.1 on intranet.dev.intra
+#   classic RCE via unsanitized filename upload (lol).
+# Target: MedCore, some pharma data company in Copenhagen.
+#   Mid-size, sloppy IT hygiene. Encrypted ~210GB on main file server.</code></pre>
+<h2>To spørgsmål, ét fund</h2>
+<p><strong>Attacks over Attacks</strong> spørger hvilken software der blev brugt til at
+             injicere payloaden. Svaret står direkte: <strong>WebFormBuilder</strong> (sårbar over for RCE
+             via et usaniteret filnavn ved upload).</p>
+             <p><strong>Ransomware Hits Hard</strong> spørger hvilket firma der blev ramt. Svaret står i
+             samme afsnit: <strong>MedCore</strong>, et pharma-datafirma i København. Opgaven kræver
+             svaret i små bogstaver.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{WebFormBuilder}</span> (Attacks over Attacks)</p>
+        <p>Flag: <span class="flag">HKN{medcore}</span> (Ransomware Hits Hard, small caps som krævet)</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Når en opgave beskriver en 'gerningsmand', så led efter dennes EGEN dokumentation (logbog, chat, noter) før du begynder teknisk analyse af systemet, den slags efterlader ofte klartekst-svar.</li><li>Flere opgaver kan dele samme kilde-fil, læs hele filen én gang i stedet for at lede efter hver opgave isoleret.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Mønstret her er generelt for OSINT-/forensics-opgaver med en menneskelig modstander:
+før man graver i logs, filsystemer eller netværkstrafik, så led efter modstanderens EGEN
+dokumentation af handlingen. Angribere (og CTF-opgaver der simulerer dem) efterlader ofte noter,
+journaler eller chat-historik der beskriver planen i klartekst, det er næsten altid den billigste
+kilde at tjekke først.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

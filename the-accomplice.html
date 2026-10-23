@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: The Accomplice, tutorial (stego er en rød sild, svaret står i historikken)</title>
+<meta name="description" content="Guide til Haaukins The Accomplice: det oplagte steganografi-spor i et meme-billede er en rød sild, det rigtige navn står i browser-historikken.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/the-accomplice.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: The Accomplice, tutorial (stego er en rød sild, svaret står i historikken)">
+<meta property="og:description" content="Guide til Haaukins The Accomplice: det oplagte steganografi-spor i et meme-billede er en rød sild, det rigtige navn står i browser-historikken.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/the-accomplice.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "The Accomplice", "description": "Guide til Haaukins The Accomplice: det oplagte steganografi-spor i et meme-billede er en rød sild, det rigtige navn står i browser-historikken.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/the-accomplice.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>The Accomplice</h1>
+<p class="subtitle">Det mest oplagte spor (stego i et billede) er ikke altid det rigtige.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Det oplagte, men forkerte spor: steganografi</h2>
+<p>Bundtet indeholder et billede, <code>communications/attachment.png</code> (et
+             Toy-Story-meme, "Hidden Messages Everywhere"), som ser oplagt ud til at skulle analyseres for
+             skjulte data. Grundig stego-analyse blev kørt mod det og mod to andre forklædte PNG'er
+             (<code>disk/Downloads/cat-greet.jpg</code>, <code>cat-with-hat.jpg</code>, der reelt er PNG):</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Finder skjult data i PNG/BMP-billeders LSB-bits (steganografi).">zsteg</span> attachment.png            # alle bit-planes/kanaler
+stegano --lsb ...                # red/alle kanaler
+<span class="gloss" tabindex="0" data-tip="Skjuler/udtrækker data gemt inde i billed- eller lydfiler (steganografi).">steghide</span> extract -sf ...         # password-forsøg mod common_danish_passwords.txt
+stegseek attachment.png common_danish_passwords.txt
+<span class="gloss" tabindex="0" data-tip="Universelt steganografi-værktøj til at skjule/udtrække data i billeder.">outguess</span> / <span class="gloss" tabindex="0" data-tip="Skjuler/finder data i JPEG-billeder via steganografi.">jsteg</span> ...
+# + manuel PNG-chunk-/trailing-data-/EXIF-/alpha-kanal-tjek</code></pre>
+             <p>Alt gav ren støj. Billedets eneste "skjulte" indhold er selve meme-teksten, synlig direkte i
+             LSB-planet, det illustrerer bare teknikken, det gemmer ikke noget ekstra.</p>
+<h2>Det rigtige spor: samme browser-historik som The Escape</h2>
+<p>Navnet ligger i stedet i <code>logs/browser_history.txt</code>, samme fil som
+             <a href="the-escape.html">The Escape</a> bruger. Historikken viser flugten til Lissabon:</p>
+             <pre><code>2025-07-28 09:34, getairways.com/booking/124ABC,
+#   Flight Confirmation for M. Christensen - Copenhagen to Lisbon</code></pre>
+             <p>og undervejs et besøg på én bestemt persons Facebook-profil:</p>
+             <pre><code>2025-07-28 10:29, facebook.com/joaodasilva93, Joao Da Silva | Facebook</code></pre>
+             <p><strong>João da Silva</strong> er det eneste fulde tredjeparts-navn i hele evidensen
+             (vennerne Filip/Sarah i <code>other/diary.md</code> optræder kun med fornavn). Et portugisisk
+             navn passer desuden med rejsen til Lissabon.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Joao_Da_Silva}</span> (hvert ord med stort, underscores)</p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et billede der ER temaet "skjulte beskeder" kan være en bevidst distraktion, en demo af en teknik, ikke en reel gåde, hvis grundig analyse giver ren støj på tværs af alle værktøjer.</li><li>Start forensics-opgaver med at læse log-/historik-filerne, før du går i et stego-kaninhul.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den vigtigste pointe her generaliserer langt ud over billeder: et spor der er for
+tematisk oplagt ("skjulte beskeder" i en opgave om at finde skjulte beskeder) kan være bevidst
+placeret som afledning eller ren illustration. Når et grundigt, bredt værktøjs-sweep konsekvent
+giver ren støj, er det et signal om at lede et andet sted, ikke om at prøve endnu et værktøj på
+samme fil. Se <a href="the-escape.html">The Escape</a> for den fil hvor svaret rent faktisk lå.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Sanity Check og Sanity Plus, tutorial (7 opstartsopgaver)</title>
+<meta name="description" content="Guide til Haaukins Sanity Check og Sanity Plus: 7 korte opstartsopgaver, hver sin egen grundteknik (kildekode, HTML-kommentarer, EXIF-metadata, appended ZIP-data).">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/sanity-check-plus.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Sanity Check og Sanity Plus, tutorial (7 opstartsopgaver)">
+<meta property="og:description" content="Guide til Haaukins Sanity Check og Sanity Plus: 7 korte opstartsopgaver, hver sin egen grundteknik (kildekode, HTML-kommentarer, EXIF-metadata, appended ZIP-data).">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/sanity-check-plus.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Sanity Check & Sanity Plus", "description": "Guide til Haaukins Sanity Check og Sanity Plus: 7 korte opstartsopgaver, hver sin egen grundteknik (kildekode, HTML-kommentarer, EXIF-metadata, appended ZIP-data).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/sanity-check-plus.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Sanity Check &amp; Sanity Plus</h1>
+<p class="subtitle">Syv små opgaver, syv grundteknikker du bruger resten af din tid på platformen.</p>
+<div class="badges"><span class="badge cat">Starters</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hvad går opgaverne ud på?</h2>
+<p>To beslægtede, lette opgavesæt på hver sin host: <code>sanity-checks.hkn</code> (Sanity
+             Check, 2 delopgaver) og <code>sanity-plus.hkn</code> (Sanity Plus, 5 delopgaver). Ingen af
+             dem kræver mere end én kommando hver, men de er den billigste måde at øve de teknikker du
+             alligevel skal bruge på tværs af alle senere, sværere opgaver. Derfor er de her samlet i
+             én side i stedet for syv, de er for trivielle til hver sin side, men ikke for trivielle
+             til at blive vist ordentligt.</p>
+<h2>Sanity Check - Dynamic: flaget står bare på forsiden</h2>
+<p>Den billigste mulige recon på enhver ny web-opgave er simpelthen at læse forsiden:</p>
+             <pre><code>curl http://sanity-checks.hkn/ | grep -oE 'HKN\{[^}]*\}'</code></pre>
+<h2>Sanity Check - Static: kig i selve HTML-kilden, ikke kun det rendrede resultat</h2>
+<p>Det andet flag vises ikke i browserens rendrede visning, men LIGGER i HTML-kilden,
+             <code>view-source</code> (eller bare <code>curl</code>, som allerede viser rå kilde) afslører
+             det med det samme:</p>
+             <pre><code>curl http://sanity-checks.hkn/ -o - | less   # flaget er synligt direkte i markup'en</code></pre>
+<h2>Sanity Plus - readme: følg de synlige links</h2>
+<p><code>sanity-plus.hkn</code> har et "DogCenter" og et "CatCenter". Flaget til
+             "readme"-delopgaven vises direkte på <code>/DogCenter</code>, bare ved at navigere dertil
+             fra forsidens egen menu.</p>
+<h2>Sanity Plus - Secret webpage: HTML-kommentarer er et kort til en skjult side</h2>
+<p>En udvikler-kommentar efterladt i HTML-kilden afslører en sti ingen almindelig bruger
+             ville finde ved at klikke rundt:</p>
+             <pre><code>curl http://sanity-plus.hkn/ | grep -i "secret"
+# &lt;!--Here is the link:http://sanity-plus.hkn/SecretPlace--&gt;</code></pre>
+             <p>Besøg <code>/SecretPlace</code> direkte, og flaget står der. HTML-kommentarer er usynlige i
+             browserens almindelige visning, men fuldt synlige i kildekoden, derfor er "læs kilden" altid
+             trin et, ikke kun klik rundt i grænsefladen.</p>
+<h2>Sanity Plus - Max og Simba: flaget gemt i billedets EXIF-metadata</h2>
+<p>To separate billeder (<code>Max.jpg</code>, <code>Kitten.jpg</code>) har hver sit flag
+             gemt i EXIF-feltet <em>Description</em>, usynligt når man bare ser billedet, men synligt med
+             det rigtige værktøj:</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span> static/fig/Max.jpg static/fig/Kitten.jpg | grep -iE 'HKN|Description'</code></pre>
+             <p>EXIF-metadata er et af de mest almindelige gemmesteder for skjult tekst i billeder på
+             tværs af hele platformen, det koster én kommando at tjekke, og bør være en refleks hver
+             gang en opgave involverer et billede.</p>
+<h2>Sanity Plus - Leo: data appended efter selve billedfilens slutning</h2>
+<p>Den sværeste af de syv (30p): <code>leo.jpeg</code> indeholder mere end selve billedet,
+             en hel password-beskyttet ZIP-fil er sat direkte efter JPEG-dataens slutning. <code><span class="gloss" tabindex="0" data-tip="Finder og udtrækker indlejrede filer/filsystemer inde i en binær fil.">binwalk</span></code>
+             finder den skjulte struktur:</p>
+             <pre><code>binwalk leo.jpeg                              # ZIP fundet ved offset 243102
+dd if=leo.jpeg of=leo.zip bs=1 skip=243102     # carv alt fra og med det offset ud
+<span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span> leo.zip > hash.txt
+<span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> --wordlist=rockyou.txt hash.txt           # -> guinness
+unzip -P guinness leo.zip                      # secret_file/flag.txt</code></pre>
+             <p>Filformater som JPEG/PNG/ZIP har en defineret SLUT-markør, men de fleste parsere stopper
+             blot ved at læse det de genkender og ignorerer overskydende bytes efter den markør, så en
+             fil kan "indeholde" en hel anden fil uden at se anderledes ud visuelt. Det er den samme
+             idé som en polyglot-fil, bare uden at begge formater behøver være gyldige samtidig.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag (eksempler, per-instans):</p>
+        <ul>
+        <li>Dynamic: <span class="flag">HKN{C3u-d6W-KKhd}</span></li>
+        <li>Static: <span class="flag">HKN{Th1s-1s-4-fL4g}</span></li>
+        <li>readme: <span class="flag">HKN{read_me}</span></li>
+        <li>Secret webpage: <span class="flag">HKN{secret_staff_flag}</span></li>
+        <li>Max: <span class="flag">HKN{max_bowl}</span></li>
+        <li>Simba: <span class="flag">HKN{simba_cat}</span></li>
+        <li>Leo: <span class="flag">HKN{leo_sleeping_troll}</span></li>
+        </ul>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Læs ALTID kildekoden (<code>curl</code>/view-source), ikke kun den rendrede side, før du leder efter noget sværere.</li><li>HTML-kommentarer er en gratis kortlægning af stier udvikleren glemte at fjerne.</li><li><code>exiftool</code> på ethvert billede i en opgave er en refleks, ikke en sidste udvej.</li><li><code>binwalk</code> finder data appended efter en fils egen slutmarkør, en fil kan gemme en helt anden fil i sig.</li><li>Disse flag er per-instans: brug metoden, ikke de viste eksempel-værdier, på din egen instans.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Disse syv teknikker (kildekode-læsning, HTML-kommentarer, EXIF-metadata, appended data)
+er ikke "begynder-tricks" man vokser fra, de er den billigste recon på ALLE senere opgaver, web
+såvel som forensics. Et erfarent øje tjekker dem først, netop fordi de koster sekunder og
+overraskende ofte rammer, før man kaster tungere værktøjer efter et problem.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

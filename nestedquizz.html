@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: NestedQuizz, tutorial (filnavnet ER hintet)</title>
+<meta name="description" content="Guide til Haaukins NestedQuizz: en firetrins zip-kæde hvor hvert filnavn, Cæsar-krypteret med shift 7, fortæller dig hvilken teknik det næste niveau kræver.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/nestedquizz.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: NestedQuizz, tutorial (filnavnet ER hintet)">
+<meta property="og:description" content="Guide til Haaukins NestedQuizz: en firetrins zip-kæde hvor hvert filnavn, Cæsar-krypteret med shift 7, fortæller dig hvilken teknik det næste niveau kræver.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/nestedquizz.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "NestedQuizz", "description": "Guide til Haaukins NestedQuizz: en firetrins zip-kæde hvor hvert filnavn, Cæsar-krypteret med shift 7, fortæller dig hvilken teknik det næste niveau kræver.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/nestedquizz.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>NestedQuizz</h1>
+<p class="subtitle">Filnavnet er ikke tilfældigt, det er selve opskriften.</p>
+<div class="badges"><span class="badge cat">Misc</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Mønstret: filnavnet fortæller dig teknikken</h2>
+<p><code>misc-nestedquizz.zip</code> indeholder en fil der hedder noget der ligner tilfældigt
+             sludder, <code>JKVhwx.igz</code>. Første instinkt (prøv at åbne den direkte) fejler, filendelsen
+             <code>.igz</code> findes ikke. <code>file</code> afslører hvad den faktisk er:</p>
+             <pre><code>file JKVhwx.igz
+# JKVhwx.igz: PNG image data, ...</code></pre>
+             <p>Et billede forklædt med en falsk endelse. Men selve filNAVNET er også mistænkeligt
+             struktureret, det ligner et ord der er skiftet et fast antal bogstaver, et Cæsar-shift. Prøver
+             man shift 7: <code>J→q, K→r, V→c, h→o, w→d, x→e</code> → <strong>qrcode</strong>. Filnavnet
+             fortæller altså direkte hvad billedet indeholder, en QR-kode.</p>
+<h2>Niveau 1: QR-koden stiller et spørgsmål, ikke giver et password direkte</h2>
+<p>Scanner man QR-koden (fx <code><span class="gloss" tabindex="0" data-tip="Afkoder indholdet af et QR-kode- eller stregkode-billede.">zbarimg</span></code> eller en telefon), er indholdet ikke et
+             password, men et spørgsmål: <em>"After what Greek island is the earliest analog computer named
+             after?"</em> Svaret, <strong>Antikythera</strong> (den antikythiske mekanisme), er passwordet til
+             næste zip-niveau, <code>Level1.rar</code>.</p>
+<h2>Niveau 2: samme Cæsar-mønster, denne gang lyd forklædt som billede</h2>
+<p>Inde i <code>Level1.rar</code> ligger <code>FhklxVhwx.pto</code>. Samme fremgangsmåde:
+             <code>file</code> viser RIFF/WAV-lyd (ikke et <code>.pto</code>-billede), og Cæsar-shift 7 på
+             navnet giver <strong>morsecode</strong>. Lyden er altså morse, kør den gennem en
+             audio-morse-decoder (fx morsecode.world's adaptive decoder). Den afkoder til <em>"WHO INVENTED
+             THE INFORMATION BIT?"</em>, svaret <strong>Shannon</strong> (Claude Shannon, informationsteoriens
+             far, opfandt begrebet "bit") låser <code>Level2.rar</code> op.</p>
+<h2>Niveau 3: samme mønster igen, nu den modsatte retning</h2>
+<p><code>Level2.rar</code> indeholder <code>Zalnhuvnyhwof.png</code>, denne gang rent faktisk
+             et PNG (ingen forklædning). Cæsar-shift på navnet virker IKKE med +7 denne gang, men med
+             <strong>-7</strong> (shift-retningen varierer, magnituden 7 er det konstante mønster):
+             <strong>steganography</strong>. Upload billedet til en online LSB-decoder (fx stylesuxx' decoder)
+             og tryk Decode. Den skjulte tekst starter med <em>"Which country first broke Enigma?"</em>,
+             svaret <strong>Poland</strong> (den polske Cipher Bureau brød Enigma i 1932, før Bletchley Park)
+             låser sidste niveau, <code>Level3.rar</code>, op.</p>
+<h2>Niveau 4: flaget, og en flag-format-faldgrube</h2>
+<p><code>Level3.rar</code> indeholder <code>Mshn.aea</code>, Cæsar-shift -7 på navnet giver
+             <strong>flag.txt</strong>, altså ingen teknik tilbage, bare læs filen:</p>
+             <pre><code>cat Mshn.aea
+# DDC{Phr0m_Th3_80770m_70_Th3_70p}</code></pre>
+             <p><strong>Faldgrube:</strong> selve filens indhold viser flaget med <code>DDC{}</code>-præfiks,
+             men Haaukins-platformen accepterer her <code>HKN{}</code>-præfikset i stedet. Hvis et
+             <code>DDC{}</code>-flag afvises, prøv <code>HKN{}</code> med samme indre tekst, før du antager
+             flaget er forkert.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">HKN{Phr0m_Th3_80770m_70_Th3_70p}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et mystisk filnavn er ikke støj, det kan være selve hintet, især hvis flere filnavne deler et genkendeligt mønster (her: Cæsar-shift 7 i begge retninger).</li><li><code>file</code> før du stoler på en filendelse, en forklædt <code>.igz</code> eller <code>.pto</code> afslører sig selv med det samme.</li><li>Match ikke alt blindt mod samme flag-præfiks, nogle opgaver accepterer et andet præfiks end det der faktisk står i filen.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Cæsar-shift i filnavne er et specialtilfælde af et bredere mønster: metadata (filnavne,
+mappestrukturer, kommentarer) kan selv bære information, ikke kun selve filindholdet. Samme idé går
+igen i steganografi generelt (indhold gemt i et medie der "ser uskyldigt ud") og i
+forensics-opgaver hvor et tidsstempel eller et filnavn afslører mere end den der gemte det
+havde regnet med.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

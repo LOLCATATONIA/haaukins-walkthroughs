@@ -28,7 +28,7 @@ fremgangsmåden der genbruges, ikke den konkrete streng.</div>
 lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, uden at hver enkelt guide gentager det.</div>
 
 <input class="search" id="q" type="search" placeholder="🔎 Søg efter lab-navn, kategori eller teknik …" autocomplete="off">
-<div class="chips"><span class="chip" onclick="q.value='';q.dispatchEvent(new Event('input'))">Alle</span><span class="chip" onclick="q.value='Forensics';q.dispatchEvent(new Event('input'))">Forensics</span><span class="chip" onclick="q.value='Crypto';q.dispatchEvent(new Event('input'))">Crypto</span><span class="chip" onclick="q.value='Web exploitation';q.dispatchEvent(new Event('input'))">Web exploitation</span><span class="chip" onclick="q.value='Starters';q.dispatchEvent(new Event('input'))">Starters</span><span class="chip" onclick="q.value='Operational Technologies';q.dispatchEvent(new Event('input'))">Operational Technologies</span><span class="chip" onclick="q.value='Reverse Engineering';q.dispatchEvent(new Event('input'))">Reverse Engineering</span><span class="chip" onclick="q.value='Pwn';q.dispatchEvent(new Event('input'))">Pwn</span><span class="chip" onclick="q.value='Boot2Root';q.dispatchEvent(new Event('input'))">Boot2Root</span><span class="chip" onclick="q.value='Network / Recon';q.dispatchEvent(new Event('input'))">Network / Recon</span></div>
+<div class="chips"><span class="chip" onclick="q.value='';q.dispatchEvent(new Event('input'))">Alle</span><span class="chip" onclick="q.value='Forensics';q.dispatchEvent(new Event('input'))">Forensics</span><span class="chip" onclick="q.value='Misc';q.dispatchEvent(new Event('input'))">Misc</span><span class="chip" onclick="q.value='Crypto';q.dispatchEvent(new Event('input'))">Crypto</span><span class="chip" onclick="q.value='Web exploitation';q.dispatchEvent(new Event('input'))">Web exploitation</span><span class="chip" onclick="q.value='Starters';q.dispatchEvent(new Event('input'))">Starters</span><span class="chip" onclick="q.value='Operational Technologies';q.dispatchEvent(new Event('input'))">Operational Technologies</span><span class="chip" onclick="q.value='Reverse Engineering';q.dispatchEvent(new Event('input'))">Reverse Engineering</span><span class="chip" onclick="q.value='Binary';q.dispatchEvent(new Event('input'))">Binary</span><span class="chip" onclick="q.value='Pwn';q.dispatchEvent(new Event('input'))">Pwn</span><span class="chip" onclick="q.value='Boot2Root';q.dispatchEvent(new Event('input'))">Boot2Root</span><span class="chip" onclick="q.value='Network / Recon';q.dispatchEvent(new Event('input'))">Network / Recon</span></div>
 
 <table id="labs">
 <thead><tr><th>Haaukins-opgave</th><th>Kategori</th><th>Teknik</th></tr></thead>
@@ -40,6 +40,8 @@ lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, ude
 <tr><td><a href="health-level-stalker.html">Health Level Stalker</a></td><td>Forensics</td><td>HL7/MLLP, MITM, protokol-analyse</td></tr>
 <tr><td><a href="http-everywhere.html">HTTP Everywhere</a></td><td>Forensics</td><td>pcap, TLS-dekryptering, RSA key exchange</td></tr>
 <tr><td><a href="bad-librarian.html">Bad librarian</a></td><td>Forensics</td><td>pcap, SSLKEYLOGFILE, TLS-dekryptering</td></tr>
+<tr><td><a href="nestedquizz.html">NestedQuizz</a></td><td>Misc</td><td>Cæsar-krypterede filnavne som hints, QR, morse-audio, LSB-steganografi, forklædte filendelser</td></tr>
+<tr><td><a href="det-afskyelige-servicescan.html">Det Afskyelige Servicescan</a></td><td>Forensics</td><td>nmap -sV versions-detektion, Server-header-bekræftelse</td></tr>
 <tr><td><a href="recovering-files.html">Recovering Files</a></td><td>Forensics</td><td>Sleuth Kit, slettede filer, mmls/fls/icat</td></tr>
 <tr><td><a href="friendly-image.html">Friendly Image</a></td><td>Forensics</td><td>EWF/E01, ewfmount, slettede filer, flag-fragmenter</td></tr>
 <tr><td><a href="the-ransomware-image.html">The Ransomware Image</a></td><td>Forensics</td><td>EWF/E01, slettede filer, flag-format</td></tr>
@@ -68,10 +70,13 @@ lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, ude
 <tr><td><a href="ad-security-pw3.html">AD Security is Great (PW3)</a></td><td>Forensics</td><td>NTLM, MD4, UTF-16LE, dictionary-attack</td></tr>
 <tr><td><a href="hasher-2.html">Hasher 2</a></td><td>Crypto</td><td>MD5, ordbogs-attack (ikke password-liste)</td></tr>
 <tr><td><a href="hasher-3.html">Hasher 3</a></td><td>Crypto</td><td>SHA-256, salt, pun-læsning</td></tr>
+<tr><td><a href="hasher-1.html">Hasher 1</a></td><td>Crypto</td><td>SHA-256, bogtitel som password, crackstation.net</td></tr>
+<tr><td><a href="hasher-420.html">Hasher4.20</a></td><td>Crypto</td><td>SHA-256, OSINT-baseret password-profilering (PUPI)</td></tr>
 <tr><td><a href="hashle.html">Hashle</a></td><td>Crypto</td><td>MD5, Wordle-orakel, filtrering af rockyou</td></tr>
 <tr><td><a href="bust-n-crack.html">Bust-N-Crack</a></td><td>Web exploitation</td><td>directory listing, ssh2john, krypteret PEM-nøgle</td></tr>
 <tr><td><a href="virtual-can-logs.html">Virtual CAN Logs</a></td><td>Forensics</td><td>CAN-bus, strings, tshark, fragment-samling</td></tr>
 <tr><td><a href="flag-in-tree.html">Flag in Tree</a></td><td>Starters</td><td>recursive grep, regex, decoy-filtrering</td></tr>
+<tr><td><a href="sanity-check-plus.html">Sanity Check &amp; Sanity Plus</a></td><td>Starters</td><td>View-source, HTML-kommentarer, EXIF-metadata, appended ZIP-data</td></tr>
 <tr><td><a href="micro-cms.html">Micro CMS (Robots / URL / XSS)</a></td><td>Web exploitation</td><td>robots.txt, broken access control (IDOR), stored XSS</td></tr>
 <tr><td><a href="sneaky-reviews.html">Sneaky Reviews</a></td><td>Web exploitation</td><td>SQL injection, UNION SELECT, schema-dump</td></tr>
 <tr><td><a href="comment-all-you-want.html">comment-all-you-want</a></td><td>Web exploitation</td><td>SSTI, Jinja2, RCE</td></tr>
@@ -87,6 +92,7 @@ lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, ude
 <tr><td><a href="sql-injection.html">SQL injection (+ Web server login)</a></td><td>Web exploitation</td><td>second-order SQLi, dobbelt-citationstegn, || konkatenering</td></tr>
 <tr><td><a href="web-exploitation-ladder.html">Web Exploitation-stigen (cybertraining)</a></td><td>Web exploitation</td><td>recon, source, robots, metadata, cookies, SQLi, stored XSS, traversal, brute, crypto, IDOR</td></tr>
 <tr><td><a href="see-my-strings.html">See my strings</a></td><td>Reverse Engineering</td><td>strings, ELF, flag i .rodata</td></tr>
+<tr><td><a href="strings-i.html">Strings I</a></td><td>Binary</td><td>strings, intet værktøj behøvet</td></tr>
 <tr><td><a href="pwn-strings.html">PWN Strings</a></td><td>Reverse Engineering</td><td>strings, offline-udledning</td></tr>
 <tr><td><a href="pwn-strings-gdb.html">PWN Strings GDB</a></td><td>Reverse Engineering</td><td>radare2, statisk analyse, strcat-kæde</td></tr>
 <tr><td><a href="the-game.html">The Game</a></td><td>Reverse Engineering</td><td>statisk RE, hardcodede værdier, kontrolflow-fælde</td></tr>
@@ -97,6 +103,7 @@ lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, ude
 <tr><td><a href="browserauth.html">BrowserAuth</a></td><td>Web exploitation</td><td>pcap-analyse, HTTP-headers, User-Agent som token</td></tr>
 <tr><td><a href="tonic-counter.html">Tonic counter</a></td><td>Web exploitation</td><td>skjult HTTP-metode, REST, IDOR</td></tr>
 <tr><td><a href="rocking-ssh.html">Rocking SSH</a></td><td>Forensics</td><td>SSH brute force, hydra, rockyou</td></tr>
+<tr><td><a href="ftp-brute-cluster.html">Secure FTP Server &amp; FTP Server Login</a></td><td>Forensics</td><td>FTP brute force, hydra, vsftpd delay-tuning</td></tr>
 <tr><td><a href="the-event.html">The Event</a></td><td>Forensics</td><td>subnet-scan, content-discovery, eksponeret datastore</td></tr>
 <tr><td><a href="campfire-stories.html">Campfire Stories</a></td><td>Boot2Root</td><td>LLM prompt-injection, robots.txt, FTP</td></tr>
 <tr><td><a href="escalator.html">Escalator</a></td><td>Boot2Root</td><td>FTP-anon, SUID nano, GTFObins, privesc</td></tr>
@@ -108,17 +115,24 @@ lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, ude
 <tr><td><a href="its-samba-time.html">It&#x27;s Samba time!</a></td><td>Web exploitation</td><td>Samba, CVE-2007-2447, impacket, exfil via åben kanal</td></tr>
 <tr><td><a href="mqtt-defaults.html">Why are people still using defaults? (MQTT)</a></td><td>Operational Technologies</td><td>MQTT, default credentials, wildcard-subscribe</td></tr>
 <tr><td><a href="iac-privatekey.html">IaC privatekey (in history)</a></td><td>Forensics</td><td>git-forensics, ssh2john, legacy RSA, decoy</td></tr>
+<tr><td><a href="hidden-entrances.html">Hidden Entrances (1-3)</a></td><td>Web exploitation</td><td>vsFTPd 2.3.4-backdoor (CVE-2011-2523), kildekode-review, statisk binær-reversing</td></tr>
+<tr><td><a href="blueneek-shell.html">Blueneek-shell</a></td><td>Web exploitation</td><td>ufiltreret fil-upload-RCE, root-cron der kører et world-writable script</td></tr>
 <tr><td><a href="ransomgang-returns.html">RansomGang Returns</a></td><td>Reverse Engineering</td><td>UPX-unpacking, time-seeded PRNG, glibc random reimpl</td></tr>
 <tr><td><a href="red-light-green-light.html">Red light, green light</a></td><td>Reverse Engineering</td><td>timing-gate, srand(time), PRNG-prædiktion, send-kadence</td></tr>
 <tr><td><a href="git-logs.html">Git logs</a></td><td>Forensics</td><td>git-historik, slettede secrets, SSH</td></tr>
 <tr><td><a href="hack-swag-shop.html">Hack Swag Shop</a></td><td>Boot2Root</td><td>NoSQL auth-bypass, blind $regex, SUID date, GTFObins</td></tr>
 <tr><td><a href="in-the-city.html">In the City</a></td><td>Forensics</td><td>pcap, export HTTP objects, se-på-billedet, ZipCrypto</td></tr>
+<tr><td><a href="brute2root-race.html">brute2root-race</a></td><td>Boot2Root</td><td>subnet-scan, IDOR, moderator-login-brute, path traversal (LFI), SSH, sudo TOCTOU-race</td></tr>
 <tr><td><a href="powering-haaukins.html">Powering HAAUKINS</a></td><td>Operational Technologies</td><td>MQTT, retained messages, WebSocket-dashboard, SCADA</td></tr>
 <tr><td><a href="water-to-the-people.html">Water to the people</a></td><td>Operational Technologies</td><td>Modbus/TCP, coils &amp; holding-registers, socket.io, adresse-offset</td></tr>
 <tr><td><a href="hackable-app-part2.html">Hackable App part 2</a></td><td>Web exploitation</td><td>blind boolean SQL injection, orakel, binær ekstraktion</td></tr>
 <tr><td><a href="johannes-riveren.html">Johannes Riveren</a></td><td>Forensics</td><td>password-beskyttet zip, zip2john, john, rockyou</td></tr>
 <tr><td><a href="wizard-activities.html">Wizard Activities</a></td><td>Forensics</td><td>PNG magic bytes, signatur-reparation, flag-i-billede</td></tr>
 <tr><td><a href="live-in-a-castle.html">Who Wants to Live in a Castle? (Pt.1 &amp; Pt.2)</a></td><td>Forensics</td><td>steghide, password-i-motivet, EXIF-decoy, reverse image search</td></tr>
+<tr><td><a href="attacks-over-attacks.html">Attacks over Attacks / Ransomware Hits Hard</a></td><td>Forensics</td><td>Logbog-læsning i et beslaglagt filsystem (DCIS-OSINT-bundt)</td></tr>
+<tr><td><a href="the-escape.html">The Escape</a></td><td>Forensics</td><td>Browser-historik-gennemgang i et beslaglagt filsystem (DCIS-OSINT-bundt)</td></tr>
+<tr><td><a href="the-accomplice.html">The Accomplice</a></td><td>Forensics</td><td>Browser-historik, afvist steganografi-spor</td></tr>
+<tr><td><a href="experimental-web-design.html">Experimental web design</a></td><td>Forensics</td><td>DOM copy-reveal-trick, skjult tekst via opacity:0, char-code-dekodning</td></tr>
 <tr><td><a href="ev-charging-ocpp.html">EV Charging Hater</a></td><td>Operational Technologies</td><td>OCPP 1.6, WebSocket-sniffing, frame-af-maskering, base64</td></tr>
 <tr><td><a href="why-http-qr.html">Why is this running HTTP?</a></td><td>Forensics</td><td>plaintext HTTP, server-impersonering, multipart-carve, QR-afkodning</td></tr>
 <tr><td><a href="becomming-a-doctor.html">Becomming a doctor</a></td><td>Web exploitation</td><td>SQL injection auth-bypass, QR som input-vektor, JWT, rolle-eskalering</td></tr>

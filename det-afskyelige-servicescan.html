@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Det Afskyelige Servicescan, tutorial (find servicen på en skæv port)</title>
+<meta name="description" content="Guide til Haaukins Det Afskyelige Servicescan: find navn og versionsnummer på en service der ikke kører på en standardport.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/det-afskyelige-servicescan.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Det Afskyelige Servicescan, tutorial (find servicen på en skæv port)">
+<meta property="og:description" content="Guide til Haaukins Det Afskyelige Servicescan: find navn og versionsnummer på en service der ikke kører på en standardport.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/det-afskyelige-servicescan.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Det Afskyelige Servicescan", "description": "Guide til Haaukins Det Afskyelige Servicescan: find navn og versionsnummer på en service der ikke kører på en standardport.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/det-afskyelige-servicescan.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Det Afskyelige Servicescan</h1>
+<p class="subtitle">Når servicen gemmer sig på en skæv port, scan hele rækken, ikke bare de kendte.</p>
+<div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Find servicen: scan ALLE porte, ikke kun de almindelige</h2>
+<p>Opgaven beder om navn + versionsnummer på en "sagnomspundne" service på
+             <code>abominable.hkn</code>, uden at sige hvilken port. En almindelig top-1000-scanning ville
+             overse den her, servicen ligger bevidst på en atypisk port, så hele rækken skal scannes:</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -n -sV -p- --min-rate 2000 77.228.24.237
+# 31337/tcp open  http  Jetty 9.4.45.v20220203</code></pre>
+             <p>Port 31337 ("eleet") er en kendt hacker-kultur-reference, men funktionelt bare endnu en
+             port, pointen er at <code>-p-</code> (alle 65535 porte) fandt den, hvor en standard-scanning
+             ikke ville have gjort.</p>
+<h2>Bekræft med Server-headeren</h2>
+<p><code>nmap -sV</code>'s eget gæt bekræftes uafhængigt ved selv at spørge serveren:</p>
+             <pre><code>curl -sI http://77.228.24.237:31337/
+# Server: Jetty(9.4.45.v20220203)</code></pre>
+             <p>To uafhængige kilder (nmaps signatur-database og serverens egen header) er enige: navn
+             <strong>Jetty</strong>, version <strong>9.4.45.v20220203</strong>. Flag-formatet i
+             opgaveteksten (<code>DDC{ServiceNavn-Version}</code>, eksemplet bruger <code>.v</code>-notation)
+             matcher Jettys eget versionsformat, endnu en bekræftelse af at det er den rå
+             version-detektion, ikke noget mere eksotisk, der efterspørges.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{Jetty-9.4.45.v20220203}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>En version-scanning uden <code>-p-</code> (alle porte) kan overse en service der bevidst ligger uden for de 1000 mest almindelige porte.</li><li>Bekræft et <code>nmap -sV</code>-gæt med en uafhængig kilde (her: HTTP Server-headeren) før du stoler på det.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>"Servicen gemmer sig på en usædvanlig port" er et tilbagevendende CTF-mønster, det
+eneste modtræk er at vænne sig til at scanne hele portrækken som standard, ikke kun når en
+top-1000-scanning allerede har fejlet. Samme logik gælder skjulte admin-paneler på høje porte,
+database-servere flyttet væk fra deres standardport, og OT/ICS-protokoller der sjældent ligger i
+de mest almindelige scannerlister.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Strings I, tutorial</title>
+<meta name="description" content="Guide til Haaukins Strings I: opgavens eget hint er navnet på det Linux-værktøj der løser den.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/strings-i.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Strings I, tutorial">
+<meta property="og:description" content="Guide til Haaukins Strings I: opgavens eget hint er navnet på det Linux-værktøj der løser den.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/strings-i.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Strings I", "description": "Guide til Haaukins Strings I: opgavens eget hint er navnet på det Linux-værktøj der løser den.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/strings-i.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Strings I</h1>
+<p class="subtitle">Opgavens navn ER løsningen.</p>
+<div class="badges"><span class="badge cat">Binary</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Hintet ligger i navnet, ikke i binæren</h2>
+<p>Opgaveteksten siger direkte: <em>"This one should be easy to solve, so easy it has
+             a linux tool named after it."</em> Kategorien er "Binary", men det kræver ingen
+             disassembler, ingen debugger, ikke engang at forstå hvad binæren gør. Værktøjet opgaven
+             er opkaldt efter er bogstaveligt talt <code>strings</code>:</p>
+             <pre><code>strings -a -n 5 strings_bin
+# Welcome to the first reversing challenge
+# You need to provide the flag as an argument
+# DDC{You_D1dnt_3Ven_Need_A_DISASSEMBLER}</code></pre>
+             <p>Flaget selv bekræfter pointen i navnet: "You Didn't Even Need A Disassembler".</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Afleveres som DDC. Flag: <span class="flag">DDC{You_D1dnt_3Ven_Need_A_DISASSEMBLER}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et opgavenavn kan selv være et direkte værktøjs-hint, ikke kun flavour-tekst, her bogstaveligt talt navnet på løsningen.</li><li>Genbrugte opgaver fra ældre konkurrencer (her Cybermesterskaberne 2022) kan stadig have det oprindelige DDC{}-flagformat, selvom platformen ellers bruger HKN{}, prøv begge hvis det afvises.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Samme lektion som <a href="see-my-strings.html">See my strings</a>: <code>strings</code>
+bør altid være det allerførste du prøver på en ukendt binær, før noget tungere værktøj. Her er
+pointen endnu mere direkte: selve opgavenavnet navngav løsningen. Et navn der lyder som et
+værktøj, en protokol eller en teknik er sjældent tilfældigt i en CTF.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

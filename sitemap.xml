@@ -8,6 +8,8 @@
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/health-level-stalker.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/http-everywhere.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/bad-librarian.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/nestedquizz.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/det-afskyelige-servicescan.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/recovering-files.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/friendly-image.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/the-ransomware-image.html</loc></url>
@@ -36,10 +38,13 @@
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/ad-security-pw3.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-2.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-3.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-1.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-420.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hashle.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/virtual-can-logs.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/flag-in-tree.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/sanity-check-plus.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/micro-cms.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/sneaky-reviews.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/comment-all-you-want.html</loc></url>
@@ -55,6 +60,7 @@
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/sql-injection.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/web-exploitation-ladder.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/see-my-strings.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/strings-i.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings-gdb.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/the-game.html</loc></url>
@@ -65,6 +71,7 @@
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/tonic-counter.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/ftp-brute-cluster.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/the-event.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/campfire-stories.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/escalator.html</loc></url>
@@ -76,17 +83,24 @@
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/its-samba-time.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/mqtt-defaults.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hidden-entrances.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/blueneek-shell.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/git-logs.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hack-swag-shop.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/brute2root-race.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/water-to-the-people.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/johannes-riveren.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/wizard-activities.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/live-in-a-castle.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/attacks-over-attacks.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/the-escape.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/the-accomplice.html</loc></url>
+  <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/experimental-web-design.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/ev-charging-ocpp.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/why-http-qr.html</loc></url>
   <url><loc>https://lolcatatonia.github.io/haaukins-walkthroughs/becomming-a-doctor.html</loc></url>

