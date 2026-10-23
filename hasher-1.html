@@ -51,6 +51,8 @@ hashcat -m 1400 -a 0 hash.txt rockyou.txt -r rockyou-30000.rule
              rel="noopener">crackstation.net</a> bruger langt bredere ordbøger end rockyou, inkl.
              bogtitler og fraser, netop den slags tekst der aldrig ville optræde i en lækket
              password-dump:</p>
+             <img src="assets/hasher-1-crackstation.png" alt="crackstation.net's resultat-tabel: hashen af typen sha256 er markeret grøn med resultatet 'Fahrenheit 451'.">
+             <p>Direkte bekræftelse uden om hashcat helt:</p>
              <pre><code>import hashlib
 hashlib.sha256(b"Fahrenheit 451").hexdigest()
 # af07c1e3ced552cbad0c1ad8ec1ed74b732dd2f524189c3a15ce27bc76b2df9a   <-- match</code></pre>
