@@ -22,20 +22,43 @@
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Stage 1 — betingelses-puslespil</h2>
-<p>En hjemmerullet login justerer en tæller ud fra 6 betingelser på input-bytes og accepterer kun hvis
-             tælleren rammer <strong>præcis 7</strong>. To tjek scorer højere ved <em>fejl</em> (bevidst twist). Løs for
-             max → <code>Ba010b</code>.</p>
+<h2>Stage 1 — statisk analyse af en hjemmerullet login (radare2)</h2>
+<p>Binæren er stripped + PIE (ingen symboler), downloadet over HTTP fra opgaven selv. <code>r2 -A</code>
+             + <code>afl</code> (funktionsliste) + <code>pdf @ main</code> (disassembler main) kortlægger logikken
+             uden symboler. Den justerer en global tæller (<code>.data</code>) ud fra 6 betingelser på input-byte 0-5,
+             og accepterer kun koden hvis tælleren rammer <strong>præcis 7</strong>:</p>
+             <table style="width:100%;font-size:14px;border-collapse:collapse;margin:10px 0">
+             <tr><th style="text-align:left;border-bottom:1px solid #8883">#</th><th style="text-align:left;border-bottom:1px solid #8883">Betingelse</th><th style="text-align:left;border-bottom:1px solid #8883">Point sand</th><th style="text-align:left;border-bottom:1px solid #8883">Point falsk</th></tr>
+             <tr><td>1</td><td><code>byte[0] == 'B'</code></td><td>+1</td><td>−1</td></tr>
+             <tr><td>2</td><td><code>byte[1] &gt; 0x60</code></td><td>+1</td><td>−1</td></tr>
+             <tr><td>3</td><td><code>byte[2] == '4'</code></td><td>+1</td><td><strong>+2</strong></td></tr>
+             <tr><td>4</td><td><code>byte[3] == byte[1] - byte[2]</code></td><td>+1</td><td>−1</td></tr>
+             <tr><td>5</td><td><code>byte[4] == (byte[2]+byte[3]) &gt;&gt; 1</code></td><td>+1</td><td>−1</td></tr>
+             <tr><td>6</td><td><code>byte[5] == 'a'</code></td><td><strong>−1</strong></td><td>+1</td></tr>
+             </table>
+             <p>Tjek 3 og 6 giver FLERE point ved fejl end ved succes, et bevidst twist. Maksimal sum (7) kræver
+             derfor at bevidst "fejle" netop de to. Løser man ligningerne for max: <code>Ba010b</code>.</p>
 <h2>Stage 2 — XOR-nøgle</h2>
-<p>Programmet XOR'er input med en nøgle i <code>.data</code> og sammenligner mod en forventet buffer.
-             Begge ligger i binæren, så svaret er <code>expected ^ key</code>:</p>
-             <pre><code>bytes(e ^ k for e, k in zip(expected, key))     # -> b'DogeCoinToTheMoon1337'</code></pre>
+<p>En anden funktion XOR'er brugerens input med en 21-byte nøgle i <code>.data</code> og sammenligner
+             resultatet direkte mod en forventet buffer. Begge ligger i den statiske binær, så svaret er
+             <code>expected ^ key</code>:</p>
+             <pre><code>key      = [0x24,0x77,0x34,0x12,0x33,0x44,0x53,0x12,0x47,0x10,0x11,0x23,0x71,0x52,0x50,0x13,0x43,0x44,0x4f,0x47,0x45]
+expected = [0x60,0x18,0x53,0x77,0x70,0x2b,0x3a,0x7c,0x13,0x7f,0x45,0x4b,0x14,0x1f,0x3f,0x7c,0x2d,0x75,0x7c,0x74,0x72]
+print(bytes(e ^ k for e, k in zip(expected, key)))     # -> b'DogeCoinToTheMoon1337'</code></pre>
+             <p>Rent printable ASCII, matcher DogeCoin-temaet ("1337" er selve login-porten) — et stærkt tegn på at
+             udledningen er korrekt, selv før man tester den live.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Login med <code>Ba010b</code> + <code>DogeCoinToTheMoon1337</code> → root-shell → flag.</p>
         <p>Flag: <span class="flag">HKN{P45_PAA_M3D_HJ3MM3L4V3T_S1KK3RH3D}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Crackmes løses ved at læse betingelserne og regne baglæns, ikke brute force.</li><li>XOR med en nøgle i binæren er trivielt reversibel (<code>expected ^ key</code>).</li><li>Stol på disassembly frem for udseende; bekræft mod den kørende service.</li></ul>
+<ul><li>Crackmes løses ved at læse betingelserne og regne baglæns, ikke brute force.</li><li>XOR med en nøgle i binæren er trivielt reversibel (<code>expected ^ key</code>).</li><li>Mistænk altid en 'tilfældig' global adresse for en r2-symbol-navne-kollision; en almindelig <code>.data</code>-tæller her blev fejlagtigt vist som <code>putchar</code>, fordi offsettet lå tæt på det rigtige GOT-slot.</li><li>Stol på disassembly frem for udseende; bekræft udledte algoritmer LIVE mod den kørende service, ikke kun statisk analyse.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>XOR er symmetrisk: <code>data ^ key = cipher</code> betyder <code>cipher ^ key = data</code>.
+Så når et program XOR'er input mod en nøgle og sammenligner med en forventet buffer, og BEGGE
+ligger i binæren, er svaret bare <code>expected ^ key</code>. XOR "kryptering" med en indlejret
+nøgle beskytter derfor ingenting mod nogen der kan læse binæren. Det samme mønster dukker op i
+masser af malware der XOR-obfuskerer sine strenge: find nøglen, XOR tilbage.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

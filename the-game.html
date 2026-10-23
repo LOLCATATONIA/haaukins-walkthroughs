@@ -23,7 +23,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p>En nc-service med en kæde af prompts. Statisk RE (<code>objdump -d</code>/radare2) viser svarene
+<p>En nc-service med en kæde af prompts. Statisk RE (<code><span class="gloss" tabindex="0" data-tip="Disassemblerer en binær fil til assembly, en del af binutils.">objdump</span> -d</code>/radare2) viser svarene
              (<code>42</code>, <code>911</code>, <code>96</code>, <code>120</code>, <code>1337</code>, <code>GTFO</code>).</p>
 <h2>Fælden</h2>
 <p>To næsten-ens 'splits' fører til samme win-funktion <code>atoi_was_here(edi)</code> — men den giver kun
@@ -35,6 +35,12 @@
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Statisk RE på en not-stripped binær afslører både værdier OG kontrolflow.</li><li>Følg dataflowet til win-funktionens argument; pas på grene der ser ud som sejr.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Crackmes handler om at læse koden, ikke gætte input. Den gennemgående fælde her (to grene
+der SER ens ud, men kun den ene sætter det rigtige argument) er et klassisk misdirection-trick:
+følg hvad der rent faktisk sendes til win-funktionen, ikke hvad tekststrengene lover. Samme
+disciplin (stol på dataflowet, ikke på labels og beskeder) bruges til at analysere malware der
+bevidst prøver at vildlede den der læser den.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

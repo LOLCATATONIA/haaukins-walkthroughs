@@ -26,8 +26,8 @@
 <p>Et EWF-image af en USB-stick. En Autopsy-tutorial-PDF hinter: <em>"perhaps finding something in the
              deleted files."</em> Der er netop én slettet fil.</p>
 <h2>Trin for trin</h2>
-<pre><code>fls -r -i ewf -f ntfs payload.E01     # * logo.bmp (inode 43)
-icat -i ewf -f ntfs payload.E01 43 > logo.bmp   # åbn -> pirat-logo med teksten CYBER_PIRATES</code></pre>
+<pre><code><span class="gloss" tabindex="0" data-tip="Lister filer/mapper i et disk-image uden at mounte det (Sleuthkit).">fls</span> -r -i ewf -f ntfs payload.E01     # * logo.bmp (inode 43)
+<span class="gloss" tabindex="0" data-tip="Udtrækker indholdet af en specifik fil fra et disk-image (Sleuthkit).">icat</span> -i ewf -f ntfs payload.E01 43 > logo.bmp   # åbn -> pirat-logo med teksten CYBER_PIRATES</code></pre>
              <p>Flaget er firmanavnet fra det slettede logo. En <code>Reminder.txt</code> bekræfter: "Some idiot used
              our old name as the password."</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -41,6 +41,12 @@ icat -i ewf -f ntfs payload.E01 43 > logo.bmp   # åbn -> pirat-logo med teksten
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>-i ewf -f ntfs</code> til fls/icat på et E01-NTFS-image.</li><li>Flaget kan være simpelt synligt indhold (firmanavn på et logo), ikke stego.</li><li>Når det oplagte flag afvises: variér systematisk præfiks (HKN/DDC) OG casing.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Format-fælden er værd at huske generelt: når du er SIKKER på at du har det rigtige svar,
+men platformen afviser det, er problemet som regel indpakningen, ikke indholdet. Varier
+systematisk præfiks og casing (<code>DDC{}</code> vs <code>HKN{}</code>, store vs små bogstaver,
+med/uden mellemrum) før du konkluderer at svaret er forkert. Se også primeren om
+<a href="kom-i-gang.html">flag-format</a>.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

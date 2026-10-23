@@ -23,15 +23,23 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
-<p>Hintet: "It doesn't check anyone's password." Log ind som <code>admin</code>, og sæt privilegie-cookien:</p>
+<p>Hintet siger "It doesn't check anyone's password", så log ind som <code>admin</code> med
+             et hvilket som helst password. Kig så på hvad serveren sætter i svaret: en
+             <code>Set-Cookie</code> med et rolle-felt. Det er det du skal manipulere, ikke login'et selv.</p>
              <pre><code>curl -i --data "user=admin&amp;password=x" http://menne.com/login/index.php
-#   Set-Cookie: user=admin ; admin=False
-curl -b "user=admin; admin=True" http://menne.com/login/index.php</code></pre>
+#   Set-Cookie: user=admin ; admin=False    <- rollen ligger client-side!
+curl -b "user=admin; admin=True" http://menne.com/login/index.php   # flip False -> True</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{LU-zrW-HQbOx}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Autorisation i en cookie = ingen autorisation; kig på alle Set-Cookie efter login.</li><li>'It doesn't check the password' = log ind som den privilegerede bruger direkte.</li></ul>
+<ul><li>Autorisation i en cookie = ingen autorisation; kig på alle Set-Cookie efter login.</li><li>'It doesn't check the password' betyder: log ind som den privilegerede bruger direkte.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En cookie som <code>admin=False</code> er en invitation: alt klienten holder, kan klienten
+ændre. Samme client-side-trust-fejl som <a href="serializator.html">Serializator</a>, bare uden
+selv kodningen til at skjule den. Gør det til en vane at kigge på ALLE <code>Set-Cookie</code>-
+headers efter login; et felt der ligner en rolle eller et privilegie er næsten altid værd at
+flippe.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

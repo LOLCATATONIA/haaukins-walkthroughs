@@ -79,7 +79,14 @@ flag = bytes.fromhex(hex(m)[2:])   # HKN{EOz-YUh-rSuL}</code></pre>
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Et "stort tilfældigt tal" i en krypto-opgave er ofte bare bytes i forklædning — prøv hex→bytes før noget andet.</li><li>One-time pad's sikkerhedsbevis kræver en HEMMELIG nøgle — en lækket/givet nøgle gør det til triviel XOR.</li><li>Tjek altid FactorDB FØRST for et ukendt RSA-modul, før du selv forsøger faktorisering.</li><li>Lav offentlig eksponent (e=3 uden padding) + kort besked = ingen modulo-reduktion sker, cifferteksten er bare m^e som et almindeligt heltal.</li></ul>
+<ul><li>Et "stort tilfældigt tal" i en krypto-opgave er ofte bare bytes i forklædning; prøv hex til bytes før noget andet.</li><li>One-time pad's sikkerhedsbevis kræver en HEMMELIG nøgle; en lækket/givet nøgle gør det til triviel XOR.</li><li>Tjek altid FactorDB FØRST for et ukendt RSA-modul, før du selv forsøger faktorisering.</li><li>Lav offentlig eksponent (e=3 uden padding) + kort besked = ingen modulo-reduktion sker, cifferteksten er bare m^e som et almindeligt heltal.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Denne stige er et katalog over klassiske RSA/krypto-fejl, og hvert trin har et generelt
+tjek du bør gøre som refleks: er "det store tal" bare ASCII-bytes (hex til bytes)? Er OTP-nøglen
+lækket (så er det ren XOR)? Står p og q i klartekst (så er RSA game over)? Er N lille nok til at
+<a href="http://factordb.com/" target="_blank">FactorDB</a> allerede har faktoriseret den? Er
+e lille (3) og beskeden kort, så m^e aldrig wrappede modulo N (tag kubikroden)? Når du møder RSA i
+en CTF, så løb den tjekliste FØR du overvejer noget tungt, den rammer overraskende ofte.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

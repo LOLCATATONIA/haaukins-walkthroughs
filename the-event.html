@@ -23,8 +23,8 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code>nmap &lt;subnet&gt;.0/24 -p 80,8080 --open     # :8080 "This is a Trap" = decoy; :80 = The Event
-gobuster dir -u http://&lt;host&gt;/ -w common.txt -x php,txt,bak
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> &lt;subnet&gt;.0/24 -p 80,8080 --open     # :8080 "This is a Trap" = decoy; :80 = The Event
+<span class="gloss" tabindex="0" data-tip="Brute-forcer skjulte URL-stier/filer/subdomæner på en webserver.">gobuster</span> dir -u http://&lt;host&gt;/ -w common.txt -x php,txt,bak
 #  finder /guestbook/data/data.txt (Yellabook's rå datastore)
 curl http://&lt;host&gt;/guestbook/data/data.txt</code></pre>
              <p>Datafilen rummer en skjult post (id 1, fra "god"/"Heaven") med flaget i farvet/"usynlig" tekst:</p>
@@ -33,7 +33,13 @@ curl http://&lt;host&gt;/guestbook/data/data.txt</code></pre>
 <p>Flag: <span class="flag">HKN{w3Lc0me_7o_th3_ev3nT_tH1s_i5_y0uR_iNv1t3_4nD_Fl4g}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>CMS'er/gæstebøger gemmer ofte data i en web-læsbar flatfil — <code>gobuster -x txt,bak,php</code> finder dem.</li><li>Læs den RÅ datafil (skjult/farvet tekst) — ikke kun den renderede side. Ignorér decoy-sider (:8080-'Trap').</li></ul>
+<ul><li>CMS'er/gæstebøger gemmer ofte data i en web-læsbar flatfil; <code>gobuster -x txt,bak,php</code> finder dem.</li><li>Læs den RÅ datafil (skjult/farvet tekst), ikke kun den renderede side. Ignorér decoy-sider (:8080-'Trap').</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Content-discovery (<code>gobuster</code>/<code>ffuf</code> med fil-endelser som
+<code>txt,bak,php,old,zip</code>) afslører tit filer der aldrig var meningen at ligge offentligt:
+backups, rå datastores, config. Og husk forskellen på den RENDEREDE side og dens KILDE: tekst kan
+være skjult med CSS-farve, <code>display:none</code> eller HTML-kommentarer, synligt i kilden men
+ikke i browseren. Kig altid på den rå respons, ikke kun på hvad der tegnes på skærmen.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

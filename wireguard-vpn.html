@@ -58,7 +58,7 @@ ip route get 1.1.1.1
 curl http://sanity-plus.hkn/</code></pre>
 <h2>6. Test targetet</h2>
 <p>Start med routing, ikke ping:</p><pre><code>ip route get &lt;lab-ip&gt;</code></pre><p>Virker routingen, så test grundlæggende forbindelse:</p><pre><code>ping -c 3 &lt;lab-ip&gt;</code></pre><p>Svarer targetet ikke på ICMP, betyder det ikke nødvendigvis at det er utilgængeligt. Ping kan være blokeret selvom en service kører fint. Test derfor servicen selv, fx:</p><pre><code>curl -v http://&lt;hostname&gt;/
-nmap -Pn &lt;lab-ip&gt;   # -Pn springer host discovery over</code></pre>
+<span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn &lt;lab-ip&gt;   # -Pn springer host discovery over</code></pre>
 <h2>Fejlsøgning: den forvirrende klassiker (stale /etc/hosts)</h2>
 <p>Dette er den hyppigste fælde, og den ligner at VPN'en er i stykker, selvom den ikke er det.</p><p><strong>Symptom:</strong> <code>ping</code> til den <em>aktuelle</em> lab-IP virker fint (0% tab), men <code>curl http://&lt;hostname&gt;/</code> eller browseren timeouter.</p><p><strong>Årsag:</strong> når du Stop/Reset'er eller genstarter en opgave, tildeler Haaukins typisk en <strong>ny IP</strong>, synlig på Hosts-siden. Din <code>/etc/hosts</code> peger stadig på den gamle. Den gamle IP ligger ofte i et helt andet subnet end dit nuværende lab-subnet, så den dækkes ikke af <code>AllowedIPs</code>, routes ikke gennem WireGuard, og sendes i stedet ud ad din normale forbindelse hvor den rammer intet.</p><p><strong>Diagnose:</strong></p><pre><code>getent hosts &lt;hostname&gt;         # fx 77.101.126.31 (gammelt subnet?)
 ip route get 77.101.126.31      # peger den på wlan0/default i stedet for wg-interfacet?</code></pre><p>Viser opslaget en IP uden for dit nuværende lab-subnet, og <code>ip route get</code> viser din normale forbindelse i stedet for WireGuard, er det netop denne fælde:</p><pre><code>77.101.126.31 via 192.168.1.1 dev wlan0   # forkert: går ud ad normal internet</code></pre><p><strong>Fix:</strong> opdatér entryen til den aktuelle IP, enten manuelt eller som en hurtig erstatning:</p><pre><code>sudo sed -i 's#^.*&lt;hostname&gt;.*$#&lt;aktuel-ip&gt; &lt;hostname&gt;#' /etc/hosts
@@ -86,6 +86,7 @@ ip route get 1.1.1.1              # skal IKKE gå via wg-interfacet</code></pre>
 
 <h2>Hvad du har lært</h2>
 <ul><li>Installér konfigurationen i <code>/etc/wireguard/</code> med <code>install -m 600</code>, så kun root kan læse din private nøgle.</li><li>Rør aldrig <code>AllowedIPs</code>, og især ikke til <code>0.0.0.0/0</code>. Det laver en full tunnel og kan tage al din anden trafik med.</li><li>Den hyppigste fejl er ikke VPN'en: det er en stale <code>/etc/hosts</code>-entry fra før sidste lab-genstart. Re-synk den hver gang du Stop/Reset'er.</li><li>En lykkedes <code>ping</code> beviser kun ICMP og routing, ikke at hostname eller service er korrekte. Verificér på servicens eget niveau.</li></ul>
+
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

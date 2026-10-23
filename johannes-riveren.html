@@ -24,15 +24,22 @@
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
 <pre><code>curl -o secret.zip http://johannes.hkn/secret.zip     # "Download ZIP" (flag.txt, krypteret)
-zip2john secret.zip > secret.hash                     # $pkzip$-hash
-john --wordlist=rockyou.txt secret.hash               # -> password (fx 12516)
+<span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span> secret.zip > secret.hash                     # $pkzip$-hash
+<span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --wordlist=rockyou.txt secret.hash               # -> password (fx 12516)
 unzip -P &lt;password&gt; secret.zip &amp;&amp; cat flag.txt</code></pre>
              <p>Opgavenavnet ER hintet: "Johannes Riveren" = John the Ripper.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag (per-instans): <span class="flag">HKN{tEI-nc-QKq2l}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>PKZIP-krypteret arkiv → <code>zip2john</code> → <code>$pkzip$</code>-hash → john + rockyou.</li><li>Håndtér downloadede arkiver i deres egen mappe (untrusted data).</li></ul>
+<ul><li>PKZIP-krypteret arkiv: <code>zip2john</code>, så <code>$pkzip$</code>-hash, så john + rockyou.</li><li>Håndtér downloadede arkiver i deres egen mappe (untrusted data).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Opgavens navn ER hintet, en dansk ordleg om "John the Ripper", og det mønster (titlen peger
+på værktøjet eller teknikken) går igen i hele dette CTF. <code>zip2john</code> hører til en hel
+familie af <code>*2john</code>-værktøjer (<code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code>, <code>rar2john</code>,
+<code>keepass2john</code>, <code>office2john</code>) der konverterer et krypteret artefakt til et
+hash john/hashcat kan angribe offline. Når du møder en adgangskodebeskyttet fil, så spørg: findes
+der en <code>...2john</code> for dette format? Som regel ja.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

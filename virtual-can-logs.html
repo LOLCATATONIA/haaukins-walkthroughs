@@ -27,7 +27,7 @@
              men flaget ligger som rå bytes i støjen.</p>
 <h2>Fremgangsmåde</h2>
 <pre><code>strings -a trace | grep -aoiE '(HKN|DDC)\{[^}]*\}'   # fandt straks "HKN{virt" (8 bytes = én payload)
-tshark -r trace -T fields -e can.id -e data.data > all.txt
+<span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r trace -T fields -e can.id -e data.data > all.txt
 awk -F'\t' '$1==1 {print NR": "$2}' all.txt | uniq   # alle payloads for CAN-ID 1, i filrækkefølge</code></pre>
              <p>Tre rigtige fragmenter var spredt blandt fuzzing-støj på samme ID; saml i <strong>kronologisk</strong>
              rækkefølge.</p>
@@ -36,7 +36,13 @@ awk -F'\t' '$1==1 {print NR": "$2}' all.txt | uniq   # alle payloads for CAN-ID 
         <p>Flag: <span class="flag">HKN{virtuel_canbus_logs}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>strings -a &lt;fil&gt; | grep HKN{</code> er altid første træk — også på eksotiske/binære traces.</li><li>Isolér den rette ID og læs payloads som bytes; saml fragmenter i tidsrækkefølge.</li></ul>
+<ul><li><code>strings -a &lt;fil&gt; | grep HKN{</code> er altid første træk, også på eksotiske/binære traces.</li><li>Isolér den rette ID og læs payloads som bytes; saml fragmenter i tidsrækkefølge.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Lad dig ikke skræmme til at lære en hel protokol, før du har prøvet det billige træk. CAN-bus,
+Modbus, en proprietær binær log: uanset hvor fremmed formatet ser ud, koster
+<code>strings | grep</code> efter flag-præfikset få sekunder, og rammer overraskende ofte. Først
+når det fejler, er det tid til at forstå protokollen. Og når data er fragmenteret, er rækkefølgen
+(her kronologisk, pr. CAN-ID) ofte afgørende.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

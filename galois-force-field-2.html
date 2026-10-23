@@ -37,7 +37,7 @@
              <code>check()</code> returnerer, og læs den interne 192-bit tilstand direkte (3 globale
              64-bit ord) for 4 varianter af et testpassword, hvor to tegn uafhængigt varieres (baseline,
              tegn A ændret, tegn B ændret, begge ændret):</p>
-             <pre><code># probe.gdb
+             <pre><code># probe.<span class="gloss" tabindex="0" data-tip="GNU Debugger — kører/inspicerer et program instruktion for instruktion.">gdb</span>
 break *check+1121
 run
 print/x *(unsigned long*)&amp;__libddc_start
@@ -71,7 +71,14 @@ print/x *((unsigned long*)&amp;__libddc_start + 2)</code></pre>
         <p>Flag: <span class="flag">DDC{q0b-qY-t3dXB}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Når symbolsk eksekvering er for langsom mod en tabel-/multiplikationsbaseret checksum, test LINEARITET først (superposition, 4 datapunkter, minutter) — det afgør om hele problemet reduceres til lineær algebra.</li><li>Differentiel GDB-probing (læs interne registre/globals direkte) slår at gætte formlen fra disassembly alene.</li><li>Tjek løkke-semantikken (antal iterationer vs. byte-count) systematisk, hvis et "oplagt" input-format giver et inkonsistent lineært system.</li><li>Brug nulrummet til at finde en læsbar/ASCII-variant af en ellers gyldig men "grim" løsning, i stedet for at opgive ved første fund.</li></ul>
+<ul><li>Når symbolsk eksekvering er for langsom mod en tabel-/multiplikationsbaseret checksum, test LINEARITET først (superposition, 4 datapunkter, minutter); det afgør om hele problemet reduceres til lineær algebra.</li><li>Differentiel GDB-probing (læs interne registre/globals direkte) slår at gætte formlen fra disassembly alene.</li><li>Tjek løkke-semantikken (antal iterationer vs. byte-count) systematisk, hvis et "oplagt" input-format giver et inkonsistent lineært system.</li><li>Brug nulrummet til at finde en læsbar/ASCII-variant af en ellers gyldig men "grim" løsning, i stedet for at opgive ved første fund.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den dybe lektie: når et værktøj kører uendeligt (Z3/angr i 45 minutter), så stop og spørg om
+problemet overhovedet er det du tror. En funktion der kun bruger XOR, shift og tabelopslag er ofte
+LINEÆR over GF(2), og linearitet kan afkræftes eller bekræftes med 4 målinger (superposition) på
+få minutter. Er den lineær, er "find et input der giver dette output" ikke et solver-problem men
+simpel lineær algebra (Gaussisk elimination). Det gælder CRC'er, mange custom-checksummer og en
+del letvægts-ciphers: test strukturen før du bruteforcer den.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

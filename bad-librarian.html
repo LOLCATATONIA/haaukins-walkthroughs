@@ -27,7 +27,7 @@
              <code>SSLKEYLOGFILE</code> på en kompromitteret offentlig computer). Med den kan al "krypteret" HTTPS
              dekrypteres bagefter — også forward-secret ECDHE/TLS 1.3, som en privatnøgle alene ikke kan.</p>
 <h2>Trin for trin</h2>
-<pre><code>tshark -r dump.pcapng -o "tls.keylog_file:tlskey.log" -Y http \
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r dump.pcapng -o "tls.keylog_file:tlskey.log" -Y http \
   -T fields -e http.file_data | grep -aoE '[A-Za-z0-9+/=]{20,}'
 # -> en base64-streng i en dekrypteret HTTP/JSON-chat -> base64 -d</code></pre>
              <p>I Wireshark-GUI: <em>Preferences → Protocols → TLS → (Pre)-Master-Secret log filename</em> → vælg
@@ -38,7 +38,13 @@
         <p>Flag: <span class="flag">HKN{l00k-0ut-f0r-th3-l1br3r13n}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>HTTPS beskytter intet hvis nogen kan logge dine session-nøgler.</li><li>En keylog-fil dekrypterer enhver TLS-session, uanset cipher (keylog ≫ privatnøgle).</li><li>Kig efter kodede strenge (base64) i de dekrypterede HTTP-bodies.</li></ul>
+<ul><li>HTTPS beskytter intet hvis nogen kan logge dine session-nøgler.</li><li>En keylog-fil dekrypterer enhver TLS-session, uanset cipher (keylog slår privatnøgle).</li><li>Kig efter kodede strenge (base64) i de dekrypterede HTTP-bodies.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p><code>SSLKEYLOGFILE</code> er en legitim debug-funktion i browsere og mange biblioteker:
+sæt miljøvariablen, og programmet skriver sine TLS-session-nøgler til en fil, så Wireshark kan
+dekryptere din egen trafik. Det samme værktøj bliver et angreb hvis en malware eller en
+kompromitteret maskine sætter variablen uden ejerens viden. Når du undersøger en maskine, er en
+uventet <code>SSLKEYLOGFILE</code> i miljøet derfor et rødt flag værd at kigge efter.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

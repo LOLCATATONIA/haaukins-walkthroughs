@@ -28,7 +28,7 @@
              hvordan flaget bygges.</p>
 <h2>Trin for trin</h2>
 <pre><code>ewfmount Friendly.E01 mnt/
-fls -rp mnt/ewf1</code></pre>
+<span class="gloss" tabindex="0" data-tip="Lister filer/mapper i et disk-image uden at mounte det (Sleuthkit).">fls</span> -rp mnt/ewf1</code></pre>
              <p>Output viser hele filsystemet, inklusive filer der normalt er usynlige:</p>
              <pre><code>r/r 12-128-1:  Instructions.txt
 * r/r 14-128-3:  Instructions2.txt      &lt;- slettet (stjernen)
@@ -36,7 +36,7 @@ r/r 15-128-1:  ini.txt
 r/r 16-128-1:  This is not a pipe.bmp
 r/r 17-128-1:  zebra.77696E6E696E67</code></pre>
              <p>Tallet før filnavnet (fx <code>14-128-3</code>) er inode-nummeret. Genskab den slettede fil med det:</p>
-             <pre><code>icat mnt/ewf1 14-128-3 > Instructions2.txt</code></pre>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Udtrækker indholdet af en specifik fil fra et disk-image (Sleuthkit).">icat</span> mnt/ewf1 14-128-3 > Instructions2.txt</code></pre>
              <p>De to instruktionsfiler forklarer opskriften tilsammen: byg flaget af brudstykker fra de tre
              <em>resterende</em> filer (<code>ini.txt</code>, <code>This is not a pipe.bmp</code>, <code>zebra.*</code>)
              i alfabetisk rækkefølge, en hex-kodet fil-endelse (<code>77696E6E696E67</code> → <code>winning</code>),
@@ -46,7 +46,13 @@ r/r 17-128-1:  zebra.77696E6E696E67</code></pre>
         <p>Flag (afleveres som DDC): <span class="flag">DDC{keep_on_winning}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>EWF/<code>.E01</code> monteres med <code>ewfmount</code> (eller <code>-i ewf</code> til fls/icat).</li><li>Slettede instruktions-filer rummer tit halvdelen af opskriften — genskab dem.</li><li>Nogle opgaver afleveres med <code>DDC{}</code>-præfiks direkte.</li></ul>
+<ul><li>EWF/<code>.E01</code> monteres med <code>ewfmount</code> (eller <code>-i ewf</code> til fls/icat).</li><li>Slettede instruktions-filer rummer tit halvdelen af opskriften, genskab dem.</li><li>Nogle opgaver afleveres med <code>DDC{}</code>-præfiks direkte.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Bemærk hvordan opgaven tvinger dig til at bruge alle filerne sammen: den slettede fil
+giver kun halvdelen af opskriften. Det er et bevidst design der belønner grundig enumeration frem
+for at gætte. Når en forensics-opgave virker ufuldstændig (en instruktion der stopper midt i),
+er det næsten altid et signal om at der mangler en skjult eller slettet brik, ikke at opgaven er
+i stykker.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

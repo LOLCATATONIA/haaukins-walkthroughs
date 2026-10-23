@@ -41,7 +41,13 @@ cat targets.txt | tr '\n' '\0' | xargs -0 grep -hoE '^HKN\{[^}]+\}$' | grep -v n
 <p>Flag: <span class="flag">HKN{fj-kI5-EM5B7}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Når antal/frekvens ikke adskiller nål fra høstak: kig på <strong>strukturen i værdierne</strong>.</li><li>Maskinelt genererede decoys har et ensartet mønster — det ægte flag bryder det.</li></ul>
+<ul><li>Når antal/frekvens ikke adskiller nål fra høstak: kig på <strong>strukturen i værdierne</strong>.</li><li>Maskinelt genererede decoys har et ensartet mønster, det ægte flag bryder det.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Nål-i-høstak-opgaver løses ved at finde den dimension hvor nålen afviger. Når indholdet ser
+ens ud, så kig på strukturen: længde, format-signatur, timestamp, entropi, eller bare "hvilken fil
+er håndlavet frem for maskingenereret". Maskinelt genererede decoys er ensartede netop fordi de er
+maskingenererede; det ægte svar er ofte det ENE der bryder mønstret. Samme tankegang bruges til at
+finde den afvigende post i store logs eller datasæt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

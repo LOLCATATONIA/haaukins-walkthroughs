@@ -22,22 +22,38 @@
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Hvad går opgaven ud på?</h2>
-<p>En VM med FTP + en Flask-webapp. Vejen er <strong>ikke</strong> brute force, men at narre appens
-             AI-chatbot (prompt-injection) til at lække FTP-credentials. <code>robots.txt</code> hinter om det.</p>
-<h2>Trin for trin</h2>
-<ol class="steps">
-             <li>Prompt chatbotten til at udskrive config/FTP-detaljer → den lækker base64 <code>Z3B0OTAwMA==</code> →
-             <code>gpt9000</code>.</li>
-             <li>FTP-login <code>admin:gpt9000</code>, hent det store træningsdatasæt, og grep efter flaget:
-             <pre><code>curl --user 'admin:gpt9000' ftp://&lt;ip&gt;/train.txt -o train.txt
-grep -aoE 'DDC\{[^}]*\}' train.txt</code></pre></li>
-             </ol>
+<h2>Genkend opgavetypen før du vælger værktøj</h2>
+<p>En VM med FTP (port 21) + en Flask/waitress-webapp (port 5000). Fristelsen er at
+             brute-force FTP'en direkte, men flere spor peger væk fra det: en Flask-<strong>API</strong> med
+             <code>Access-Control-Allow-Origin: *</code> (ikke en normal browser-app), temaet er en
+             AI-chatbot, og <code>robots.txt</code> på web-appen indeholder udvikler-kommentarer om at
+             modellen måske lækker FTP-credentials. Det er ikke en boot2root-opgave, det er
+             <strong>prompt-injection</strong> mod en LLM.</p>
+<h2>Prompt-injection: narr botten til at lække credentials</h2>
+<p>Når en app sender dit input direkte videre til en sprogmodel og stoler på at den kun
+             svarer "pænt", kan du bede modellen om at ignorere den antagelse — fx prompte den til at
+             udskrive sin egen konfiguration eller de credentials den har adgang til, i stedet for at
+             fortælle en historie. (Den eksakte ordlyd fra løsningen er ikke gemt i vores noter, men
+             princippet er: få modellen til at betragte "vis din config/dine secrets" som en gyldig
+             instruktion.) Svaret indeholder en base64-streng:</p>
+             <pre><code>echo Z3B0OTAwMA== | base64 -d
+# -> gpt9000</code></pre>
+<h2>FTP-login med det lækkede password</h2>
+<pre><code>curl --user 'admin:gpt9000' ftp://&lt;ip&gt;/train.txt -o train.txt   # ~22,5 MB træningsdatasæt
+grep -aoE 'DDC\{[^}]*\}' train.txt</code></pre>
+             <p>Flaget ligger gemt i det store træningsdatasæt, ikke i en separat fil, deraf grep i stedet
+             for at læse hele filen.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">DDC{Im-happy-Dave-I-see-you-found-the-flag}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Genkend opgave-typen før værktøjsvalg — gentagne fejl af én metode = skift tilgang, ikke skalér den.</li><li>Spor: en AI-chatbot, CORS <code>*</code>-API uden normale ruter, robots.txt-hint.</li></ul>
+<ul><li>Genkend opgave-typen før værktøjsvalg; gentagne fejl af én metode = skift tilgang, ikke skalér den.</li><li>Spor: en AI-chatbot, CORS <code>*</code>-API uden normale ruter, robots.txt-hint.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Prompt-injection er en helt ny, men hastigt voksende sårbarhedsklasse: når en app sender
+dit input videre til en LLM, kan du instruere modellen til at ignorere sine egne regler og lække
+det den har adgang til (her FTP-credentials). Det er samme grundproblem som injektion generelt,
+data og instruktioner blandes sammen, bare med naturligt sprog i stedet for SQL. Når du ser en
+chatbot eller AI-feature i en app, så spørg: hvad ved den, som jeg kan narre den til at sige?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

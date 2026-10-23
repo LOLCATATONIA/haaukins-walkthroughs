@@ -41,7 +41,15 @@
         <code>/bin/supersecretdir/fl4g.txt</code> (kun læsbar for root): <span class="flag">HKN{ED-JM-Ty52Rv}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>find -perm -4000 er det første du kører for SUID-privesc-recon.</li><li>GTFOBins.github.io har en klar liste over hvilke binaries der har kendte SUID/sudo-escape-tricks — find er et af de mest almindelige.</li><li>-p på sh/bash er nødvendigt for at BEVARE forhøjede rettigheder når reel ≠ effektiv uid.</li></ul>
+<ul><li>find -perm -4000 er det første du kører for SUID-privesc-recon.</li><li>GTFOBins.github.io har en klar liste over hvilke binaries der har kendte SUID/sudo-escape-tricks; find er et af de mest almindelige.</li><li>-p på sh/bash er nødvendigt for at BEVARE forhøjede rettigheder når reel og effektiv uid ikke matcher.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>SUID-privesc følger en fast rutine: <code>find / -perm -4000 -type f 2>/dev/null</code> lister
+kandidaterne, og <a href="https://gtfobins.github.io/" target="_blank">GTFObins</a> fortæller
+hvilke af dem der har et kendt escape. <code>find -exec</code> er blandt de mest almindelige, fordi
+den kan starte en vilkårlig kommando. Den subtile detalje værd at huske: moderne shells DROPPER
+forhøjede rettigheder ved opstart hvis reel og effektiv uid ikke matcher, så <code>-p</code> (eller
+et eksplicit <code>setuid(0)</code>) er nødvendigt for at beholde root. Samme nuance dukker op med
+SUID-sprogtolke, se <a href="hgls-package-delivery.html">HGLS Package Delivery</a>.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

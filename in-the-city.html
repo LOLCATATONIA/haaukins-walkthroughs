@@ -23,7 +23,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code>tshark -r trace.pcap --export-objects http,out    # 5 JPG'er + secret.zip (ZipCrypto)
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r trace.pcap --export-objects http,out    # 5 JPG'er + secret.zip (ZipCrypto)
 # "look closely" = kig VISUELT på billederne; passwordet står på hyperreality_wormhole.jpg
 unzip -P SALAMISLICE secret.zip     # -> secret.txt = flaget</code></pre>
              <p><strong>Fælde:</strong> pcap'en har også en iøjnefaldende 1-byte "I/M" covert-kanal — det er en
@@ -37,6 +37,13 @@ unzip -P SALAMISLICE secret.zip     # -> secret.txt = flaget</code></pre>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li><code>--export-objects http</code> henter exfiltrerede filer ud af en pcap.</li><li>Ved 'file transmissions' + 'look closely': åbn og SE de ekstraherede billeder (zoom svag/overlejret tekst) før dyb pakke-analyse.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To tilbagevendende pointer. (1) En pcap er ikke kun pakker: <code>--export-objects http</code>
+(eller Wiresharks "Export Objects") rekonstruerer hele filer der blev overført, så du kan åbne dem
+direkte. (2) "Look closely" og lignende hints er tit bogstavelige: kig på de ekstraherede billeder
+MED ØJNENE, zoom ind på svag eller lodret tekst, før du dykker i pakke-niveau. Og vær på vagt over
+for iøjnefaldende "covert channels" der viser sig at være afledninger, det flashede spor er ikke
+altid det rigtige.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

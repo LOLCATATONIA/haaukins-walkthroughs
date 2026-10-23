@@ -27,7 +27,7 @@
              Heartbleed (CVE-2014-0160) lader en klient bede om op til ~64 KB i et TLS-heartbeat-svar men sende en lille
              payload → serveren lækker tilstødende proces-hukommelse (nøgler, sessioner … eller flaget).</p>
 <h2>Trin for trin</h2>
-<pre><code>nmap -Pn -p443 --open &lt;subnet&gt;/24                 # find TLS-servere
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p443 --open &lt;subnet&gt;/24                 # find TLS-servere
 nmap -Pn -p443 --script ssl-heartbleed &lt;ip&gt;        # State: VULNERABLE
 msfconsole -q -x "use auxiliary/scanner/ssl/openssl_heartbleed; \
   set RHOSTS &lt;ip&gt;; set RPORT 443; set ACTION DUMP; run; exit -y"
@@ -40,7 +40,13 @@ grep -aoE 'HKN\{[^}]*\}' ~/.msf4/loot/*heartble*.bin | sort | uniq -c | sort -rn
         <p>Flag (eksempel): <span class="flag">HKN{1JM-fuD-Ywxn}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Navngiver opgaven et CVE, så slå exploitet op (nmap NSE, Metasploit-modul, manuel PoC).</li><li>Ingen host oplyst? Start lab'et, se Hosts-siden, scan subnettet for porten.</li><li>Memory-leaks er støjende → gentag og tag det konsistente resultat.</li></ul>
+<ul><li>Navngiver opgaven et CVE, så slå exploitet op (nmap NSE, Metasploit-modul, manuel PoC).</li><li>Ingen host oplyst? Start lab'et, se Hosts-siden, scan subnettet for porten.</li><li>Memory-leaks er støjende, gentag og tag det konsistente resultat.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Når en opgave navngiver et CVE (eller en versions-streng du kan slå op), er halvdelen af
+arbejdet gjort: der findes næsten altid en færdig nmap NSE-script, et Metasploit-modul eller en
+offentlig PoC. Det generelle mønster, "læk tilstødende hukommelse", går igen i mange bugs
+(buffer over-reads, uninitialiseret hukommelse), og outputtet er altid støjende: kør flere gange
+og tag den streng der går igen, i stedet for at stole på ét enkelt leak.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

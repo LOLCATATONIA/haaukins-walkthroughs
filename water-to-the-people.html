@@ -56,7 +56,15 @@ time.sleep(30)   # hold forbindelsen åben mens du kører Modbus-skriptet ovenfo
 <p>Flag: <span class="flag">HKN{1_l0v3_4_c0ld_6l455_0f_w473r}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Modbus-adresser er tit forskudt — map addr→coil/register empirisk ved at skrive og aflæse.</li><li>Flaget kommer via socket.io <code>win</code>-eventet — lyt med en klient mens du skriver Modbus.</li></ul>
+<ul><li>Modbus-adresser er tit forskudt; map addr til coil/register empirisk ved at skrive og aflæse.</li><li>Flaget kommer via socket.io <code>win</code>-eventet; lyt med en klient mens du skriver Modbus.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Modbus er den mest udbredte industrielle protokol, og den har ingen autentificering: coils
+(til/fra-ventiler) og holding-registers (tal-værdier som pumpehastigheder) kan skrives af enhver
+der når port 502. To praktiske lektier der går igen: adresserne er ofte forskudt, så kortlæg
+empirisk ved at skrive én værdi og se hvad displayet gør; og når en "win" leveres via et
+asynkront event (her socket.io), skal du have en lytter forbundet MENS du handler, ellers går
+beskeden tabt. At forstå anlæggets fysik (hvilke ventiler må ikke åbnes) er lige så vigtigt som
+at kunne sende pakkerne.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

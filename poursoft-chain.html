@@ -83,7 +83,15 @@
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>En fjernet secret lever stadig i git-historikken — tjek commit-diffs, ikke kun den aktuelle HEAD.</li><li>Automatisk secret-maskering matcher typisk kun den EKSAKTE byte-streng — enhver omkodning (base64, hex, rot13) af outputtet før print omgår filteret, hvis du har skriveadgang til pipelinen.</li><li>OAuth2-flows kan simuleres fuldt med curl + en cookie-jar, ingen browser nødvendig, så længe du allerede har en gyldig session hos identity provideren.</li><li>Admin-adgang til ÉT system (Gitea) giver ofte en vej ind i et INTEGRERET system (Drone CI) via deres fælles OAuth/service-account-tillid.</li></ul>
+<ul><li>En fjernet secret lever stadig i git-historikken; tjek commit-diffs, ikke kun den aktuelle HEAD.</li><li>Automatisk secret-maskering matcher typisk kun den EKSAKTE byte-streng; enhver omkodning (base64, hex, rot13) af outputtet før print omgår filteret, hvis du har skriveadgang til pipelinen.</li><li>OAuth2-flows kan simuleres fuldt med curl + en cookie-jar, ingen browser nødvendig, så længe du allerede har en gyldig session hos identity provideren.</li><li>Admin-adgang til ÉT system (Gitea) giver ofte en vej ind i et INTEGRERET system (Drone CI) via deres fælles OAuth/service-account-tillid.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>CI/CD-pipelines er et rigt angrebsmål i den virkelige verden, og denne kæde rammer de
+klassiske svagheder: secrets i git-historik (fjernet men ikke væk), secret-maskering der kun
+matcher den eksakte byte-streng (så base64 af værdien slipper ucensureret ud hvis du styrer
+pipelinen), og tillidsforhold mellem integrerede systemer (Gitea-admin giver Drone-adgang via delt
+OAuth). Den gennemgående lektie: en hemmelighed er kun skjult så længe ALLE veje til den er lukkede,
+og et sammenkoblet system er kun så sikkert som tilliden mellem dets dele. Tænk i hele kæden, ikke
+i enkelt-tjenester.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

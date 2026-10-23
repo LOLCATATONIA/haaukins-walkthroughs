@@ -77,7 +77,15 @@ for i in range(1, length + 1):
 <p>Flag: <span class="flag">HKN{p4ran0ia_mak3s_y0u_go0d_a7_gue5s1ng_g4me5}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Blind boolean SQLi: et binært orakel (Good/Bad) + <code>substr/unicode/length</code> → fuld ekstraktion.</li><li>Fælde: injektionsfeltet når kun query'en hvis det ANDET felt (user_name) matcher en rigtig bruger.</li><li>Jf. UNION-varianten i <a href="sneaky-reviews.html">Sneaky Reviews</a> — her er output blindt.</li></ul>
+<ul><li>Blind boolean SQLi: et binært orakel (Good/Bad) + <code>substr/unicode/length</code> giver fuld ekstraktion.</li><li>Fælde: injektionsfeltet når kun query'en hvis det ANDET felt (user_name) matcher en rigtig bruger.</li><li>Jf. UNION-varianten i <a href="sneaky-reviews.html">Sneaky Reviews</a>; her er output blindt.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Blind injection er UNION-SQLi's tålmodige fætter: du ser ikke dataene, kun et ja/nej-signal
+("Good"/"Bad", eller en tidsforskel ved time-based blind). Men ét bit information pr. request er
+nok: med <code>substr</code> + <code>unicode</code> + binær søgning udtrækker du hvert tegn på ~7
+forespørgsler. Det er langsomt nok til at <code><span class="gloss" tabindex="0" data-tip="Automatiserer detektion og udnyttelse af SQL-injection.">sqlmap</span></code> som regel automatiserer det, men at
+kunne det i hånden lærer dig præcis hvorfor et orakel, uanset hvor lille, lækker alt til sidst.
+Samme princip som Hashle og padding-oracles: lidt feedback pr. forsøg, gentaget, afslører
+helheden.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

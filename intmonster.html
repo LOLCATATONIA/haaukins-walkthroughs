@@ -23,7 +23,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
-<p><code>nc intmonster.hkn 9000</code>: du gør 10 skade/runde, monsteret 15 — du dør først. Men
+<p><code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> intmonster.hkn 9000</code>: du gør 10 skade/runde, monsteret 15 — du dør først. Men
              kildekoden afslører: <code>char myHealth</code> (8-bit, max 127), og
              <code>myHealth = (char)abs(myHealth - poison)</code> lader dig sætte health til 127 ved
              <code>poison = health + 127</code> (gratis heal). Monster-død tjekkes <em>før</em> monsteret slår.</p>
@@ -34,7 +34,14 @@
         <p>Flag (per-instans): <span class="flag">DDC{j8oZfWrouvq9}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Læs kildekoden når den udleveres — bugs står i klartekst.</li><li><code>char</code>/<code>short</code> til spil-værdier = overflow-guld.</li><li>Logik-rækkefølge (hvornår win tjekkes) kan være lige så udnyttelig som overflow'et.</li></ul>
+<ul><li>Læs kildekoden når den udleveres, bugs står i klartekst.</li><li><code>char</code>/<code>short</code> til spil-værdier = overflow-guld.</li><li>Logik-rækkefølge (hvornår win tjekkes) kan være lige så udnyttelig som overflow'et.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Integer- og char-overflow er en hel bug-familie: en 8-bit <code>char</code> wrapper ved 127/255,
+en <code>int</code> ved ~2 milliarder, og negative tal opstår hvor koden antog positive. Overalt
+hvor et program bruger en for lille taltype til en værdi en bruger kan påvirke (health, mængde,
+pris, længde), er der potentiale for at wrappe den rundt. Og rækkefølgen af tjek (her: monster-død
+tjekkes før monsteret slår) er lige så udnytteligt som selve overflow'et. Læs koden og spørg
+"hvad hvis dette tal bliver meget stort eller negativt?".</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

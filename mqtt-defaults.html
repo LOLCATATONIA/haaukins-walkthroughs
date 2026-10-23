@@ -22,11 +22,44 @@
 <div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Trin for trin</h2>
+<h2>Sporet: hvorfor leder vi her?</h2>
+<ol class="steps">
+<li><strong>Opgaven giver dig værten (<code>myggen.hkn</code>) og titlen "Why are people still
+using defaults?".</strong> Titlen fortæller dig sårbarhedsklassen, før du har rørt noget:
+svaret involverer standard-credentials. Opgavebeskrivelsens egne ord er et spor, ikke kun
+kontekst.</li>
+<li><strong>Bekræft protokollen.</strong> Et scan af værten viser port 1883 åben, MQTT's
+standardport. Når du ved hvilken protokol du har med at gøre, ved du også hvilke spørgsmål der er
+relevante. For MQTT er det "kan jeg forbinde uden credentials?" og "hvilke topics findes der?",
+ikke fx HTTP-ruter eller SQL-tabeller.</li>
+<li><strong>Test den billigste hypotese først: ingen autentificering.</strong> Mange MQTT-brokere
+tillader anonym forbindelse som standard.
+<pre><code><span class="gloss" tabindex="0" data-tip="MQTT-klient til at abonnere på topics på en MQTT-broker.">mosquitto_sub</span> -h myggen.hkn -p 1883 -t '#' -v
+# Connection Refused: not authorised.</code></pre>
+Afvist. Næste skridt følger titlens eget hint: defaults.</li>
+<li><strong>Brute-force mod en bred, ikke MQTT-specifik ordliste.</strong> Der er ingen grund til
+at gætte på ét bestemt navn/password-par.
+<pre><code>msfconsole -q
+use auxiliary/scanner/mqtt/connect
+set RHOSTS myggen.hkn
+show options          # sæt bruger/password-ordliste-feltet herfra
+run</code></pre>
+Mod en standard unix/admin-ordliste rammer scanneren <code>operator</code>/<code>catalina</code>.</li>
+<li><strong>Først nu, med credentials i hånden, ser man mønstret.</strong>
+<code>operator</code>/<code>catalina</code> er faktisk en kendt Apache Tomcat-default, helt
+urelateret til MQTT. Det forklarer bagefter hvorfor en generel ordliste virkede, hvor en
+MQTT-specifik liste måske ikke havde: en administrator genbruger ofte et credential-par fra et
+helt andet system.</li>
+<li><strong>Når du er inde: hvordan "lister" man indhold i MQTT?</strong> MQTT har ingen
+<code>SHOW TABLES</code>. Den funktionelle analog er wildcard-subscribe (<code>#</code>): abonnér
+på absolut alt på én gang, og se hvad broker'en rent faktisk transporterer.</li>
+</ol>
 <pre><code>mosquitto_sub -h myggen.hkn -p 1883 -u operator -P catalina -t 'flags/#' -v</code></pre>
-             <p><code>operator</code>/<code>catalina</code> er en klassisk Tomcat-default (findes også i unix-ordlister).
-             Wildcard <code>#</code> = fuld læseadgang; flagene publiceres retained på <code>flags/</code>-topics. Samme
-             subscribe afslører bonus-opgaven <strong>Unsecure IoT Traffic</strong>.</p>
+<p>Flagene kommer tilbage på <code>flags/</code>-topics, og det gør de selv om du forbinder lang
+tid efter de blev sendt. MQTT's <em>retained</em>-flag betyder broker'en husker den seneste besked
+pr. topic og sender den automatisk til enhver ny subscriber. Uden retained-beskeder ville du kun
+se fremtidige publiceringer, ikke historiske. Samme subscribe afslører bonus-opgaven
+<strong>Unsecure IoT Traffic</strong>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <ul>
         <li>Why are people still using defaults?: <span class="flag">HKN{jJ-4u-g2p25N}</span></li>
@@ -34,7 +67,13 @@
         </ul><p>(per-instans)</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>IoT-broker med default-creds + wildcard-subscribe (<code>#</code>) = fuld læseadgang.</li><li><code>mosquitto_sub</code> (eller en rå MQTT-klient) læser flagene.</li></ul>
+<ul><li><strong>Opgavebeskrivelsen er selv et spor.</strong> "Defaults" i titlen er ikke tilfældigt. CTF-opgaver (og ofte rigtige pentest-rapporter) fortæller dig ofte sårbarhedsklassen, hvis du læser teksten som et hint frem for blot kontekst.</li><li><strong>Credentials genbruges på tværs af ulige systemer.</strong> At en MQTT-broker bruger en Tomcat-default er ikke et tilfælde, det er mønstret: den samme administrator satte begge systemer op og brugte det han/hun kendte.</li><li><strong>Wildcard-subscribe er pub/sub's svar på "list alt".</strong> Når du først har en gyldig forbindelse til et pub/sub-system, er bred enumeration (abonnér/lyt på alt) det naturlige næste skridt, præcis som <code>SELECT *</code> eller en fuld directory-listing i andre kontekster.</li><li><strong>Retained/persisterede beskeder lækker historik, ikke kun live-trafik.</strong> Det er derfor et øjebliks adgang kan afsløre data der blev sendt lang tid før du kom til.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Samme to mønstre dukker op langt uden for MQTT: standard-credentials der er "lånt" fra et andet
+system findes overalt i IoT/OT (routere, kameraer, SCADA-udstyr), og "subscribe/lyt på alt" er
+den samme første-reconnaissance-bevægelse i andre pub/sub-systemer som Redis' <code>PSUBSCRIBE
+*</code>, Kafka-topics eller AMQP-exchanges. Når du møder et nyt pub/sub-system, er "kan jeg
+forbinde uden creds, og kan jeg abonnere på alt" altid de første to spørgsmål at stille.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

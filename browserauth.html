@@ -26,17 +26,25 @@
 <p>En "passwordless" auth på <code>browserauth.hkn</code> + en udleveret <code>capture.pcap</code>.
              Hintet: "what is http headers and what is a user agent?"</p>
 <h2>Trin for trin</h2>
-<pre><code>tshark -r capture.pcap -Y http.request -O http
+<p>Hintet peger på HTTP-headers og User-Agent, så led i den udleverede trafik efter hvad
+             der adskiller en gyldig request fra en afvist. Her bærer selve User-Agent-strengen "login'et":</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -Y http.request -O http
 #  GET /secrets/YWdlbnRfMDA3/flag
 #  User-Agent: BrowserAuth/9472.2843.8275.1753   <- fungerer som token
 #  YWdlbnRfMDA3 = base64("agent_007") = bruger-id</code></pre>
-             <p>Replikér mod hosten med samme User-Agent:</p>
+             <p>En header kan klienten sætte frit, så replikér den bare mod hosten:</p>
              <pre><code>curl -H "User-Agent: BrowserAuth/9472.2843.8275.1753" http://&lt;ip&gt;/secrets/YWdlbnRfMDA3/flag</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>"Access granted. Welcome back Alice …" → <span class="flag">HKN{…}</span> (per-instans).</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>En auth der kun tjekker en statisk header-streng er triviel at forfalske — headeren lækkes i al trafik.</li><li>Analysér pcap'en: <code>tshark -Y http.request -O http</code> viser hele requesten inkl. headers.</li></ul>
+<ul><li>En auth der kun tjekker en statisk header-streng er triviel at forfalske; headeren lækkes i al trafik.</li><li>Analysér pcap'en: <code>tshark -Y http.request -O http</code> viser hele requesten inkl. headers.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Enhver HTTP-header kan klienten sætte til hvad som helst, inklusive User-Agent,
+<code>X-Forwarded-For</code>, <code>Referer</code> og custom-headers. En "auth" der stoler på en
+sådan værdi er derfor ingen auth. Når du ser et system der behandler en bestemt header som bevis
+på identitet eller rettighed, så forfalsk den med <code>curl -H</code>. Samme fejltype som en
+rolle gemt i en cookie: alt klienten kontrollerer, kontrollerer angriberen.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

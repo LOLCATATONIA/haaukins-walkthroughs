@@ -55,9 +55,14 @@ m = pow(ct, d, N)
 print(m.to_bytes((m.bit_length()+7)//8, 'big'))
 # b'My bank password is 523635'</code></pre>
 <h2>Lydsporet: enkelt-tone-signalering, IKKE standard-DTMF</h2>
-<p>Transskriberet med lokal Whisper (<code>nix shell nixpkgs#openai-whisper
-             nixpkgs#ffmpeg</code> — whisper fejler stille, exit 0, uden <code>ffmpeg</code> i samme shell).
-             Samtalen beder Jens om at indtaste sit nye 6-cifrede password og senere sit CPR-nummer, begge
+<p>Transskriberet med lokal Whisper. På en almindelig Kali:</p>
+             <pre><code>sudo apt install -y ffmpeg
+pip install openai-whisper
+<span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model — transskriberer lydfiler lokalt.">whisper</span> samtale.wav --model base</code></pre>
+             <p>(Vi kørte selv <code>nix shell nixpkgs#openai-whisper nixpkgs#ffmpeg</code>, samme resultat.
+             Whisper fejler STILLE, exit 0, ingen fejlmeddelelse, hvis <code>ffmpeg</code> ikke findes i
+             samme shell, installér altid begge sammen.)</p>
+             <p>Samtalen beder Jens om at indtaste sit nye 6-cifrede password og senere sit CPR-nummer, begge
              via telefon-toner lige efter et "long beep". <strong>Vigtig faldgrube:</strong> det er ikke
              almindelig telefon-DTMF (to samtidige toner fra et 697-941Hz/1209-1633Hz-gitter) — det er
              <strong>kun én enkelt tone pr. ciffer</strong>, en custom kodning.</p>
@@ -118,7 +123,15 @@ for combo in itertools.permutations(['0','1','4','7','8','9'], 6):
 <p>Flag: <span class="flag">HKN{9046172835}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>En RSA-modulus under ~512 bit falder altid til Pollard's rho på sekunder/minutter — tjek nøglestørrelsen før du overvejer noget tungere.</li><li>Hvis to hemmeligheder er kodet med samme custom skema, og du kender den ene (her: password via RSA), kan du bruge den til at KALIBRERE afkodningen af den anden, i stedet for at gætte formlen fra bunden.</li><li>En automatisk energi-tærskel finder nemt de stærke toner og misser de svage — scan efter SPECIFIKKE kendte mål-frekvenser i stedet for blot "den højeste top", når du ved hvilket gitter du leder efter.</li><li>Når selve dataindholdet er korrekt, men flaget stadig afvises, kan selve FORMATET (HKN{}/DDC{}, indpakning, rækkefølge) være den sidste ukendte variabel — hvis resten af søgerummet er lille nok (her: 720 permutationer), brute-force den direkte mod svar-API'et i stedet for at gætte i mørket.</li></ul>
+<ul><li>En RSA-modulus under ~512 bit falder altid til Pollard's rho på sekunder/minutter; tjek nøglestørrelsen før du overvejer noget tungere.</li><li>Hvis to hemmeligheder er kodet med samme custom skema, og du kender den ene (her: password via RSA), kan du bruge den til at KALIBRERE afkodningen af den anden, i stedet for at gætte formlen fra bunden.</li><li>En automatisk energi-tærskel finder nemt de stærke toner og misser de svage; scan efter SPECIFIKKE kendte mål-frekvenser i stedet for blot "den højeste top", når du ved hvilket gitter du leder efter.</li><li>Når selve dataindholdet er korrekt, men flaget stadig afvises, kan selve FORMATET (HKN{}/DDC{}, indpakning, rækkefølge) være den sidste ukendte variabel; hvis resten af søgerummet er lille nok (her: 720 permutationer), brute-force den direkte mod svar-API'et i stedet for at gætte i mørket.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den mest overførbare idé her er kalibrering med et kendt anker: fordi RSA-delen afslørede
+passwordet, kunne den ukendte frekvens-til-ciffer-tabel udledes i stedet for gættes, et "known
+plaintext"-angreb på et akustisk signal. Det mønster (brug det du allerede kender til at afkode det
+du ikke kender) går igen i al kryptoanalyse. Dertil to praktiske pointer: nøglestørrelse afgør
+angrebet (under ~512-bit RSA falder til Pollard's rho), og lydsignaler kan bære data i tid
+(morse), frekvens (toner, spektrogrammer) eller amplitude, så se på spektrogrammet, ikke kun
+bølgeformen.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

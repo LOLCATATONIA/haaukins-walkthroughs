@@ -25,7 +25,7 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>Alle tre opgaver løses på <strong>samme</strong> <code>capture.pcap</code>. Start altid med
 protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefølge:</p>
-<pre><code>tshark -r capture.pcap -q -z io,phs</code></pre><p>67 SYN-pakker der aldrig får svar. ISN/vindue/IP-ID var støj — men de <strong>3 reserverede bits</strong>
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -q -z io,phs</code></pre><p>67 SYN-pakker der aldrig får svar. ISN/vindue/IP-ID var støj — men de <strong>3 reserverede bits</strong>
              i TCP-flags (skal være 0 pr. RFC) varierede.</p>
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0 &amp;&amp; ip.dst==18.157.68.73' \
@@ -45,6 +45,12 @@ print(''.join(chars))"</code></pre>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Skjulte data kan bo i reserverede/ubrugte bits, IP-ID, sequence numbers eller pakke-timing.</li><li>Opgaveteksten pegede på feltet (’those SYN packets seem off’).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Protokol-felter der "skal" være nul eller ignoreres (TCP's reserverede bits, IP-ID,
+padding-bytes) er oplagte skjulesteder, fordi normale systemer aldrig kigger på dem. Endnu mere
+subtilt kan data ligge i TIMING mellem pakker, ikke i indholdet overhovedet. Når ingen af de
+synlige felter bærer et mønster, så spørg: hvad ved denne protokol har jeg endnu ikke kigget på,
+inklusive det der burde være betydningsløst?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -27,7 +27,7 @@
              <pre><code>ls -la ~
 # -rwsr-xr-x root root ... pakkesystem      (SUID binary)
 sudo -l
-# (ALL) NOPASSWD: /usr/bin/gdb</code></pre>
+# (ALL) NOPASSWD: /usr/bin/<span class="gloss" tabindex="0" data-tip="GNU Debugger — kører/inspicerer et program instruktion for instruktion.">gdb</span></code></pre>
              <p><code>sudo gdb</code> uden password er i sig selv en triviel root-shell via GTFOBins
              (<code>sudo gdb -nx -ex '!sh' -ex quit</code>) — men pointen her er at finde den
              <strong>glemte testfunktion</strong> i binaren, ikke bare at få et skal.</p>
@@ -57,7 +57,14 @@ gdb -batch -ex 'info functions' ./pakkesystem</code></pre>
 <p>Flag: <span class="flag">DDC{dontDoTh4t}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>gdb info functions på en ikke-strippet binary afslører EVERY funktion, også de der aldrig kaldes fra main.</li><li>gdb's call <funktion>() kører funktionen direkte — ingen grund til at finde en reel kaldekæde i programmets normale flow.</li><li>SUID + sudo gdb NOPASSWD er en triviel root-shell i sig selv (GTFOBins), men opgavens pointe var at finde udviklerens glemte testkode, ikke bare rode root.</li></ul>
+<ul><li>gdb info functions på en ikke-strippet binary afslører hver funktion, også de der aldrig kaldes fra main.</li><li>gdb's call-funktion kører funktionen direkte, ingen grund til at finde en reel kaldekæde i programmets normale flow.</li><li>SUID + sudo gdb NOPASSWD er en triviel root-shell i sig selv (GTFOBins), men opgavens pointe var at finde udviklerens glemte testkode, ikke bare rode root.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En ikke-strippet binær udleverer gratis sin fulde funktionsliste (<code>gdb info functions</code>),
+inklusive "glemt" kode: test-, debug- og admin-funktioner der aldrig kaldes fra den normale menu.
+Og <code>gdb</code>'s <code>call</code> lader dig eksekvere en vilkårlig funktion direkte i
+processens adresserum, så du behøver ikke finde en rigtig kaldekæde. Begge dele minder om en vigtig
+defensiv pointe: afsend aldrig binære med debug-symboler eller ubrugt test-kode, det er en
+funktionsliste over præcis det udvikleren håbede ingen ville finde.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

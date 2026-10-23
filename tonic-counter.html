@@ -25,18 +25,33 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>Hjælp "Alex P. Isaac" (bruger-ID 1) af med sin gæld på <code>tonic-counter.hkn</code>. UI'en har
              kun en "Add a Tonic"-knap (<code>POST /tonic/&lt;id&gt;</code>), ingen fjern-knap.</p>
-<h2>Trin for trin</h2>
-<p>Endpointet er RESTful og understøtter flere metoder end UI'en viser:</p>
-             <pre><code>GET    /tonic/1  -> 405        POST /tonic/1 -> 200 (add)
-DELETE /tonic/1  -> 200 (REMOVE!)   <- skjult, intet autorisationstjek (IDOR)
-# nulstil Alex' gæld:
-curl -b &lt;cookie&gt; -X DELETE http://&lt;ip&gt;/tonic/1   # gentag til 0</code></pre>
-             <p>Når Alex' tæller er 0, viser dashboardet flaget. (Session-cookien udløber ~5 min → re-login.)</p>
+<h2>Sporet: UI&#x27;en viser kun én knap, men endpointet er RESTful</h2>
+<ol class="steps">
+<li><strong>UI'en har kun "Add a Tonic" (<code>POST /tonic/&lt;id&gt;</code>).</strong> Men en knap er
+bare den ene metode udvikleren valgte at tegne. Spørgsmålet er hvad endpointet ELLERS accepterer.</li>
+<li><strong>Prøv andre HTTP-metoder mod samme sti.</strong> Et RESTful endpoint router ofte flere
+verber end UI'en bruger:
+<pre><code>GET    /tonic/1  -> 405 (Method Not Allowed)
+POST   /tonic/1  -> 200 (add, den UI bruger)
+DELETE /tonic/1  -> 200 (REMOVE!)   <- skjult, og uden autorisationstjek (IDOR)</code></pre></li>
+<li><strong>DELETE virker og tjekker ikke hvem der ejer tælleren.</strong> Nulstil Alex' (id 1)
+gæld:
+<pre><code>curl -b &lt;cookie&gt; -X DELETE http://&lt;ip&gt;/tonic/1   # gentag til 0</code></pre></li>
+</ol>
+             <p>Når Alex' tæller er 0, viser dashboardet flaget. (Session-cookien udløber efter ca. 5 min,
+             så log ind igen hvis den holder op med at virke.)</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag (per-instans): <span class="flag">HKN{2fi-nQ7-3EUQ}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Prøv altid andre HTTP-metoder end UI'en bruger (DELETE/PUT/PATCH) — manglende metode-whitelist.</li><li>IDOR: intet tjek på hvem der må ændre en andens ressource.</li></ul>
+<ul><li>Prøv altid andre HTTP-metoder end UI'en bruger (DELETE/PUT/PATCH); manglende metode-whitelist.</li><li>IDOR: intet tjek på hvem der må ændre en andens ressource.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En webside viser kun de knapper udvikleren lavede, men REST-endpointet bagved accepterer
+ofte flere metoder end UI'en bruger. Prøv altid <code>OPTIONS</code>, <code>PUT</code>,
+<code>DELETE</code>, <code>PATCH</code> mod et endpoint, UI'en begrænser dig ikke. Kombineret med
+IDOR (ressource-ID'et i URL'en uden noget ejerskabstjek) er det en af de hyppigste rigtige
+API-sårbarheder: du ændrer en andens data bare ved at bruge den rigtige metode og det rigtige
+ID.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -22,13 +22,24 @@
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Opgaven</h2>
-<p>Opgaveteksten giver <code>p</code>, <code>q</code> og <code>e</code> direkte (i stedet
-             for kun den offentlige nøgle <code>n=p·q</code>, <code>e</code>, som den burde), plus en
-             opsnappet ciffertekst <code>c</code>. RSA's sikkerhed hviler <em>udelukkende</em> på at
-             faktorisere <code>n</code> er svært, givet kun <code>n</code> og <code>e</code> — men her er
-             der intet at faktorisere, man kan beregne den private nøgle direkte.</p>
-<h2>Beregn d og dekryptér</h2>
+<h2>Sporet: hvad er mærkeligt ved det, vi får udleveret?</h2>
+<ol class="steps">
+<li><strong>Opgaveteksten siger det selv.</strong> Den fortæller direkte at udvikleren
+"published p and q and e and not n and e which he should have done as the company public key".
+Det er ikke et hint man selv skal regne sig frem til, det STÅR der. En RSA-nøgle skal normalt kun
+bestå af <code>n</code> (=p·q) og <code>e</code>, aldrig <code>p</code> og <code>q</code> hver for
+sig.</li>
+<li><strong>Forstå hvorfor det er en big deal.</strong> RSA's sikkerhed hviler udelukkende på at
+faktorisere <code>n</code> er svært, hvis man KUN har <code>n</code> og <code>e</code>. Har man
+derimod <code>p</code> og <code>q</code> direkte, er der intet at faktorisere, den private nøgle
+kan beregnes direkte.</li>
+<li><strong>Byg den private nøgle.</strong> Standard-RSA-formlen: <code>phi = (p-1)(q-1)</code>,
+og den private eksponent <code>d</code> er den modulære inverse af <code>e</code> modulo
+<code>phi</code>.</li>
+<li><strong>Dekryptér med den.</strong> <code>m = c^d mod n</code> er standard RSA-dekryptering,
+uanset om du selv beregnede <code>d</code> eller fik den udleveret.</li>
+</ol>
+<h2>Koden</h2>
 <pre><code>p = 56071706520419311198103263781
 q = 77706821840278501303995553379
 e = 65537
@@ -36,18 +47,25 @@ c = 3180216847896822642607790534988843792574569579226923103980
 
 n = p * q
 phi = (p - 1) * (q - 1)
-d = pow(e, -1, phi)          # Python ≥3.8: pow() understøtter modulær invers direkte
+d = pow(e, -1, phi)          # Python >=3.8: pow() understøtter modulær invers direkte
 
 m = pow(c, d, n)
 flag_bytes = m.to_bytes((m.bit_length() + 7) // 8, 'big')
 print(flag_bytes)            # b'HKN{a_rsa_challenge}'</code></pre>
-             <p>Hele scriptet kører på under et sekund — ingen faktorisering, ingen brute force, kun ren
-             modulær aritmetik.</p>
+             <p>Under et sekund at køre. Ingen faktorisering, ingen brute force, kun ren modulær
+             aritmetik, fordi det hårde skridt (faktorisér n) allerede var gjort for os af
+             opgaven selv.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{a_rsa_challenge}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Tjek altid om en "offentlig nøgle" rent faktisk kun indeholder (n, e) — hvis p/q optræder nogen steder i klartekst (kode, logs, opgavetekst), er RSA'en game over uanset nøglelængde.</li><li>Når du HAR p og q: phi=(p-1)(q-1), d=pow(e,-1,phi), m=pow(c,d,n) — ingen bibliotek nødvendigt udover Pythons indbyggede pow().</li></ul>
+<ul><li><strong>Opgavetekstens eget sprogbrug var spoileret.</strong> Når en tekst nævner hvad der SKULLE have været gjort i stedet, er det værd at tage den sætning helt bogstaveligt: det er selve sårbarheden.</li><li><strong>Tjek altid om en "offentlig nøgle" rent faktisk kun indeholder (n, e).</strong> Dukker p eller q op nogen steder i klartekst (kode, logs, opgavetekst, en config-fil), er RSA'en game over uanset nøglelængde.</li><li><strong>Med p og q i hånden er resten ren formel.</strong> phi=(p-1)(q-1), d=pow(e,-1,phi), m=pow(c,d,n), ingen bibliotek nødvendigt udover Pythons indbyggede pow().</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Mønstret "sikkerheden hviler på ÉT bestemt tal der skal forblive privat" går igen i al
+asymmetrisk kryptografi: Diffie-Hellman bryder sammen hvis den private eksponent lækkes, ECDSA
+bryder sammen hvis nonce'n genbruges eller lækkes. Når du møder et kryptosystem, er det første
+spørgsmål altid: hvilket tal er det HELE sikkerheden hænger på, og optræder det tal nogen steder
+det ikke burde (kode, logs, en delt variabel, en tidligere session)?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

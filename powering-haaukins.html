@@ -23,7 +23,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Recon</h2>
-<pre><code>mosquitto_sub -h danwind.hkn -p 1883 -t '#' -v</code></pre>
+<pre><code><span class="gloss" tabindex="0" data-tip="MQTT-klient til at abonnere på topics på en MQTT-broker.">mosquitto_sub</span> -h danwind.hkn -p 1883 -t '#' -v</code></pre>
              <p>Giver 6 møller på <code>windmills/{id}/status</code> = <code>{ID,Speed,Running,Power}</code>.
              Dashboard-JS åbner <code>ws://danwind.hkn/ws</code> og modtager <code>{..,HaaukinsPower,Flag}</code>.
              Flag sættes når HaaukinsPower rammer target. For selv at se WebSocket-strømmen uden at åbne en
@@ -50,7 +50,14 @@ done</code></pre>
 <p>Flag (per-instans): <span class="flag">HKN{ZO-ss-kFDXXF}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>MQTT uden auth: subscribe <code>#</code> og spoof status-topics; brug <strong>retained</strong> (<code>-r</code>) ellers sticker værdien ikke.</li><li>Win er et PRÆCIST target (HP=100%), ikke maksimal effekt — overpower gav intet flag.</li></ul>
+<ul><li>MQTT uden auth: subscribe <code>#</code> og spoof status-topics; brug <strong>retained</strong> (<code>-r</code>) ellers sticker værdien ikke.</li><li>Win er et PRÆCIST target (HP=100%), ikke maksimal effekt; overpower gav intet flag.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>I SCADA/OT-systemer er sensor-aflæsninger ofte bare MQTT-beskeder uden autentificering, så
+du kan PUBLICERE falske status-værdier og narre dashboardet til at tro anlægget er i en tilstand
+det ikke er. Det er en direkte parallel til rigtige angreb på industrielle styresystemer (tænk
+falske aflæsninger der skjuler sabotage). Bemærk <code>retained</code>-detaljen: uden den forsvinder
+din spoofede værdi straks. Og læg mærke til at målet var PRÆCIST, ikke maksimalt, OT-opgaver
+belønner at ramme en bestemt driftstilstand, ikke at skrue alt i bund.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -23,16 +23,29 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Web server login</h2>
-<p>Log ind med sniffede credentials (<code>carsten@netsec.aau.dk</code>/<code>mormor1932</code>). Appen
-             bouncer http↔https: giv curl både <code>--resolve ...:80:</code> og <code>:443:</code>, send cookien, følg
-             redirects. Det autentificerede forum viser flaget + en kommentar-form.</p>
+<p>Credentials <code>carsten@netsec.aau.dk</code>/<code>mormor1932</code> stammer ikke fra
+             denne opgave selv, de er opsnappet som klartekst-HTTP i den beslægtede
+             <a href="network-sniffing.html">Network sniffing</a>-opgave (ARP-spoofing MITM på samme
+             netsegment). Log ind med dem her:</p>
+             <pre><code>curl -sk --resolve netsec-forum.dk:80:&lt;ip&gt; --resolve netsec-forum.dk:443:&lt;ip&gt; \
+  -c jar --data-urlencode "email=carsten@netsec.aau.dk" \
+  --data-urlencode "password=mormor1932" http://netsec-forum.dk/login
+# forkerte creds -> 200 "Username and password does not match"
+# korrekte       -> 302 + Set-Cookie: session=...</code></pre>
+             <p>Appen bouncer http↔https: login over http redirecter til https, og <code>/</code> over http
+             viser altid login-siden uanset cookie. Giv curl BÅDE <code>--resolve ...:80:</code> og
+             <code>:443:</code>, send cookien, og følg redirects (<code>-L</code>). Det autentificerede
+             forum viser flaget + en kommentar-form.</p>
 <h2>SQL injection — second-order i kommentarfeltet</h2>
-<p>Login-formen er parameteriseret, men en gemt kommentar er injectable. INSERT'en bruger
-             <strong>dobbelt</strong>-citationstegn, så <code>'</code>-breakout fejler; brug <code>"</code> + SQLite
-             <code>||</code>:</p>
+<p>Login-formen selv er parameteriseret (ingen injection der), men en gemt kommentar er
+             injectable. Det klassiske <code>'</code>-breakout fejler her — INSERT'en bruger
+             <strong>dobbelt</strong>-citationstegn om værdien, ikke single-quote. Når den oplagte payload
+             fejler, prøv det andet anførselstegn i stedet for at opgive, kombineret med SQLite's
+             <code>||</code>-konkatenering for at lække en subquery tilbage via den viste kommentar:</p>
              <pre><code>" || (SELECT group_concat(sql,0x0a) FROM sqlite_master))--
 " || (SELECT group_concat(email||0x3a||password,0x0a) FROM users))--</code></pre>
-             <p>→ en skjult bruger <code>you@found.it</code> hvis "password" er flaget.</p>
+             <p>Skema-dumpet viser <code>users(email, password)</code>; anden query afslører en skjult
+             bruger <code>you@found.it</code> hvis "password" er flaget.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <ul>
         <li>Web server login: <span class="flag">HKN{ga-wR-jNtYnh}</span></li>
@@ -40,7 +53,14 @@
         </ul><p>(per-instans)</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Injektion er ikke altid i login-formen — tænk second-order (data gemt nu, brugt i en query senere).</li><li>Variér breakout-tegnet: <code>'</code> vs <code>"</code> afhænger af hvordan serveren bygger SQL'en.</li></ul>
+<ul><li>Injektion er ikke altid i login-formen; tænk second-order (data gemt nu, brugt i en query senere).</li><li>Variér breakout-tegnet: <code>'</code> vs <code>"</code> afhænger af hvordan serveren bygger SQL'en.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Second-order injection er lumsk fordi input og sårbarhed er adskilt i tid: du gemmer noget
+harmløst-udseende (en kommentar) som FØRST bliver farligt når en senere query bruger det uden
+escaping. Derfor skal du teste injektion ved HVERT sted data genbruges, ikke kun der hvor du
+indtaster det. Og breakout-tegnet afhænger af serverens egen SQL-konstruktion: fejler
+<code>'</code>, så prøv <code>"</code>, for det afslører om strengen blev bygget med enkelt- eller
+dobbelt-citationstegn.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

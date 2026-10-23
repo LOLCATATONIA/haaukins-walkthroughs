@@ -41,7 +41,7 @@ curl -b "jwt=&lt;forged&gt;" http://fartcorp.hkn/   # flag + ny rute /gasgrid</c
 <h2>Give us the Gas — det er en OT/ICS-opgave</h2>
 <p><code>/gasgrid</code> er read-only, men en portscan afslører <strong>port 502 (Modbus/TCP)</strong>.
              Valvene styres via Modbus holding-registre:</p>
-             <pre><code>nmap -p- fartcorp.hkn                 # 80 + 502/mbap
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -p- fartcorp.hkn                 # 80 + 502/mbap
 mbpoll -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs de 5 valve-vinkler (holding-regs r1..r5)</code></pre>
              <p>Kortlæg modellen ved at skrive værdier og aflæse WebSocket-staten (<code>ws://host/ws</code>):
              <strong>r1</strong> = afbrændings-station (luk = <code>0</code>), <strong>r2</strong> = outlet til verden
@@ -57,6 +57,12 @@ mbpoll -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs de 5 valve-vinkler
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>JWT: prøv <code>alg:none</code> først; ellers find/knæk secret'en og forfalsk claims.</li><li>Read-only dashboard + åben port 502 = OT/ICS-opgave; scan ALLE porte.</li><li>Modbus-recon med <code>mbpoll</code>; vindet krævede intermediate register-værdier (275).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To lærdomme. (1) Et web-dashboard der kun KAN læse er et vink om at kontrollen sker et andet
+sted: scan alle porte, ikke kun 80/443. Industrielle protokoller som Modbus (502), S7 (102) og
+DNP3 (20000) har typisk ingen autentificering overhovedet, fordi de blev designet til isolerede
+netværk. (2) OT-opgaver belønner ofte at du forstår systemets FYSIK (her: tryk = sum af kilder,
+for meget = eksplosion), ikke bare at du kan sende pakker. Kortlæg modellen før du handler.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

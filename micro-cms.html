@@ -27,10 +27,22 @@
 curl http://microcms.com/secret/          # "This is a secret: HKN{...}"</code></pre>
              <p>Hent ALTID <code>/robots.txt</code> — Disallow-stier er gratis efterretning.</p>
 <h2>Micro CMS URL — IDOR / broken access control</h2>
-<p>Sider vises via <code>page.php?view=N</code>. <code>view=4</code> giver 403, men editor-stien
-             <code>edit=N</code> har ingen adgangskontrol og rammer samme ressource:</p>
-             <pre><code>curl "http://microcms.com/page.php?view=4"   # Forbidden
-curl "http://microcms.com/page.php?edit=4"   # &lt;textarea&gt;The Secret is: HKN{...}&lt;/textarea&gt;</code></pre>
+<p>Opgaveteksten siger kun at der er en bug "when you change URL path". Siderne vises via
+             <code>page.php?view=N</code>, men kun <code>view=1</code> og <code>view=2</code> er linket fra
+             forsiden. Enumerér de næste ID'er for at se om der findes mere:</p>
+             <pre><code>for n in $(seq 1 10); do
+  echo -n "view=$n: "; curl -s "http://microcms.com/page.php?view=$n" | grep -oiE '&lt;h1&gt;[^&lt;]*'
+done
+# view=1 Test Page / view=2 Event 1 / view=4 Forbidden / resten Not Found</code></pre>
+             <p><code>view=4</code> svarer <strong>"Forbidden"</strong>, ikke "Not Found" som de tomme ID'er.
+             Det er en anden fejl end de andre, det betyder siden FINDES, bare adgangsspærret, ikke ikke-eksisterende.
+             Opgaveteksten pegede på URL-STIEN, ikke kun ID'et, så det næste at variere er selve handlingen:
+             findes der en anden sti til samme ressource end <code>view</code>? Et CMS har typisk en
+             redigerings-handling for hver visnings-handling, prøv <code>edit</code>:</p>
+             <pre><code>curl "http://microcms.com/page.php?edit=4"
+# &lt;textarea&gt;The Secret is: HKN{...}&lt;/textarea&gt;</code></pre>
+             <p><code>edit=4</code> har ingen adgangskontrol og rammer samme ressource som den spærrede
+             <code>view=4</code>.</p>
 <h2>Stored XSS — belønnet server-side</h2>
 <pre><code>curl -X POST "http://microcms.com/page.php?add" \
   --data-urlencode 'title=pwn' --data-urlencode 'content=&lt;img src=x onerror=alert(1)&gt;'</code></pre>
@@ -42,7 +54,13 @@ curl "http://microcms.com/page.php?edit=4"   # &lt;textarea&gt;The Secret is: HK
         <code>solved:true</code>, ikke statuskoden.</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>robots.txt</code> lækker skjulte stier.</li><li>Broken access control: samme ressource via en anden sti (view→edit) kan omgå 403.</li><li>Stored XSS i usaniteret input; nogle platforme belønner det server-side uden en bot.</li></ul>
+<ul><li><code>robots.txt</code> lækker skjulte stier.</li><li>Broken access control: samme ressource via en anden sti (view/edit) kan omgå 403.</li><li>Stored XSS i usaniteret input; nogle platforme belønner det server-side uden en bot.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Broken access control er den hyppigste web-sårbarhed i den virkelige verden (toppen af
+OWASP Top 10). Mønstret går igen overalt: en ressource er beskyttet ét sted (<code>view</code>)
+men ikke et andet (<code>edit</code>), eller adgangen tjekkes kun i UI'et, ikke på serveren. Når
+du møder en 403, så spørg altid: findes der en ANDEN vej til samme data? Og <code>robots.txt</code>
+er altid gratis efterretning, det er en liste over præcis de stier ejeren helst vil skjule.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

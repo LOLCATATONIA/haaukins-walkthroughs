@@ -38,7 +38,14 @@
         <p>Flag (afleveres som DDC): <span class="flag">DDC{1_c0uld_h4v3_dr0pp3d_3v3ryth1ng_but_1_4m_n1c3}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>'</code>→fejl = injection; <code>ORDER BY N</code> finder kolonne-antal; <code>UNION SELECT</code> finder synlige kolonner.</li><li><code>sqlite_master.sql</code> giver hele schemaet.</li><li>Kig efter skjulte felter/rækker (draft, note, is_admin).</li></ul>
+<ul><li><code>'</code> giver fejl = injection; <code>ORDER BY N</code> finder kolonne-antal; <code>UNION SELECT</code> finder synlige kolonner.</li><li><code>sqlite_master.sql</code> giver hele schemaet.</li><li>Kig efter skjulte felter/rækker (draft, note, is_admin).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den manuelle UNION-metode her er værd at kunne i hånden, selv om <code><span class="gloss" tabindex="0" data-tip="Automatiserer detektion og udnyttelse af SQL-injection.">sqlmap</span></code> ofte
+automatiserer den: et enkelt citationstegn der fremkalder en fejl afslører injektionen,
+<code>ORDER BY N</code> tæller kolonnerne, <code>UNION SELECT</code> finder de synlige, og
+databasens eget skema-katalog (<code>sqlite_master</code>, eller <code>information_schema</code> i
+MySQL/Postgres) afslører resten. At forstå HVORFOR hvert trin virker gør dig i stand til at
+injicere også de steder hvor automatiske værktøjer går i stå.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

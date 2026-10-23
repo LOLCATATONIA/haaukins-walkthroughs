@@ -25,7 +25,7 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>Alle tre opgaver løses på <strong>samme</strong> <code>capture.pcap</code>. Start altid med
 protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefølge:</p>
-<pre><code>tshark -r capture.pcap -q -z io,phs</code></pre><p>HTTP-headernavne er case-insensitive (RFC 2616 §4.2), så stort/lille forbogstav kan bære
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -q -z io,phs</code></pre><p>HTTP-headernavne er case-insensitive (RFC 2616 §4.2), så stort/lille forbogstav kan bære
              <strong>1 bit pr. header</strong> uden at ændre requesten. 8 faste headers = 1 byte pr. request.</p>
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'http.request &amp;&amp; ip.dst==100.117.87.84' -T text -V   # se casing</code></pre>
@@ -53,7 +53,12 @@ print(chr(int(bits, 2)))"   # ét tegn; gentag for hver request og sæt sammen i
 <p>Flag: <span class="flag">HKN{3nc0d3d_1n_c4ps}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Covert channels bor i felter der kan variere frit — her header-casing.</li><li>Opgaveteksten hinter om feltet (’RFC 2616 §4.2’).</li></ul>
+<ul><li>Covert channels bor i felter der kan variere frit, her header-casing.</li><li>Opgaveteksten hinter om feltet (’RFC 2616 §4.2’).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Det generelle princip bag alle tre covert-channel-opgaver: skjulte data bor i ethvert felt
+der kan variere frit UDEN at ændre den observerbare funktion. Header-casing er ligegyldigt for
+HTTP, så det kan bære bits. Når opgaven citerer en præcis RFC-paragraf, er det et direkte fingerpeg
+om hvilket felt der er i spil. Læs altid en RFC-henvisning i en opgavetekst som "kig lige her".</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

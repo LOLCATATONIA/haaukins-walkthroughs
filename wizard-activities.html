@@ -48,7 +48,14 @@ file fixed.png             # -> PNG image data, 3648 x 2432</code></pre>
         </figure>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>PNG-signaturen er altid <code>89 50 4E 47 0D 0A 1A 0A</code> — ret den og filen lever igen.</li><li>Samme klasse som <a href="concealed-conversation.html">Concealed Conversation</a> (én ødelagt signatur-byte); her er alle 8 overskrevet.</li><li><code>file</code> siger "data" = magic bytes matcher intet kendt format → mistænk en overskrevet header.</li></ul>
+<ul><li>PNG-signaturen er altid <code>89 50 4E 47 0D 0A 1A 0A</code>; ret den og filen lever igen.</li><li>Samme klasse som <a href="concealed-conversation.html">Concealed Conversation</a> (én ødelagt signatur-byte); her er alle 8 overskrevet.</li><li><code>file</code> siger "data" = magic bytes matcher intet kendt format; mistænk en overskrevet header.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Når <code>file</code> svarer bare "data", matcher de første bytes ikke noget kendt format, og
+den hyppigste årsag er en overskrevet eller beskadiget header. Da resten af en fil-struktur typisk
+er intakt, kan du reparere den ved at skrive den korrekte signatur tilbage (PNG, JPEG = FFD8FFxx,
+GIF = <code>GIF89a</code>). Det er samme princip som <a href="concealed-conversation.html">Concealed
+Conversation</a>, bare med alle 8 signatur-bytes ødelagt i stedet for én. At kende de almindelige
+magic bytes udenad gør den slags reparation til et par minutters arbejde.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

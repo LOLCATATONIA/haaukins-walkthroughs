@@ -44,6 +44,11 @@ print(AES.new(key, AES.MODE_ECB).decrypt(ciphertext))               # ... DDC{St
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Skjulte nøgler bor i 'harmløse' bilag (trailing whitespace).</li><li>128/256 linjer der giver 16/32 bytes = stærkt fingeraftryk på en AES-nøgle.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Tal-sammenfald er et stærkt spor i krypto-opgaver: præcis 128 eller 256 noget (linjer, bits,
+tegn) råber AES-nøgle, 16/24/32 bytes ligeså. Og læg mærke til den sociale markør: når noget
+udtrykkeligt kaldes "harmløst, men del det ikke", er det ofte netop dét der bærer hemmeligheden.
+Et bilag ingen ville kigge på to gange er et perfekt gemmested for en nøgle.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

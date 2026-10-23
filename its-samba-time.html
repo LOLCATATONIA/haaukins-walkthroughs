@@ -22,8 +22,11 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Trin for trin</h2>
-<pre><code>nmap -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20 = CVE-2007-2447
+<h2>Sporet: versionen er hele vejen til exploitet</h2>
+<p>Når en tjeneste er åben, så spørg ikke bare "hvilken port?" men "hvilken VERSION?". Et
+<code>-sV</code>-scan giver dig den præcise version, og en gammel version peger ofte direkte på et
+kendt CVE med en færdig exploit:</p>
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20  -> slå op: CVE-2007-2447
 smbclient -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>
              <p>Reverse/bind-shells er netværksblokeret (ingen rute tilbage til din VPN-IP, og kun 139/445 er
              åbne indgående). <code>smbclient</code> og Metasploits shell-moduler kan ikke udnytte dette, så brug
@@ -45,7 +48,15 @@ cat FLAGS</code></pre>
 <p>Flag: <span class="flag">HKN{h13-EW-XICln}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>nmap -sV</code> → version → slå CVE op (Samba 3.0.20 = CVE-2007-2447).</li><li>Når shells blokeres: eksekvér via injektionen, exfiltrér via en åben kanal (SMB-share).</li></ul>
+<ul><li><code>nmap -sV</code>, så version, så slå CVE op (Samba 3.0.20 = CVE-2007-2447).</li><li>Når shells blokeres: eksekvér via injektionen, exfiltrér via en åben kanal (SMB-share).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To bredt anvendelige lektioner. (1) En versionsstreng fra <code>nmap -sV</code> er ofte hele
+vejen til et exploit: slå den op og find det kendte CVE. (2) Den vigtigste: når en reverse shell
+ikke kan nå tilbage til dig (firewall, ingen rute), så opgiv ikke, men split eksekvering fra
+exfiltrering. Kør kommandoen via injektionen, skriv resultatet til et sted du KAN nå (her en
+anonym SMB-share), og hent det derfra. "Jeg kan køre kode men ikke få en shell" er en meget
+almindelig situation i rigtige engagementer, og en skrivbar delt mappe er en klassisk
+exfil-kanal.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

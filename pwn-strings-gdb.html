@@ -22,18 +22,33 @@
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Hvad går opgaven ud på?</h2>
-<p>Samme binær som PWN Strings, men flaget beregnes ved runtime (opgaven antyder gdb-patching).
-             Med statisk analyse behøver du ikke køre noget:</p>
-             <pre><code>r2 -A pwn_strings
+<h2>Hvorfor hedder opgaven &#x27;GDB&#x27;?</h2>
+<p>Samme binær som PWN Strings, men flaget beregnes nu ved runtime i stedet for at ligge som
+             en ren string. <code>Look_At_Me_And_PWN_ME()</code> har en hardcoded byte
+             (<code>var_9h = 1</code>) der normalt tvinger programmet ind i <code>wrongcrack()</code>. Den
+             rigtige gren, <code>correctcrack()</code>, nås kun hvis man patcher den byte live i gdb, deraf
+             opgavens navn. Men du behøver IKKE gøre det: selve flag-strengen <code>correctcrack()</code>
+             bygger er allerede fuldt bestemt statisk.</p>
+<h2>Spor strcat-kæden statisk, uden at eksekvere noget</h2>
+<pre><code>r2 -A pwn_strings
 [0x...]> pdf @ sym.correctcrack      # strcat'er 7 .data-fragmenter sammen</code></pre>
-             <p>Fragmenterne samles til en hex-streng → hex-afkod:</p>
+             <p>7 hex-literal-stumper i <code>.data</code> samles i strcat-rækkefølge:</p>
+             <pre><code>484B + 4E7B58 + 6E6 + F2D51 + 5234 + 2D4459 + 34517D
+= 484B4E7B586E6F2D5152342D445934517D</code></pre>
+             <p>Denne hex-streng hex-afkodes derefter byte for byte af <code>feedMeChars()</code> (en
+             obfuskeret men standard ASCII-hex-til-værdi-beregning):</p>
              <pre><code>bytes.fromhex("484B4E7B586E6F2D5152342D445934517D").decode()   # HKN{Xno-QR4-DY4Q}</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{Xno-QR4-DY4Q}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Et 'runtime-beregnet' flag kan være fuldt bestemt af statiske data + en kendt dekoder.</li><li>Følg <code>strcat</code>/<code>memcpy</code>-kæder (<code>lea</code>+<code>push</code>+<code>call</code>) i radare2's <code>pdf</code>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>"Flaget beregnes ved runtime" betyder ikke "du skal køre det". Hvis både inputtet (de
+statiske <code>.data</code>-fragmenter) og dekoderen (koden der samler dem) ligger i binæren, kan
+du udføre beregningen i hånden eller i et lille Python-script. Statisk analyse er ofte at
+foretrække: ingen anti-debug-fælder, ingen afhængighed af et bestemt miljø, og du kan ikke komme
+til at trigge noget uønsket. Dynamisk kørsel (gdb) er backup, ikke udgangspunkt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

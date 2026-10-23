@@ -39,7 +39,14 @@
 <p>Flag: <span class="flag">HKN{C0NTEST4NT_1337_P4SSED}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Tids-seedet PRNG er forudsigeligt for en modstander der kan se/observere tidspunktet.</li><li>'Vinder lokalt' ≠ 'vinder live' — test timing-exploits mod den rigtige RTT.</li><li>At skrive hurtigere end modtageren læser = en kø, ikke hurtigere respons; match forbrugstakten.</li></ul>
+<ul><li>Tids-seedet PRNG er forudsigeligt for en modstander der kan se/observere tidspunktet.</li><li>'Vinder lokalt' er ikke 'vinder live'; test timing-exploits mod den rigtige RTT.</li><li>At skrive hurtigere end modtageren læser = en kø, ikke hurtigere respons; match forbrugstakten.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den mest overraskende lektie her er netværks-timing: at skrive hurtigere end serveren LÆSER
+bygger bare en kø af gamle beslutninger, så din perfekt-timede exploit desynkroniserer og taber,
+selv om den virker lokalt uden latens. Enhver exploit der afhænger af timing (race conditions,
+PRNG-forudsigelse, dette lys-spil) skal testes mod den RIGTIGE round-trip-tid, ikke kun lokalt.
+Og forudsigelig tilfældighed fra <code>srand(time())</code> er en reel, tilbagevendende
+svaghed.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

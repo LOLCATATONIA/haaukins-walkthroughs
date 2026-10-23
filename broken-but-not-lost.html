@@ -35,7 +35,12 @@ cp 01-3xt 01.jpg       # åbn -> flaget står skrevet i billedet</code></pre>
         </figure>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>file</code> læser magic bytes og afslører det faktiske format uanset endelse.</li><li>"Korruption" er tit bare et vildledende navn — selve opgavens pointe her.</li></ul>
+<ul><li><code>file</code> læser magic bytes og afslører det faktiske format uanset endelse.</li><li>"Korruption" er tit bare et vildledende navn, selve opgavens pointe her.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En filendelse er bare en del af navnet, den fortæller intet sikkert om indholdet. Derfor er
+<code>file</code> (som læser de faktiske magic bytes) et af de allerførste værktøjer at nå efter,
+når du får en ukendt eller "ødelagt" fil. Samme pointe går igen i <a href="dotsuffix.html">dotsuffix</a>
+(en ZIP forklædt som JPEG). Gør det til en refleks: kør <code>file</code> før du tror på navnet.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

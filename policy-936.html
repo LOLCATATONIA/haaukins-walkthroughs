@@ -26,14 +26,14 @@
 <p>Opgaveteksten ("new password policies... policy 936... state-of-the-art") peger direkte
              på <a href="https://xkcd.com/936/" target="_blank">XKCD #936 "Password Strength"</a> —
              tegneserien om <code>correct horse battery staple</code> vs. <code>Tr0ub4dor&amp;3</code>.</p>
-             <pre><code>nmap -Pn -p- --open &lt;ip&gt;
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p- --open &lt;ip&gt;
 # 21/tcp open ftp    22/tcp open ssh   (ingen HTTP)
 curl -s "ftp://&lt;ip&gt;/" -u "anonymous:anonymous"
 # -rw-r--r-- 1 ftp users 93427 ... backup.zip</code></pre>
              <p><code>backup.zip</code> indeholder en brugerliste (<code>alice, bob, charlie, ftp,
              root</code>) og selve XKCD-tegneserien som billede — bekræfter temaet og antyder det reelle
              password: <code>correcthorsebatterystaple</code>. Zip-filen er selv password-beskyttet;
-             knækket med John (<code>zip2john</code> + rockyou.txt) på under et sekund: <code>whatever</code>.</p>
+             knækket med John (<code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code> + rockyou.txt) på under et sekund: <code>whatever</code>.</p>
 <h2>Fælden: et forberedt decoy-flag</h2>
 <p>SSH med <code>correcthorsebatterystaple</code> virker direkte for <strong>alice</strong>
              og <strong>charlie</strong> (men IKKE <code>bob</code> eller <code>root</code>). Men deres
@@ -58,7 +58,14 @@ sudo -l
 <p>Flag: <span class="flag">DDC{iae9PpYLFWSls-nbHcXIeRrpwZJ}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Et direkte kulturelt hint (XKCD-reference) kan give et ægte, virkende password — men "det virker" betyder ikke automatisk "det er flaget".</li><li>Tjek sudo -l for HVER kompromitteret bruger, ikke kun den første der lykkedes — forskellige brugere kan have helt forskellige privesc-veje.</li><li>Filstørrelse (ls -la) er et billigt, tidligt signal om at noget er anderledes ved én bestemt fil blandt flere ellers-identiske.</li></ul>
+<ul><li>Et direkte kulturelt hint (XKCD-reference) kan give et ægte, virkende password, men "det virker" betyder ikke automatisk "det er flaget".</li><li>Tjek sudo -l for HVER kompromitteret bruger, ikke kun den første der lykkedes; forskellige brugere kan have helt forskellige privesc-veje.</li><li>Filstørrelse (ls -la) er et billigt, tidligt signal om at noget er anderledes ved én bestemt fil blandt flere ellers-identiske.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p><code>sudo -l</code> er et af de allerførste privesc-tjek på en Linux-maskine: det viser hvad
+den aktuelle bruger må køre som root, ofte uden password. Den centrale lektie her er at gøre det
+for HVER bruger du kompromitterer, ikke kun den første, forskellige konti har forskellige veje op.
+Og pas på decoy-flag: at en "oplagt" løsning virker betyder ikke at den fører til målet. Ledende
+hints (her en XKCD-reference) er ofte ægte, men kun første skridt, grav videre når belønningen
+virker for nem.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

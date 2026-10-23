@@ -28,13 +28,13 @@
 <ul>
              <li><strong>-0/-1 (signaturer):</strong> JPEG starter med <code>FF D8 FF</code>, slutter med
              <code>FF D9</code>.</li>
-             <li><strong>-2/-3 (EXIF):</strong> <code>exiftool carbonara.jpg</code> giver device (<code>iphone 13</code>);
+             <li><strong>-2/-3 (EXIF):</strong> <code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span> carbonara.jpg</code> giver device (<code>iphone 13</code>);
              en <em>manipuleret</em> ExifIFD-pointer gemte <code>Location: Venice</code> (det synlige "Rome" var decoy —
              læs den rå EXIF).</li>
              <li><strong>-4 (Baconian):</strong> 22 grupper á 5 bit efter JPEG-EOI = Baconian cipher (opgaven sagde
              "using BACON"). Klassisk 24-bogstavs (I=J, U=V) → <code>COOKINGWATERINTHESAUCE</code>.</li>
              <li><strong>Zip:</strong> WinZip-AES — knæk kun mod den lille fil-entry for fart
-             (<code>hashcat -m 13600</code>) → password <code>Barilla</code>; <code>7z x -pBarilla</code>.</li>
+             (<code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 13600</code>) → password <code>Barilla</code>; <code>7z x -pBarilla</code>.</li>
              </ul>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p><strong>Format-konventioner (vigtige):</strong> signaturer = hex m. mellemrum + uppercase; tekst-svar
@@ -47,6 +47,13 @@
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Læs den RÅ EXIF, ikke kun det pæne <code>exiftool</code>-output (manipuleret pointer, decoy-location).</li><li>5-bit grupper efter EOI = Baconian cipher (CyberChef 'Bacon Cipher Decode').</li><li>WinZip-AES: crack mod den lille entry for fart (<code>-m 13600</code>).</li><li>Format er det halve: hex m. mellemrum/uppercase vs. sammenskrevet lowercase vs. eksakt EXIF-casing.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Et billede er et helt lille økosystem af gemmesteder: EXIF-metadata (hvor en manipuleret
+pointer kan skjule den ægte værdi bag en decoy), data efter EOI-markøren, og LSB-stego i selve
+pixels. Lær desuden at genkende klassiske ciphers på deres form: Baconian bruger kun to symboler
+i grupper af 5, Vigenère ligner tekst men med skæv bogstavfordeling, en ren substitution bevarer
+ord-længder. Og som gennemgående tema i hele denne serie: når svaret afvises, er indpakningen
+(casing, mellemrum, præfiks) næsten altid problemet, ikke indholdet.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

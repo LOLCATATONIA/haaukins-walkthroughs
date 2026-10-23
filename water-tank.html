@@ -26,7 +26,7 @@
 <p><code>http://water-tank.hkn</code> poller <code>/update</code> hvert 1,5 sekund og
              viser <code>security</code>, <code>water_level</code>, <code>temperature</code> som JSON.
              <code>/update</code> er GET-only (405 på andre metoder) — ingen skriv-vej via web-laget.</p>
-             <pre><code>nmap -Pn -p1-10000 --open &lt;ip&gt;
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p1-10000 --open &lt;ip&gt;
 # 80/tcp  open  http
 # 502/tcp open  mbap        &lt;-- Modbus TCP!</code></pre>
              <p>Port 502 (Modbus TCP, "mbap") er den rigtige kontrolkanal — og Modbus har INGEN indbygget
@@ -63,7 +63,15 @@ write_reg(2, 65000)</code></pre>
 <p>Flag: <span class="flag">HKN{m0dbu5_i5nt_m34nt_f0r_publ1c_n3tw0rks}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Et pænt web-dashboard der KUN viser tilstand (read-only) betyder ikke at der ikke findes en separat, skrivbar kontrolkanal bagved.</li><li>nmap -p1-10000 fanger industrielle protokoller (Modbus/502, DNP3/20000 osv.) som normale web-scanninger overser.</li><li>Modbus TCP har ingen indbygget autentificering — en rå socket-implementering er ofte hurtigere end at fejlsøge et tredjeparts-bibliotek.</li></ul>
+<ul><li>Et pænt web-dashboard der KUN viser tilstand (read-only) betyder ikke at der ikke findes en separat, skrivbar kontrolkanal bagved.</li><li>nmap -p1-10000 fanger industrielle protokoller (Modbus/502, DNP3/20000 osv.) som normale web-scanninger overser.</li><li>Modbus TCP har ingen indbygget autentificering; en rå socket-implementering er ofte hurtigere end at fejlsøge et tredjeparts-bibliotek.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den vigtigste indsigt er at skille VISNING fra KONTROL: et read-only dashboard er ikke en
+sikkerhedsgrænse, den rigtige styrekanal (her Modbus på 502) kan ligge helt ved siden af, uden
+autentificering. Derfor skal du scanne bredt (ikke kun 80/443); industrielle protokoller lever på
+porte almindelige web-scanninger springer over. Og Modbus er simpel nok til at en 30-linjers rå
+socket-klient ofte er hurtigere end at fejlsøge et bibliotek. Samme tema som
+<a href="water-to-the-people.html">Water to the people</a> og <a href="fartcorp.html">FartCorp</a>:
+OT-systemer stoler på netværks-isolation i stedet for adgangskontrol.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

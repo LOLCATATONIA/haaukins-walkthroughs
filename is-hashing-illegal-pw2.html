@@ -25,7 +25,7 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p><em>Fil: <code>evidence/credentials/pw-02.txt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
              <p>En ulæselig credential: <code>380fbafd2a92eb8d442b419f18e43fce</code> = 32 hex-tegn = <strong>MD5</strong>.</p>
-             <pre><code>hashcat -m 0 -a 0 hash.txt rockyou.txt        # eller john --format=raw-md5
+             <pre><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 0 -a 0 hash.txt rockyou.txt        # eller <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=raw-md5
 # python: hashlib.md5(word).hexdigest() == target</code></pre>
              <p>En lille dansk ordliste gav intet — den fulde <code>rockyou.txt</code> (14,3M ord) knækkede den.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -33,6 +33,12 @@
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>32 hex-tegn (lowercase) = MD5. Identificér hashen på længde/format først.</li><li>Standard dictionary = rockyou; <code>hashcat -m 0</code> / <code>john --format=raw-md5</code>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>At identificere en hash på dens form er altid første skridt, før du knækker den: 32 hex =
+MD5 eller NTLM, 40 = SHA-1, 64 = SHA-256. Værktøjer som <code>hashid</code> eller
+<code>hashcat --identify</code> hjælper. En hash er envejs, så "cracking" er i virkeligheden bare
+at hashe en masse kandidater og sammenligne. Derfor virker det kun på svage/gættelige inputs, en
+tilfældig 20-tegns adgangskode knækker rockyou aldrig.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -36,6 +36,13 @@ ssh -i private.key -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostKeyAlgorithms=+ss
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>Gamle nøgler/servere kræver <code>-o PubkeyAcceptedAlgorithms=+ssh-rsa</code> på moderne klienter.</li><li>Shellshock: <code>() { :;};&lt;payload&gt;</code> i en env-var/SSH_ORIGINAL_COMMAND giver RCE og omgår ForceCommand.</li><li>Verificér med et benignt <code>id</code> før du læser flaget.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Shellshock (CVE-2014-6271) virker fordi Bash fejlagtigt eksekverede kode der stod efter en
+funktionsdefinition i en miljøvariabel. Alt der sætter en env-var fra bruger-input og derefter
+kører Bash er potentielt sårbart: CGI-scripts, DHCP-klienter, og her sshd's
+<code>SSH_ORIGINAL_COMMAND</code>. Den bredere lære: en "begrænset" shell eller ForceCommand er
+kun så stærk som alt det den stadig lader passere uændret. Og bekræft altid RCE med en harmløs
+kommando (<code>id</code>) før du gør noget mere.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

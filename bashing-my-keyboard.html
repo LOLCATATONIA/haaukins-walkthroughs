@@ -72,7 +72,14 @@ cat /etc/doas.conf
         ordspil på keyBoARD-temaet, eller en bevidst tastefejl): <span class="flag">HNK{w3w_7h47_700k_qu173_4_7urn}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Dødt kode i en JS-kommentar er stadig ægte kildekode-læk — læs det, selv når det ser "outkommenteret væk" ud.</li><li>En case-sensitiv 13-tegns cookie er kun 8192 muligheder — altid værd at brute-force frem for at gætte.</li><li>vim -es ("ex silent mode") lader dig køre shell-kommandoer via en upload-baseret RCE uden at have en interaktiv pty.</li></ul>
+<ul><li>Dødt kode i en JS-kommentar er stadig ægte kildekode-læk; læs det, selv når det ser "outkommenteret væk" ud.</li><li>En case-sensitiv 13-tegns cookie er kun 8192 muligheder; altid værd at brute-force frem for at gætte.</li><li>vim -es ("ex silent mode") lader dig køre shell-kommandoer via en upload-baseret RCE uden at have en interaktiv pty.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Klient-side JavaScript (inkl. udkommenteret kode) er fuldt synligt for enhver, og udviklere
+efterlader tit hele angrebsplanen der: hvilke filtyper serveren kører, en "midlertidig" cookie-gate,
+et endpoint der ikke er linket. Læs altid den fulde kilde, også kommentarer. Regn desuden på
+søgerummet før du gætter: en case-varieret 13-tegns streng er kun 2^13 muligheder. Og
+<code>vim -es</code> (batch/ex-mode) er guld når du har RCE men ingen interaktiv terminal, samme
+situation som mange web-shells: du kan køre kommandoer, men ikke "sidde" i en pty.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

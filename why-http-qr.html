@@ -52,14 +52,20 @@ HTTPServer(('0.0.0.0', 80), H).serve_forever()"</code></pre>
 <h2>Carve &amp; afkod QR&#x27;en</h2>
 <p>QR-PNG'en ligger i POST-body'en (ét TCP-segment). Carve den ud mellem PNG-signaturen og IEND, og afkod:</p>
              <pre><code>python3 -c "d=open('cap.pcap','rb').read(); i=d.find(bytes.fromhex('89504e470d0a1a0a')); j=d.find(b'IEND',i)+8; open('qr.png','wb').write(d[i:j])"
-zbarimg --raw qr.png        # -> QR'ens indhold</code></pre>
+<span class="gloss" tabindex="0" data-tip="Afkoder indholdet af et QR-kode- eller stregkode-billede.">zbarimg</span> --raw qr.png        # -> QR'ens indhold</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>QR-indhold (JSON): <code>{"username":"BlackNurse","password":"CVE-2011-1871","flag":"HKN{…}"}</code>
         — flaget lå <em>direkte</em> i QR'en, plus en nurse-login til <a href="becomming-a-doctor.html">Becomming a doctor</a>.</p>
         <p>Flag (per-instans): <span class="flag">HKN{ci1-g3I-e3ly}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Ren HTTP lækker alt — inkl. et uploadet billede i en multipart-body.</li><li>Er serveren fraværende? <strong>Impersonér</strong> den: claim dens ubesvarede IP (<code>ip addr add</code>) + lyt, så klientens request lander hos dig.</li><li>Carve filer direkte fra en pcap via magic bytes (PNG = <code>89 50 4E 47</code>) når stream-dissektion driller.</li><li>Et QR-billede er bare data — det kan bære credentials (og her: flaget).</li></ul>
+<ul><li>Ren HTTP lækker alt, inkl. et uploadet billede i en multipart-body.</li><li>Er serveren fraværende? <strong>Impersonér</strong> den: claim dens ubesvarede IP (<code>ip addr add</code>) + lyt, så klientens request lander hos dig.</li><li>Carve filer direkte fra en pcap via magic bytes (PNG = <code>89 50 4E 47</code>) når stream-dissektion driller.</li><li>Et QR-billede er bare data, det kan bære credentials (og her: flaget).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den stærkeste idé her er aktiv impersonering: hvis serveren er død, og en klient ARP'er
+forgæves efter dens IP, kan du selv CLAIME den ubesvarede IP og lytte, så klientens request lander
+hos dig. Det er et skridt op fra passiv sniffing (samme familie som ARP-spoofing/MITM). Dertil to
+genbrugelige vaner: ren HTTP lækker alt inkl. uploadede filer, og en QR-kode er bare kodet data,
+den kan lige så godt bære credentials eller et flag som en URL. Scan den altid.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

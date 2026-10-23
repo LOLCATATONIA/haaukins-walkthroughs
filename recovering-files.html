@@ -29,9 +29,9 @@
 <h2>Trin for trin</h2>
 <pre><code>7z x drive.7z                         # -> drive1.vhd
 mmls drive1.vhd                       # NTFS-partition @ sektor 128
-fls -r -o 128 drive1.vhd | grep '\*'  # slettede poster markeret med *
+<span class="gloss" tabindex="0" data-tip="Lister filer/mapper i et disk-image uden at mounte det (Sleuthkit).">fls</span> -r -o 128 drive1.vhd | grep '\*'  # slettede poster markeret med *
 # -> * r/r 211-128-1:     Pictures/picsfrominternet/cryptolocker.exe
-icat -o 128 drive1.vhd 211-128-1 | head   # carve filen -> ren tekst, ikke en rigtig .exe</code></pre>
+<span class="gloss" tabindex="0" data-tip="Udtrækker indholdet af en specifik fil fra et disk-image (Sleuthkit).">icat</span> -o 128 drive1.vhd 211-128-1 | head   # carve filen -> ren tekst, ikke en rigtig .exe</code></pre>
              <p><code>-o</code> = partitionens offset (fra <code>mmls</code>). Tallet du giver <code>icat</code>
              (her <code>211-128-1</code>) er inode-nummeret fra <code>fls</code>-outputtets anden kolonne: det er
              den du skal bruge, ikke filnavnet. Kør altid <code>file</code>/kig på resultatet. "<code>cryptolocker.exe</code>"
@@ -42,7 +42,13 @@ icat -o 128 drive1.vhd 211-128-1 | head   # carve filen -> ren tekst, ikke en ri
         <p>Flag: <span class="flag">HKN{1m_4_d4n63r0u5_cryp70l0ck3r}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>mmls</code> → <code>fls -r | grep '*'</code> → <code>icat &lt;inode&gt;</code> genskaber slettede filer.</li><li>Kør <code>file</code> på resultatet — falske endelser er normen.</li><li>Flag-format: nogle opgaver viser <code>DDC{}</code> men kræver aflevering som <code>HKN{}</code>.</li></ul>
+<ul><li><code>mmls</code>, så <code>fls -r | grep '*'</code>, så <code>icat &lt;inode&gt;</code> genskaber slettede filer.</li><li>Kør <code>file</code> på resultatet, falske endelser er normen.</li><li>Flag-format: nogle opgaver viser <code>DDC{}</code> men kræver aflevering som <code>HKN{}</code>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Kernen her er at "slet" sjældent betyder "væk". Et filsystem markerer bare pladsen som
+ledig og fjerner katalog-henvisningen; selve data-blokkene overlever indtil noget andet skriver
+oven i dem. Det er derfor forensics-værktøjer kan genskabe slettede filer, og derfor rigtig
+sletning kræver aktiv overskrivning (<code>shred</code>) eller fuld-disk-kryptering. Samme princip
+gælder slettede rækker i databaser og "tømt" papirkurv.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

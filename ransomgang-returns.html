@@ -65,12 +65,20 @@ r1, r2 = next(g), next(g)
 kode = epoch - (r1 % 10000) + (r2 % 10000)</code></pre>
              <p>Jeg har selv verificeret denne implementation byte-for-byte mod en rigtig glibc <code>random()</code>
              (kompileret et lille C-testprogram og sammenlignet output for samme seed) før den blev sat her. Send
-             koden → match → <code>system("/bin/sh")</code> på <code>nc …:1338</code>.</p>
+             koden → match → <code>system("/bin/sh")</code> på <code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> …:1338</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{F0RBRYDELSE_B3TALER_S1G_1KK3}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>'No section header'/'statically linked' kan være UPX — <code>grep -a UPX</code> er et sekunds tjek.</li><li>Et tids-seedet PRNG der printer sit eget seed er ikke en hemmelighed — genskab sekvensen.</li><li>Daemon-tråde dør med hovedtråden; join en output-drain-tråd eksplicit når du henter flaget over socket.</li></ul>
+<ul><li>'No section header'/'statically linked' kan være UPX; <code>grep -a UPX</code> er et sekunds tjek.</li><li>Et tids-seedet PRNG der printer sit eget seed er ikke en hemmelighed; genskab sekvensen.</li><li>Daemon-tråde dør med hovedtråden; join en output-drain-tråd eksplicit når du henter flaget over socket.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To bredt nyttige pointer. (1) En binær der "ser stripped ud" er tit bare PAKKET: UPX er
+suverænt mest almindelig, og <code>grep -a UPX</code> eller <code>upx -d</code> afslører/udpakker
+den på et sekund, hvorefter du har fuld debug-info. (2) En tilfældighedsgenerator seedet med
+<code>time()</code> er kun så uforudsigelig som angriberens viden om tidspunktet, og lækker
+programmet selv sit seed, er sekvensen fuldt bestemt. Bemærk desuden at sprogenes PRNG'er IKKE er
+ens: glibc's <code>rand()</code>/<code>random()</code> matcher ikke Pythons Mersenne Twister, så
+du skal genimplementere den rigtige algoritme.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

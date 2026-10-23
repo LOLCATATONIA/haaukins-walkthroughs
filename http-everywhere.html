@@ -31,10 +31,10 @@
              cipheren i ServerHello først.</p>
 <h2>Trin for trin</h2>
 <ol class="steps">
-             <li>Kortlæg: <code>tshark -r trace.pcapng -q -z io,phs</code>.</li>
+             <li>Kortlæg: <code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r trace.pcapng -q -z io,phs</code>.</li>
              <li>Følg SMTP-strømmen og udtræk CERT + PRIVATE KEY (brug <code>follow,tcp,raw</code>, ikke ascii —
              ascii ødelægger base64).</li>
-             <li>Bekræft at nøglen passer: samme modulus i <code>openssl x509 -modulus</code> og
+             <li>Bekræft at nøglen passer: samme modulus i <code><span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi — certifikater, kryptering, hashing.">openssl</span> x509 -modulus</code> og
              <code>openssl rsa -modulus</code>.</li>
              <li>Tjek at TLS'en bruger <strong>RSA key exchange</strong> (ellers nytter nøglen ikke):
              <pre><code>tshark -r trace.pcapng -Y "tls.handshake.type==2" -T fields -e tls.handshake.ciphersuite
@@ -53,7 +53,13 @@ WIRESHARK_CONFIG_DIR=$PWD/wsconf \
         <p>Flag (per-instans): <span class="flag">HKN{fj2-pS-KIo7Z}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>En privatnøgle sendt i klartekst = total kompromittering af den TLS-trafik den beskytter.</li><li>Privatnøgle dekrypterer kun RSA-kx TLS (ikke ECDHE/TLS 1.3) — tjek cipheren.</li><li>En keylog-fil (<code>SSLKEYLOGFILE</code>) dekrypterer derimod enhver TLS-session — se <a href="bad-librarian.html">Bad librarian</a>.</li></ul>
+<ul><li>En privatnøgle sendt i klartekst = total kompromittering af den TLS-trafik den beskytter.</li><li>Privatnøgle dekrypterer kun RSA-kx TLS (ikke ECDHE/TLS 1.3), tjek cipheren.</li><li>En keylog-fil (<code>SSLKEYLOGFILE</code>) dekrypterer derimod enhver TLS-session, se <a href="bad-librarian.html">Bad librarian</a>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den vigtigste lære er hvorfor forward secrecy (ECDHE, TLS 1.3) findes: med gammeldags
+RSA-key-exchange kan ÉN lækket privatnøgle dekryptere al historisk trafik der nogensinde er
+optaget. Med forward secrecy har hver session sin egen flygtige nøgle, så et senere nøgletyveri
+afslører ikke fortidens trafik. Derfor skal du altid tjekke cipher-suiten FØR du antager en nøgle
+hjælper, det afgør om angrebet overhovedet er muligt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

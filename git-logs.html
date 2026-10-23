@@ -32,7 +32,13 @@ git -C ~/project log -p --all | grep -aoE '(HKN|DDC)\{[^}]*\}'</code></pre>
 <p>Flag (per-instans): <span class="flag">HKN{A3-nl-woElDW}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>git log -p --all</code> viser alle diffs i hele historikken (alle branches).</li><li>Commit-beskeder lækker hvor hemmeligheder blev 'fjernet'; <code>gitleaks</code>/<code>trufflehog</code> automatiserer.</li></ul>
+<ul><li><code>git log -p --all</code> viser alle diffs i hele historikken (alle branches).</li><li>Commit-beskeder lækker hvor hemmeligheder blev 'fjernet'; <code><span class="gloss" tabindex="0" data-tip="Scanner et git-repo&#x27;s historik for lækkede secrets/nøgler.">gitleaks</span></code>/<code><span class="gloss" tabindex="0" data-tip="Scanner (bl.a.) git-historik for højt-entropi-strenge og kendte secret-mønstre.">trufflehog</span></code> automatiserer.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Samme kerneidé som <a href="iac-privatekey.html">IaC privatekey</a>: git glemmer intet. En
+hemmelighed der blev "fjernet" i en senere commit ligger stadig i historikken og er en af de
+hyppigste rigtige secret-læk, derfor er det alvorligt når et privat repo lækkes, og derfor kræver
+en ægte secret-rotation efter et commit, ikke bare en ny commit. Commit-beskeder som "removed
+password" er ironisk nok et vejskilt lige til den. Scan hele historikken, ikke kun HEAD.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

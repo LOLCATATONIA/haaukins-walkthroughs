@@ -31,7 +31,7 @@
 <h2>Bust — directory listing</h2>
 <p>Apache directory listing er slået til, men stien er ikke linket fra forsiden. Du skal selv
              finde den. En hurtig content-discovery-scan:</p>
-             <pre><code>gobuster dir -u http://bustncrack.com/ -w /usr/share/wordlists/dirb/common.txt
+             <pre><code><span class="gloss" tabindex="0" data-tip="Brute-forcer skjulte URL-stier/filer/subdomæner på en webserver.">gobuster</span> dir -u http://bustncrack.com/ -w /usr/share/wordlists/dirb/common.txt
 # -> /privacy/ (Status: 200), Apache's directory-listing-side</code></pre>
              <p>Åbn <code>http://bustncrack.com/privacy/</code> i browseren (eller <code>curl</code>): den lister
              <code>flag.txt</code> og <code>key.txt</code> (en krypteret RSA-privatnøgle). Download begge:</p>
@@ -40,12 +40,12 @@ curl -sO http://bustncrack.com/privacy/key.txt
 cat flag.txt     # dette er Bust-flaget</code></pre>
 <h2>Crack — ssh2john + pivot</h2>
 <p><code>key.txt</code> er en adgangskode-beskyttet PEM-nøgle. Den kan ikke bruges direkte til
-             <code>ssh</code> uden passphrasen. Knæk den offline med <code>ssh2john</code> + <code>john</code>
+             <code>ssh</code> uden passphrasen. Knæk den offline med <code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code> + <code><span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span></code>
              (hurtigere end at gætte den live mod SSH-serveren, og uden at risikere lockout):</p>
              <pre><code>ssh2john key.txt > key.hash
 john --format=SSH --wordlist=/usr/share/wordlists/rockyou.txt key.hash
 john --show key.hash                                   # -> ChangeMe
-openssl rsa -in key.txt -passin pass:ChangeMe -check    # bekræft at passphrasen er rigtig</code></pre>
+<span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi — certifikater, kryptering, hashing.">openssl</span> rsa -in key.txt -passin pass:ChangeMe -check    # bekræft at passphrasen er rigtig</code></pre>
              <p>Passphrasen i sig selv er <em>ikke</em> flaget. Nøglen er et pivot-middel ind på en SSH-konto.
              Afkryptér nøglen (fjern passphrase-kravet) og log ind med den:</p>
              <pre><code>openssl rsa -in key.txt -passin pass:ChangeMe -out dec_key
@@ -59,7 +59,14 @@ $ cat /home/haxor/flag.txt                              # Crack-flaget</code></p
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Tjek altid for directory listing før du dirbuster enkeltfiler.</li><li><code>ssh2john</code> + <code>john --format=SSH</code> knækker krypterede PEM-nøgler.</li><li>Passphrasen er sjældent flaget — nøglen er et pivot-middel; bekræft og brug den.</li></ul>
+<ul><li>Tjek altid for directory listing før du dirbuster enkeltfiler.</li><li><code>ssh2john</code> + <code>john --format=SSH</code> knækker krypterede PEM-nøgler.</li><li>Passphrasen er sjældent flaget, nøglen er et pivot-middel; bekræft og brug den.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Hele kæden her er et miniature-pentest: find en eksponeret ressource (directory listing),
+udtræk et stykke materiale (den krypterede nøgle), knæk det offline, og brug det som pivot til
+næste trin (SSH). Den mest overførbare vane er at knække ting OFFLINE: <code>ssh2john</code>,
+<code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code>, <code>keepass2john</code> og lignende konverterer et krypteret artefakt
+til et hash du kan angribe lokalt, langt hurtigere og mere stealthy end at hamre på selve
+tjenesten. Og husk at det du knækker sjældent er målet, det er nøglen til næste dør.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

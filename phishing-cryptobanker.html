@@ -69,7 +69,15 @@
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Route-back-blokeringen gælder kun VPN-klient-IP'en; på lab-subnettet (Kali-Toolbox) kan offer-bots nå dig → host/MITM on-segment.</li><li>Studér den ægte artefakt før du forfalsker den: bot'ens form-filler krævede eksakte <code>id</code>-attributter (1:1-kopi).</li><li>Når DNS-spoofing fejler (offeret bruger en intern/anden resolver), så MITM på L3: <strong>ARP-spoof mål-IP'en + <code>iptables</code> DNAT</strong> — uafhængigt af DNS og DNS-cache.</li><li>SMTP uden auth = triviel afsender-spoofing; en <code>@firma.com</code>-afsender løser "impersonate"-delen gratis.</li></ul>
+<ul><li>Route-back-blokeringen gælder kun VPN-klient-IP'en; på lab-subnettet (Kali-Toolbox) kan offer-bots nå dig, host/MITM on-segment.</li><li>Studér den ægte artefakt før du forfalsker den: bot'ens form-filler krævede eksakte <code>id</code>-attributter (1:1-kopi).</li><li>Når DNS-spoofing fejler (offeret bruger en intern/anden resolver), så MITM på L3: <strong>ARP-spoof mål-IP'en + <code>iptables</code> DNAT</strong>, uafhængigt af DNS og DNS-cache.</li><li>SMTP uden auth = triviel afsender-spoofing; en <code>@firma.com</code>-afsender løser "impersonate"-delen gratis.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Phishing er stadig den mest effektive angrebsvektor i den virkelige verden, og de fire trin
+her afspejler ægte teknikker: SMTP uden afsender-autentificering (SPF/DKIM/DMARC) gør
+afsender-spoofing trivielt, en pixel-perfekt kopi af login-siden høster credentials, og når ét lag
+(DNS-spoofing) fejler, falder man ned på et lavere (ARP + L3-redirect). Den vigtigste generelle
+lektie: studér den ægte artefakt før du forfalsker den, bot'ens form-filler krævede eksakte
+HTML-<code>id</code>'er, præcis som en overbevisende phishing-side skal matche originalen pixel for
+pixel. Og ryd altid op efter aktive MITM-ændringer.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -27,15 +27,20 @@
              <p><code>43239E3A0AF748020D5B426A4977D7E5</code> — 32 hex <strong>uppercase</strong>, og "AD"
              (Active Directory) i titlen = <strong>NTLM</strong> = <code>MD4(UTF-16LE(password))</code>.</p>
 <h2>Fremgangsmåde</h2>
-<p><code>hashcat -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4 — brug
+<p><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4 — brug
              OpenSSL legacy-provider (sanity-check) eller en egen MD4 (verificér mod RFC 1320):</p>
-             <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | openssl dgst -md4 -provider legacy -provider default
+             <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | <span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi — certifikater, kryptering, hashing.">openssl</span> dgst -md4 -provider legacy -provider default
 # 31d6cfe0...089c0 = NTLM af tomt password</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{supersecret}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Uppercase 32-hex ≈ NTLM; casing er et spor.</li><li><code>hashcat -m 1000</code>, eller egen MD4 verificeret mod RFC-vektorer.</li></ul>
+<ul><li>Uppercase 32-hex ligner NTLM; casing er et spor.</li><li><code>hashcat -m 1000</code>, eller egen MD4 verificeret mod RFC-vektorer.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>NTLM er stadig overalt i Windows/Active Directory-miljøer, og en NTLM-hash er lige så god
+som adgangskoden i mange angreb: "pass-the-hash" lader dig autentificere med selve hashen uden at
+knække den. Casing i opgaven (uppercase hex) plus et tema-ord som "AD" er et dobbelt-fingerpeg om
+hash-typen. Læs begge dele som hints, de indsnævrer hvilken <code>-m</code>-mode du skal bruge.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

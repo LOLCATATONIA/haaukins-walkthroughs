@@ -26,14 +26,22 @@
 <pre><code>curl http://handyman-joe.com/robots.txt            # Disallow: /~admin/accesslog.txt
 curl http://handyman-joe.com/~admin/accesslog.txt
 #   Failed login MD5: 880a...  Failed login MD5: 5c3d...  Successful login</code></pre>
-             <p>De to fejlede forsøg lige før succes er <strong>typos</strong>. Knæk MD5'erne (rockyou) →
-             <code>proffesional</code>, <code>profesional</code> → korrekt = <code>professional</code>. Log ind,
-             publicér et indlæg → flaget.</p>
+             <p>Her er den kloge indsigt: de to fejlede forsøg lige FØR et vellykket login er
+             <strong>typos</strong> af det rigtige password (folk taster forkert et par gange først). Knæk de
+             to MD5'er med rockyou: <code>proffesional</code> og <code>profesional</code>, og den korrekte
+             stavning midt imellem er passwordet: <code>professional</code>. Log ind, publicér et indlæg,
+             og flaget vises.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{r5-O1I-nzF1d}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>robots.txt</code>-Disallow = 'kig her'; eksponerede logs rummer tit credentials.</li><li>De fejlede forsøg var typos → den korrekte stavning var passwordet.</li></ul>
+<ul><li><code>robots.txt</code>-Disallow = 'kig her'; eksponerede logs rummer tit credentials.</li><li>De fejlede forsøg var typos; den korrekte stavning var passwordet.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En klog detalje her: de FEJLEDE login-forsøg var guld værd. Folk taster deres rigtige
+password med små tastefejl, så de mislykkede forsøg lige før et vellykket login er typos AF det
+rigtige password. At rette dem fører til svaret. Mere generelt: logs der ikke burde være
+offentlige (adgangslogs, fejl-logs, debug-output) rummer tit credentials, interne stier eller
+stak-spor, og <code>robots.txt</code> peger ofte lige på dem.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

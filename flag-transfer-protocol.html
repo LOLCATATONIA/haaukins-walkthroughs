@@ -23,8 +23,8 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code>nmap -p21 --open &lt;subnet&gt;/24          # find FTP-host (pyftpdlib)
-hydra -l admin -P rockyou.txt -t 4 -f ftp://&lt;ip&gt;   # -> admin:phantom (tidligt i rockyou)
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -p21 --open &lt;subnet&gt;/24          # find FTP-host (pyftpdlib)
+<span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l admin -P rockyou.txt -t 4 -f ftp://&lt;ip&gt;   # -> admin:phantom (tidligt i rockyou)
 # log ind, hent /flag.txt (jpg/png er pynt)</code></pre>
              <p>Ved brute-force: slå aldrig et allerede-prøvet søgerum op igen — genoptag eller slice ordlisten.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -32,6 +32,12 @@ hydra -l admin -P rockyou.txt -t 4 -f ftp://&lt;ip&gt;   # -> admin:phantom (tid
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>pyftpdlib tåler <code>hydra -t 4</code>; svage passwords ligger tidligt i rockyou.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Hydra taler mange protokoller (ftp, ssh, http-post-form, smb, rdp og flere), så det samme
+værktøj og den samme rockyou-liste dækker et bredt felt af login-brute-opgaver. Disciplinen er den
+samme overalt: hold trådtallet lavt mod skrøbelige tjenester, og spild ikke tid på at gentage et
+søgerum du allerede har prøvet, genoptag eller slice ordlisten i stedet. Online-brute er altid
+sidste udvej; har du et hash, så crack offline.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

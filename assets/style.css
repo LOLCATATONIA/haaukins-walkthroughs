@@ -104,3 +104,22 @@ figure.shot figcaption { color: var(--muted); font-size: 13.5px; margin-top: 6px
 
 footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--border);
   color: var(--muted); font-size: 13.5px; }
+
+/* værktøjs-ordliste: hover/fokus-tooltip på kendte værktøjsnavne i <code> */
+.gloss {
+  border-bottom: 1px dotted var(--link); cursor: help; position: relative;
+}
+.gloss:hover, .gloss:focus { outline: none; border-bottom-style: solid; }
+.gloss:hover::after, .gloss:focus::after {
+  content: attr(data-tip);
+  position: absolute; left: 0; bottom: 135%;
+  background: var(--fg); color: var(--bg);
+  padding: 7px 11px; border-radius: 7px; font-size: 13px; font-weight: 400;
+  white-space: normal; width: max-content; max-width: min(280px, 70vw);
+  box-shadow: 0 4px 14px rgba(0,0,0,.25); z-index: 20;
+  font-family: var(--sans); line-height: 1.4; text-align: left;
+}
+.gloss:hover::before, .gloss:focus::before {
+  content: ""; position: absolute; left: 10px; bottom: 128%;
+  border: 6px solid transparent; border-top-color: var(--fg); z-index: 20;
+}

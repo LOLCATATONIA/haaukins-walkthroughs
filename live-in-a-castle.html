@@ -36,7 +36,7 @@
              <figcaption>Passwordet er malet ind i et vindue i bybilledet — "hidden in plain sight", ikke i bits.</figcaption>
              </figure>
 <h2>Udtræk med steghide</h2>
-<p>Det er <code>steghide</code>-passwordet (steghide understøtter JPEG):</p>
+<p>Det er <code><span class="gloss" tabindex="0" data-tip="Skjuler/udtrækker data gemt inde i billed- eller lydfiler (steganografi).">steghide</span></code>-passwordet (steghide understøtter JPEG):</p>
              <pre><code>steghide extract -sf bitwise_secrecy.jpeg -p 41659
 #  -> secret.zip  ->  secret/plan.txt  +  secret/meeting-point.png</code></pre>
 <h2>Pt.2 — planen (plan.txt)</h2>
@@ -60,7 +60,14 @@
         </ul>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Et navn som "bitwise_secrecy" kan være en lokkemad — led OGSÅ efter en synlig nøgle i selve motivet før du brænder timer på bit-stego.</li><li><code>steghide</code> (JPEG/BMP/WAV) kræver et password — det ligger tit "hidden in plain sight".</li><li>GPS-EXIF er trivielt at forfalske → bekræft en lokation visuelt (reverse image search), stol ikke på metadata.</li></ul>
+<ul><li>Et navn som "bitwise_secrecy" kan være en lokkemad; led OGSÅ efter en synlig nøgle i selve motivet før du brænder timer på bit-stego.</li><li><code>steghide</code> (JPEG/BMP/WAV) kræver et password; det ligger tit "hidden in plain sight".</li><li>GPS-EXIF er trivielt at forfalske; bekræft en lokation visuelt (reverse image search), stol ikke på metadata.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>To gennemgående faldgruber i forensics. (1) Et ledende navn ("bitwise", "LSB") kan være
+bevidst misvisende: kig ALTID på billedet med øjnene for en synlig nøgle, før du brænder timer på
+avanceret stego-værktøj. (2) Metadata som GPS-EXIF er trivielt at forfalske og bliver tit brugt som
+bevidst afledning. Når en lokation betyder noget, så bekræft den visuelt (reverse image search på
+arkitektur/vartegn), ikke via et felt nogen frit kunne have sat. "Hidden in plain sight" slår
+avanceret stego oftere end man skulle tro.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

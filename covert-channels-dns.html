@@ -25,7 +25,7 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p>Alle tre opgaver løses på <strong>samme</strong> <code>capture.pcap</code>. Start altid med
 protokol-hierarkiet, og saml bits/bytes i <strong>kronologisk</strong> rækkefølge:</p>
-<pre><code>tshark -r capture.pcap -q -z io,phs</code></pre><p>En kompromitteret host slår mærkelige domæner op. Dataene ligger som hex forrest i hvert subdomæne
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -q -z io,phs</code></pre><p>En kompromitteret host slår mærkelige domæner op. Dataene ligger som hex forrest i hvert subdomæne
              hos <code>canarytokens.com</code>.</p>
 <h2>Trin for trin</h2>
 <pre><code>tshark -r capture.pcap -Y 'dns.flags.response==0 &amp;&amp; dns.qry.name contains "canarytokens"' \
@@ -42,6 +42,12 @@ print(''.join(bytes.fromhex(l).decode() for l in labels))"
 </details>
 <h2>Hvad du har lært</h2>
 <ul><li>DNS-exfiltrering pakker data i opslags-navne til en server angriberen styrer.</li><li>Saml altid i tidsrækkefølge (ikke alfabetisk).</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>DNS er et yndet exfiltrerings-medie i den virkelige verden, netop fordi DNS næsten altid
+får lov at passere en firewall, selv når alt andet er blokeret. Angriberen ejer en domæne, og
+hver "opslag" leverer et stykke data i selve navnet. Når du på et netværk ser en host slå mange
+usædvanlige, lange eller tilfældigt-udseende subdomæner op mod ét domæne, er DNS-tunneling en
+stærk mistanke. Samme detektions-instinkt bruges af rigtige SOC-analytikere.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

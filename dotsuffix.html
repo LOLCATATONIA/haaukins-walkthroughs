@@ -36,7 +36,14 @@ file porygon39.jpg        # -> JPEG image data</code></pre>
         </figure>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Kør altid <code>file</code> — endelsen siger intet om det faktiske format.</li><li>Samme klasse som Broken but not Lost: filtypen lyver.</li></ul>
+<ul><li>Kør altid <code>file</code>, endelsen siger intet om det faktiske format.</li><li>Samme klasse som Broken but not Lost: filtypen lyver.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>En ZIP forklædt som JPEG er en variant af samme princip som
+<a href="broken-but-not-lost.html">Broken but not Lost</a>: endelsen lyver. Når <code>file</code>
+siger et andet format end navnet, så behandl filen som dét format (omdøb og pak ud, eller carve
+med <code><span class="gloss" tabindex="0" data-tip="Finder og udtrækker indlejrede filer/filsystemer inde i en binær fil.">binwalk</span></code> hvis der er flere formater lagt i forlængelse af hinanden). Mange
+formater, blandt andet ZIP, Office-dokumenter og APK'er, er i virkeligheden bare ZIP-arkiver i
+forklædning.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

@@ -48,7 +48,15 @@ https://formalbank.com/transfer?amount=100&amp;email=&lt;dig&gt;   ...
 <p>Flag (per-instans): <span class="flag">HKN{Q9-kk-DnyWJq}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Et CSRF-offer kan være en <strong>klik-bot</strong>, ikke en render-bot — så post et <em>link</em> det klikker, ikke kun et auto-firing <code>&lt;img&gt;</code>.</li><li>Nærstudér den <strong>renderede</strong> app (ikke kun curl/JS): her afslørede dashboardet at flaget købes, og at transfer er eneste penge-kilde.</li><li>State-ændring via <code>GET</code> uden CSRF-token = lærebogs-CSRF.</li><li>Jf. andre web-opgaver: <a href="becomming-a-doctor.html">Becomming a doctor</a>, <a href="sql-injection.html">SQL injection</a>.</li></ul>
+<ul><li>Et CSRF-offer kan være en <strong>klik-bot</strong>, ikke en render-bot, så post et <em>link</em> det klikker, ikke kun et auto-firing <code>&lt;img&gt;</code>.</li><li>Nærstudér den <strong>renderede</strong> app (ikke kun curl/JS): her afslørede dashboardet at flaget købes, og at transfer er eneste penge-kilde.</li><li>State-ændring via <code>GET</code> uden CSRF-token = lærebogs-CSRF.</li><li>Jf. andre web-opgaver: <a href="becomming-a-doctor.html">Becomming a doctor</a>, <a href="sql-injection.html">SQL injection</a>.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>CSRF udnytter at browseren automatisk sender offerets cookies med enhver request til et
+site, så hvis en state-ændrende handling kan udløses via en simpel <code>GET</code> uden et
+uforudsigeligt CSRF-token, kan en angriber få offeret til at udføre den bare ved at besøge/klikke
+et link. Den afgørende recon-pointe her: FORSTÅ offeret. En bot der KLIKKER links kræver et plain
+link, en bot der RENDERER HTML kan trigges med et <code>&lt;img&gt;</code>. At studere den rigtige,
+renderede app (ikke bare rå HTTP) afslørede både bot-typen og at flaget skulle KØBES. Forsvaret er
+CSRF-tokens og at state-ændringer aldrig må være rene GET-requests.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

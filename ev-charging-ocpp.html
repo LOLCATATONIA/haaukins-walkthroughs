@@ -28,7 +28,7 @@
              Et ladepunkt holder en WS-forbindelse åben og sender beskeder (BootNotification, Heartbeat, MeterValues …);
              flaget er gemt i én af dem.</p>
 <h2>Recon &amp; capture</h2>
-<pre><code>nmap -Pn -sT -p- &lt;central-system&gt;      # fx 8887/tcp = OCPP central system
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -sT -p- &lt;central-system&gt;      # fx 8887/tcp = OCPP central system
 # trafikken er ofte synlig passivt på lab-segmentet — ingen MITM nødvendig:
 sudo tcpdump -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</code></pre>
 <h2>Af-maskér WebSocket-frames (nøgletrinnet)</h2>
@@ -37,7 +37,7 @@ sudo tcpdump -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</
              frame) — kun server→klient er læsbar med <code>strings</code>. Af-masker klient-frames manuelt:</p>
              <pre><code># WS-frame: [FIN+opcode][MASK+len][evt. ext-len][4-byte nøgle][maskeret payload]
 # payload[i] XOR nøgle[i % 4]  giver klarteksten
-tshark -r ocpp.pcap -Y 'ip.src==&lt;charger&gt; &amp;&amp; tcp.len&gt;0' -T fields -e tcp.payload</code></pre>
+<span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r ocpp.pcap -Y 'ip.src==&lt;charger&gt; &amp;&amp; tcp.len&gt;0' -T fields -e tcp.payload</code></pre>
              <p>Af-maskér hver hex-streng fra outputtet ovenfor:</p>
              <pre><code>python3 -c "
 def unmask(raw: bytes) -> bytes:
@@ -66,7 +66,14 @@ print(unmask(raw).decode(errors='replace'))"
         <p>Flag: <span class="flag">HKN{h34rt-b34t}</span> ("heartbeat" — OCPP har netop Heartbeat-beskeder).</p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>OCPP = JSON-RPC over WebSocket; "monitor the traffic" = sniff den (ofte synlig passivt on-segment).</li><li>Frames fanget midt-stream: tshark dissekerer ikke uden handshaket → af-masker klient-frames selv (<code>^ nøgle[i%4]</code>).</li><li>"Poorly set up" = en hemmelighed i et frit tekstfelt (vendor) — tjek ALLE felter i protokol-beskederne.</li><li>Flaget var kun i den sjældne BootNotification → fang en (re)connect, ikke kun de periodiske MeterValues.</li></ul>
+<ul><li>OCPP = JSON-RPC over WebSocket; "monitor the traffic" = sniff den (ofte synlig passivt on-segment).</li><li>Frames fanget midt-stream: tshark dissekerer ikke uden handshaket, så af-masker klient-frames selv (<code>^ nøgle[i%4]</code>).</li><li>"Poorly set up" = en hemmelighed i et frit tekstfelt (vendor); tjek ALLE felter i protokol-beskederne.</li><li>Flaget var kun i den sjældne BootNotification; fang en (re)connect, ikke kun de periodiske MeterValues.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>WebSocket-frames fra klient til server er altid XOR-maskerede med en 4-byte nøgle der står i
+selve framen, så "af-maskering" er ikke et brud, bare at XOR'e payloaden med nøglen. Det er værd at
+kunne, fordi mange moderne apps (chats, dashboards, IoT, spil) kører over WebSocket, og en capture
+taget MIDT i en forbindelse dissekeres ikke automatisk, fordi værktøjet ikke så handshaket. Den
+bredere lektie fra OCPP: eksotiske branche-protokoller er stadig bare struktureret data, og
+"dårligt opsat" betyder ofte en hemmelighed proppet i et frit tekstfelt, så læs alle felter.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver

