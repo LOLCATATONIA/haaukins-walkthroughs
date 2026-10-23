@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Haaukins: Hasher 1 tutorial (SHA-256, en bogtitel i stedet for et password)</title>
-<meta name="description" content="Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Riddlet (&#x27;some people don&#x27;t like books&#x27;) peger på svaret.">
+<meta name="description" content="Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Gåden (&#x27;some people don&#x27;t like books&#x27;) peger på svaret.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-1.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Haaukins: Hasher 1 tutorial (SHA-256, en bogtitel i stedet for et password)">
-<meta property="og:description" content="Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Riddlet (&#x27;some people don&#x27;t like books&#x27;) peger på svaret.">
+<meta property="og:description" content="Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Gåden (&#x27;some people don&#x27;t like books&#x27;) peger på svaret.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-1.html">
 <meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hasher 1", "description": "Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Riddlet ('some people don't like books') peger på svaret.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-1.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hasher 1", "description": "Guide til Haaukins Hasher 1: rockyou og massive regelsæt knækker IKKE denne SHA-256, fordi preimage er en bogtitel, ikke et typisk password. Gåden ('some people don't like books') peger på svaret.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-1.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -28,7 +28,7 @@
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Opgaveteksten er selv et riddel</h2>
+<h2>Opgaveteksten er selv en gåde</h2>
 <p>En SHA-256-hash gives sammen med teksten: <em>"Some people just really don't like
              books. I rather enjoy reading my dictionary, however."</em> Ingen anden kontekst, bare
              hashen og de to sætninger.</p>
@@ -45,7 +45,7 @@ hashcat -m 1400 -a 0 hash.txt rockyou.txt -r rockyou-30000.rule
              <p>Hele rockyou-keyspace'et er nu afsøgt, med og uden mutationer. Det er et stærkt
              signal: preimage er sandsynligvis slet ikke et typisk "password"-mønster, rockyou er
              lækkede adgangskoder, ikke generel tekst.</p>
-<h2>Læs riddlet bogstaveligt: en ordbog er ikke en password-liste</h2>
+<h2>Læs gåden bogstaveligt: en ordbog er ikke en password-liste</h2>
 <p>Opgaveteksten siger selv <em>"I rather enjoy reading my dictionary"</em>, altså en
              ORDBOG, ikke en adgangskode-liste. <a href="https://crackstation.net/" target="_blank"
              rel="noopener">crackstation.net</a> bruger langt bredere ordbøger end rockyou, inkl.
@@ -54,7 +54,7 @@ hashcat -m 1400 -a 0 hash.txt rockyou.txt -r rockyou-30000.rule
              <pre><code>import hashlib
 hashlib.sha256(b"Fahrenheit 451").hexdigest()
 # af07c1e3ced552cbad0c1ad8ec1ed74b732dd2f524189c3a15ce27bc76b2df9a   <-- match</code></pre>
-             <p>Riddlet giver mening bagudrettet: "some people really don't like books" er en
+             <p>Gåden giver mening bagudrettet: "some people really don't like books" er en
              omskrivning af bogafbrænding, og 451°F er netop temperaturen hvor bogpapir antændes i
              Ray Bradburys roman <em>Fahrenheit 451</em>, en mere skjult reference end et ligefremt
              password-tema.</p>
