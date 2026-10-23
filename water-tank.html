@@ -36,7 +36,9 @@
 # 80/tcp  open  http
 # 502/tcp open  mbap        &lt;-- Modbus TCP!</code></pre>
              <p>Port 502 (Modbus TCP, "mbap") er den rigtige kontrolkanal, og Modbus har INGEN indbygget
-             autentificering i sin standardform.</p>
+             autentificering i sin standardform. Kender du ikke protokollen i forvejen, er
+             <a href="https://modbustools.com/modbus.html" target="_blank" rel="noopener">denne gennemgang
+             af Modbus</a> en god baggrund, før du går videre til den rå klient nedenfor.</p>
 <h2>En minimal rå Modbus-klient</h2>
 <p>Protokollen er simpel nok til en ~30-linjers rå socket-implementering (MBAP-header +
              funktionskode) i stedet for at kæmpe med en færdig klient-bibliotek:</p>

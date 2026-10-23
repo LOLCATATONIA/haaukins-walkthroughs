@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: BREACH, tutorial (kompressions-sidekanal, IDOR, og Dirty Pipe til root)</title>
+<meta name="description" content="Guide til Haaukins BREACH: opgavens navn er et direkte hint til det klassiske BREACH-angreb, men den egentlige vej til root går gennem en IDOR, en ordliste af hele sidens egen tekst, og til sidst Dirty Pipe.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/breach.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: BREACH, tutorial (kompressions-sidekanal, IDOR, og Dirty Pipe til root)">
+<meta property="og:description" content="Guide til Haaukins BREACH: opgavens navn er et direkte hint til det klassiske BREACH-angreb, men den egentlige vej til root går gennem en IDOR, en ordliste af hele sidens egen tekst, og til sidst Dirty Pipe.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/breach.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "BREACH", "description": "Guide til Haaukins BREACH: opgavens navn er et direkte hint til det klassiske BREACH-angreb, men den egentlige vej til root går gennem en IDOR, en ordliste af hele sidens egen tekst, og til sidst Dirty Pipe.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/breach.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>BREACH</h1>
+<p class="subtitle">Opgavens eget navn er det første, vigtigste hint, tag det bogstaveligt.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Sporet: hvorfor leder vi efter en sidekanal?</h2>
+<p>Opgaveteksten er selv et ordspil: <em>"På overfladen ser fresh-start.hkn ud som en
+             almindelig rengøringstjeneste men hvilket snavs kan mon opfanges."</em> "Opfange snavs" er
+             en omskrivning af "aflæse et lækket signal", og opgavens titel, BREACH, navngiver angrebet
+             direkte (Browser Reconnaissance and Exfiltration via Adaptive Compression of Hypertext,
+             CVE-2013-3587). Det er altså ikke et gæt, opgaven FORTÆLLER dig hvilken teknik der skal
+             bruges, før du overhovedet har set en linje kode.</p>
+             <p>BREACH udnytter at HTTP-komprimering (gzip/deflate) gør en respons MINDRE når den
+             indeholder en gentaget delstreng. Hvis en respons indeholder både en hemmelighed OG
+             angriber-styret input i samme komprimerede output, falder den komprimerede størrelse
+             målbart når dit gæt matcher hemmeligheden, fordi DEFLATE finder en backreference til det
+             allerede-sete stykke tekst.</p>
+<h2>Bekræft oraklet: /guest/token reflekterer et token og dit input sammen</h2>
+<p>Sidens navigation har et "Token"-link, <code>/guest/token?request=</code>. Et kig på
+             svaret viser hvorfor det er interessant:</p>
+             <pre><code>curl -s "http://fresh-start.hkn/guest/token?request=TEST" \
+  -H "Accept-Encoding: gzip" --compressed
+# &lt;p&gt;7f4d10ac20b9edfbb495baf51c5a7a3&lt;/p&gt;   &lt;-- et token, ukendt oprindelse
+# &lt;p&gt;TEST&lt;/p&gt;                              &lt;-- vores eget input, reflekteret</code></pre>
+             <p>Begge dele ligger i SAMME komprimerede HTML-side, det er netop BREACH-opskriften. Mål
+             komprimeret størrelse for tre forskellige gæt:</p>
+             <pre><code>curl -s ".../guest/token?request=" -H "Accept-Encoding: gzip" \
+  -w "%{size_download}\n" -o /dev/null
+# 107 bytes (tomt gæt)
+curl -s ".../guest/token?request=7f4d10ac20b9edfbb495baf51c5a7a3" ...
+# 105 bytes, MINDRE: gættet matcher tokenet, DEFLATE finder en backreference
+curl -s ".../guest/token?request=0000000000000000000000000000000" ...
+# 110 bytes, STØRRE: ingen match, ren tilfældig tekst tilføjer kun entropi</code></pre>
+             <p>Oraklet er nu bekræftet funktionelt, man kunne i princippet gætte tokenet tegn for tegn
+             ved at finde det næste tegn der giver den mindste størrelse. Men her er tokenet allerede
+             synligt i klartekst i responsen, så selve udtrækningen er ikke nødvendig for DETTE token,
+             den reelle udfordring ligger et andet sted.</p>
+<h2>Simpel sti-gætning: guest → admin</h2>
+<p>Hvis der findes en "guest"-rolle i URL'en, findes der måske en "admin"-rolle samme
+             sted. At erstatte <code>guest</code> med <code>admin</code> i stien er den billigste
+             hypotese man kan teste:</p>
+             <pre><code>curl -s "http://fresh-start.hkn/admin/token?request=" \
+  -H "Accept-Encoding: gzip" --compressed
+# HTTP 401 Unauthorized</code></pre>
+             <p>Endpointet findes, men kræver noget vi ikke har endnu. Afgørende detalje: prøv SAMME
+             request uden <code>Accept-Encoding: gzip</code>-headeren:</p>
+             <pre><code>curl -s "http://fresh-start.hkn/admin/token?request="
+# HTTP 200
+# &lt;p&gt;5e7d2f67145f6b2a8c94efc25a76de3&lt;/p&gt;   &lt;-- admin-tokenet, i klartekst!
+# &lt;p&gt;&lt;/p&gt;</code></pre>
+             <p>Det er en separat bug, ikke selve BREACH-teknikken: auth-tjekket springes
+             tilsyneladende helt over når der ikke komprimeres, og aktiveres først når gzip er sat. En
+             enkelt manglende header er altså nok til at lække admin-tokenet uden nogen cookie
+             overhovedet.</p>
+<h2>Brug admin-tokenet: en PGP-krypteret besked med et verbalt hint</h2>
+<p>Sæt det lækkede token som <code>csrf_token</code>-cookie, og send nu MED
+             gzip-headeren (det aktiverer det rigtige, forventede flow):</p>
+             <pre><code>curl -s "http://fresh-start.hkn/admin" -H "Accept-Encoding: gzip" --compressed \
+  -b "csrf_token=5e7d2f67145f6b2a8c94efc25a76de3"</code></pre>
+             <p>Resultat: en side med overskriften "Admin Credentials", teksten <em>"I'm the best admin
+             ever, rocking the freshest vocabulary!"</em>, og en symmetrisk PGP-krypteret besked
+             (bekræftet med <code>gpg --list-packets</code>: <code>:symkey enc packet:</code>, ikke en
+             public-key-besked, så der findes INGEN privat nøgle at angribe, kun en passphrase).</p>
+<h2>Mange målrettede gæt, alle forgæves</h2>
+<p>Hint-sætningen inviterer naturligt til at gætte en passphrase ud fra temaet. Flere
+             runder blev afprøvet grundigt og systematisk, alle negative: hele <code>rockyou.txt</code>
+             (14+ millioner ord), nyere internet-slang ("rizz", "sigma" osv.), et produktnavn nævnt
+             andetsteds på siden ("Hoover Max Extract Pressure-Pro, model sixty", inkl. de ægte
+             officielle modelnumre fundet via websøgning), telefonnummeret på siden (der skjuler
+             "1337" i midten), omvendte strenge, og dansk "snavs"-tema ud fra selve opgaveteksten. Ingen
+             af disse ellers fornuftige, tematisk begrundede hypoteser ramte.</p>
+<h2>Det der virkede: en ordliste af HELE sidens tekst, ikke kun de &quot;interessante&quot; ord</h2>
+<p>Når håndplukkede tema-gæt er udtømt, er næste, billige skridt at stoppe med at
+             VÆLGE ord selv, og i stedet udtrække EVERY unikt ord fra al synlig sidetekst (forsiden
+             OG admin-siden), uden at dømme på forhånd hvilke der "ser interessante ud":</p>
+             <pre><code>import re, html
+text = strip_html(fetch("/") + fetch("/admin"))
+words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'/\-\.]{1,}", text)
+# 169 unikke ord -&gt; 467 kandidater med store/små bogstaver-varianter</code></pre>
+             <p>Testet ét ad gangen direkte mod PGP-beskeden:</p>
+             <pre><code>gpg --batch --pinentry-mode loopback --passphrase providers -d msg.asc
+# Exhale8-Saturate6-Easily1</code></pre>
+             <p>Passphrasen var <strong>"providers"</strong>, fra den helt ordinære sætning <em>"we are
+             one of the country's biggest providers of private cleaning"</em> på forsiden. Et
+             fuldstændig utematisk ord, ingen af de forrige hypoteser pegede på det, men det stod der
+             hele tiden, synligt for enhver der læste siden.</p>
+<h2>Den dekrypterede besked er ikke flaget, det er et SSH-password</h2>
+<p><code>fresh-start.hkn</code> har port 22 åben (webappen selv kører tilsyneladende et
+             andet sted bag samme hostname, kun SSH lytter lokalt på denne specifikke boks):</p>
+             <pre><code>ssh admin@fresh-start.hkn
+# password: Exhale8-Saturate6-Easily1</code></pre>
+             <p>Det giver en almindelig shell som <code>admin</code> (uid 8000). <code>/flag.txt</code>
+             findes i rodmappen, men er <code>-rwx------ root:root</code>, og <code>sudo -l</code> er
+             eksplicit nægtet admin via sudoers-policy. Tre SUID-binære findes
+             (<code>sudo</code>, <code>busybox</code>, <code>ssh-keysign</code>), men ingen af dem giver
+             en gratis genvej, <code>busybox su</code> beder korrekt om et ægte root-password.</p>
+<h2>Root via Dirty Pipe: en kerne-ABI-faldgrube, ikke en patchet kerne</h2>
+<p><code>uname -a</code> viser kernel <code>5.11.10</code>, lige i midten af den
+             sårbare range for Dirty Pipe (CVE-2022-0847, rammer 5.8–5.16.11). <code>/etc/passwd</code>
+             er verdens-læsbar (644), det klassiske mål: overskriv root's password-hash-felt direkte
+             via en splice-baseret skrivning til en fil man kun har LÆSEadgang til.</p>
+             <p>Target-boksen har ingen compiler, så en offentlig PoC skal kompileres statisk lokalt og
+             overføres som binær. Første forsøg, statisk kompileret med glibc, crashede med
+             <code>Illegal instruction</code> ved kørsel på target, to gange, selv med eksplicitte
+             kompatibilitets-flag. Det SÅ ud som om kernen var patchet, men var det ikke:</p>
+             <pre><code>file write_anything
+# ... statically linked, for GNU/Linux 6.1.0 ...</code></pre>
+             <p>Byggemaskinens glibc er bygget til en langt nyere kerne-ABI (6.1.0) end target's
+             faktiske 5.11.10, og den uoverensstemmelse alene er nok til at udløse en illegal
+             instruktion ved opstart, uafhængigt af om selve sårbarheden er lukket. Løsningen var at
+             kompilere statisk med <strong>musl</strong> i stedet for glibc (ingen tilsvarende
+             kerne-version-mærke i det resulterende binære), hvorefter PoC'en kørte rent uden crash,
+             og overskrev <code>/etc/passwd</code>'s root-linje med en kendt hash. <code>su root</code>
+             med den tilhørende adgangskode gav derefter root direkte.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{all-purpose-cleaner-best-in-class}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li>Et opgavenavn kan være et bogstaveligt teknik-hint, ikke kun en flavour-tekst, BREACH hed BREACH fordi det var BREACH.</li><li>En manglende header kan springe et auth-tjek helt over, test altid den samme request både MED og UDEN headere du forventer skal være der (her: Accept-Encoding: gzip).</li><li>Når håndplukkede tema-gæt til et password er udtømt, er en fuldautomatisk ordliste af ALT synligt sidetekst et billigt næste skridt, det rammer ord intet menneske ville vælge at fremhæve manuelt.</li><li>"Illegal instruction" ved en statisk-kompileret kernel-exploit er ikke nødvendigvis et tegn på en patchet kerne, det kan være et build-værts-libc-version-mismatch mod en ældre target-kerne, prøv musl eller en ældre byggemaskine før du opgiver sporet.</li><li>Public-key-fri "PGP-kryptering" i en CTF er næsten altid symmetrisk (passphrase-baseret), gpg --list-packets afgør det med sikkerhed på et øjeblik.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den røde tråd her er at følge opgavens eget sprog bogstaveligt: navnet BREACH
+pegede direkte på teknikken, og opgavebeskrivelsens "hvilket snavs kan mon opfanges" var samme hint
+oversat til et ordspil. Den slags direkte hints går igen i mange CTF-opgaver, og er værd at tage
+seriøst før man leder efter noget mere eksotisk. Selve BREACH-sidekanalen (komprimeret
+størrelse afslører et match) er i familie med andre side-channel-angreb som CRIME og
+timing-angreb, se <a href="arp-mitm.html">ARP-spoofing-primeren</a> for et andet eksempel på at
+udnytte information der ikke var beregnet til at lække. Og "ordliste af hele siden" generaliserer
+langt ud over PGP-passphrases, det er den samme teknik man bør bruge når man leder efter et
+skjult ord i enhver tekst man allerede har adgang til.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>
