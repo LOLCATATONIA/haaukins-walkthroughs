@@ -1,4 +1,4 @@
-# Haaukins CTF — walkthroughs
+# Haaukins CTF: walkthroughs
 
 Trin-for-trin guides til [Haaukins](https://haaukins.dk/)-opgaverne fra AAU og De Danske Cybermesterskaber.
 Hver opgave har sin egen side: hvad går den ud på, hvordan griber du den an, og til sidst flaget, gemt bag en
@@ -13,7 +13,7 @@ først. Den dækker VPN-opsætning og de andre praktiske ting guiderne ellers fo
 Flagene i guiderne er eksempler. Haaukins genererer mange af dem per instans, så dit eget flag typisk ser
 anderledes ud end det der står her. Det er fremgangsmåden, ikke den konkrete streng, der genbruges.
 
-[Haaukins](https://haaukins.dk/) er en dansk undervisningsplatform til sikkerhedstræning — opgaverne løses
+[Haaukins](https://haaukins.dk/) er en dansk undervisningsplatform til sikkerhedstræning. Opgaverne løses
 på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Brug siderne som hjælp undervejs
 i dit eget autoriserede trænings- eller CTF-forløb, ikke som en genvej uden om selv at løse opgaven.
 

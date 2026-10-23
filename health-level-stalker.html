@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Health Level Stalker — tutorial (HL7/MLLP)</title>
+<title>Haaukins: Health Level Stalker tutorial (HL7/MLLP)</title>
 <meta name="description" content="Guide til Haaukins Health Level Stalker: MITM en HL7/MLLP-strøm (port 2575) og find flaget i en patientjournal.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/health-level-stalker.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Health Level Stalker — tutorial (HL7/MLLP)">
+<meta property="og:title" content="Haaukins: Health Level Stalker tutorial (HL7/MLLP)">
 <meta property="og:description" content="Guide til Haaukins Health Level Stalker: MITM en HL7/MLLP-strøm (port 2575) og find flaget i en patientjournal.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/health-level-stalker.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Health Level Stalker", "description": "Guide til Haaukins Health Level Stalker: MITM en HL7/MLLP-strøm (port 2575) og find flaget i en patientjournal.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/health-level-stalker.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,14 +27,14 @@
 <p class="subtitle">Aflyt en HL7-journal-udveksling og find flaget i et segment.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>Et hospital sender journaler med "et meget normalt protokol" = <strong>HL7 v2</strong>, pakket i
              <strong>MLLP over TCP (port 2575)</strong>. HL7 er klartekst-segmenter adskilt af <code>|</code> og
              <code>^</code> (<code>MSH</code>, <code>PID</code>, <code>OBR</code>, <code>OBX</code> …), så en MITM kan
              læse hele journalen.</p>
 <h2>Trin for trin</h2>
-<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
+<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
 sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote -w /tmp/hl7.pcap /&lt;server&gt;// ///
 # tekst-protokol -> ofte nok:
 strings /tmp/hl7.pcap | grep -aoiE '(HKN|DDC)\{[^}]*\}'</code></pre>
@@ -48,7 +52,7 @@ læsbart. Er det tekst, er <code>strings | grep</code> et helt legitimt første 
 specialiseret protokollen lyder.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

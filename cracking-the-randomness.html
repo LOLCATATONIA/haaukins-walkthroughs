@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Cracking the Randomness — tutorial (genskab Pythons random-tilstand og knæk en XOR-pad)</title>
-<meta name="description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
+<title>Haaukins: Cracking the Randomness (tutorial: genskab Pythons random-tilstand og knæk en XOR-pad)</title>
+<meta name="description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator. Genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Cracking the Randomness — tutorial (genskab Pythons random-tilstand og knæk en XOR-pad)">
-<meta property="og:description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
+<meta property="og:title" content="Haaukins: Cracking the Randomness (tutorial: genskab Pythons random-tilstand og knæk en XOR-pad)">
+<meta property="og:description" content="Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator. Genskab MT19937&#x27;s interne tilstand og forudsig resten uden at kende seedet.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Cracking the Randomness", "description": "Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator — genskab MT19937's interne tilstand og forudsig resten uden at kende seedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Cracking the Randomness", "description": "Guide til Haaukins Cracking the Randomness: et program lækker 624 rå getrandbits(32)-outputs før det XOR-krypterer et flag med samme generator. Genskab MT19937's interne tilstand og forudsig resten uden at kende seedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/cracking-the-randomness.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -28,7 +32,7 @@
 <p>Kildekoden (<code>main.py</code>) viser alt: programmet skriver 624 rå
              <code>random.getrandbits(32)</code>-værdier til <code>output.txt</code>, og derefter
              XOR-krypterer flaget 4 bytes ad gangen med endnu flere <code>getrandbits(32)</code>-kald som
-             engangs-pad. Pythons <code>random</code> bruger <strong>Mersenne Twister (MT19937)</strong> —
+             engangs-pad. Pythons <code>random</code> bruger <strong>Mersenne Twister (MT19937)</strong>,
              statistisk god, men slet ikke kryptografisk sikker. Hele dens interne tilstand er
              <strong>624 stykker 32-bit heltal</strong>; ser man 624 rå outputs i træk, kan man genskabe
              tilstanden 1:1 og forudsige alt generatoren laver derefter.</p>
@@ -56,7 +60,7 @@ flag_bytes = b''
 for res in remaining_values:
     otp = r.getrandbits(32)
     flag_bytes += (res ^ otp).to_bytes(4, 'big')</code></pre>
-             <p><code>r</code> producerer nu nøjagtig den samme sekvens som originalen ville have gjort —
+             <p><code>r</code> producerer nu nøjagtig den samme sekvens som originalen ville have gjort.
              XOR'et med de resterende linjer i <code>output.txt</code> giver flag-bytes tilbage.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">DDC{Not_so_random_anymore_mr_randcrack}</span></p>
@@ -72,7 +76,7 @@ generator, kun fra en CSPRNG (<code>secrets</code>, <code>os.urandom</code>). Se
 hedsrelevant tal der stammer fra en forudsigelig PRNG, er det et reelt hul, ikke kun en CTF-leg.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

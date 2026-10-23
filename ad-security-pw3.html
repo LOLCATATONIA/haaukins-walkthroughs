@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: AD Security is Great (PW3) — tutorial (NTLM-crack)</title>
-<meta name="description" content="Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + &#x27;AD&#x27;) og knæk den — NTLM = MD4(UTF-16LE(password)).">
+<title>Haaukins: AD Security is Great (PW3) tutorial (NTLM-crack)</title>
+<meta name="description" content="Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + &#x27;AD&#x27;) og knæk den: NTLM = MD4(UTF-16LE(password)).">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ad-security-pw3.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: AD Security is Great (PW3) — tutorial (NTLM-crack)">
-<meta property="og:description" content="Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + &#x27;AD&#x27;) og knæk den — NTLM = MD4(UTF-16LE(password)).">
+<meta property="og:title" content="Haaukins: AD Security is Great (PW3) tutorial (NTLM-crack)">
+<meta property="og:description" content="Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + &#x27;AD&#x27;) og knæk den: NTLM = MD4(UTF-16LE(password)).">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ad-security-pw3.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AD Security is Great (PW3)", "description": "Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + 'AD') og knæk den — NTLM = MD4(UTF-16LE(password)).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ad-security-pw3.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AD Security is Great (PW3)", "description": "Guide til Haaukins AD Security is Great (PW3): genkend en NTLM-hash (uppercase + 'AD') og knæk den: NTLM = MD4(UTF-16LE(password)).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ad-security-pw3.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -25,13 +29,13 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><em>Fil: <code>evidence/credentials/pw-03.txt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
-             <p><code>43239E3A0AF748020D5B426A4977D7E5</code> — 32 hex <strong>uppercase</strong>, og "AD"
+<p><em>Fil: <code>evidence/credentials/pw-03.txt</code>, del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
+             <p><code>43239E3A0AF748020D5B426A4977D7E5</code>: 32 hex <strong>uppercase</strong>, og "AD"
              (Active Directory) i titlen = <strong>NTLM</strong> = <code>MD4(UTF-16LE(password))</code>.</p>
 <h2>Fremgangsmåde</h2>
-<p><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4 — brug
+<p><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4, brug
              OpenSSL legacy-provider (sanity-check) eller en egen MD4 (verificér mod RFC 1320):</p>
-             <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | <span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi — certifikater, kryptering, hashing.">openssl</span> dgst -md4 -provider legacy -provider default
+             <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | <span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi: certifikater, kryptering, hashing.">openssl</span> dgst -md4 -provider legacy -provider default
 # 31d6cfe0...089c0 = NTLM af tomt password</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{supersecret}</span></p>
@@ -45,7 +49,7 @@ knække den. Casing i opgaven (uppercase hex) plus et tema-ord som "AD" er et do
 hash-typen. Læs begge dele som hints, de indsnævrer hvilken <code>-m</code>-mode du skal bruge.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

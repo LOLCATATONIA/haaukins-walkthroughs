@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Bashing My Keyboard — tutorial (dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)</title>
+<title>Haaukins: Bashing My Keyboard (tutorial: dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)</title>
 <meta name="description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Bashing My Keyboard — tutorial (dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)">
+<meta property="og:title" content="Haaukins: Bashing My Keyboard (tutorial: dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)">
 <meta property="og:description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Bashing My Keyboard", "description": "Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -38,7 +42,7 @@ function uploadFile() {
 */</code></pre>
              <p>To ting afsløres direkte: (1) backend kører uploadede <code>.py</code>-filer som
              Python-script ved besøg på <code>/uploads/&lt;filnavn&gt;</code>, og (2) upload kræver en
-             cookie <code>admin=&lt;case-variant af "okaaaayletsgo"&gt;</code> — kommentaren indrømmer
+             cookie <code>admin=&lt;case-variant af "okaaaayletsgo"&gt;</code>. Kommentaren indrømmer
              selv at store/små bogstaver er "tilfældige".</p>
 <h2>Brute-force cookie-casingen</h2>
 <p>13 tegn → 2¹³ = 8192 mulige store/små-bogstav-kombinationer. Trivielt at
@@ -66,11 +70,11 @@ cat /etc/doas.conf
              <pre><code>subprocess.run(["doas","vim","-es",
     "-c", "!ls -la /root &gt; /tmp/out.txt; cat /root/*.txt /root/*flag* &gt;&gt; /tmp/out.txt 2&gt;&amp;1",
     "-c", "qa!"])</code></pre>
-             <p><code>vim -es</code> = "ex silent mode" — kører som batch-script uden interaktiv UI,
+             <p><code>vim -es</code> = "ex silent mode": kører som batch-script uden interaktiv UI,
              nødvendigt når du ikke har en pty over en HTTP-uploadet RCE. <code>/root/flag.txt</code> var
              verdens-læsbar, så den sidste <code>cat</code>-del afslører flaget direkte.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Flag (bemærk det usædvanlige præfiks <strong>HNK{</strong>, ikke HKN{} — formentlig et
+<p>Flag (bemærk det usædvanlige præfiks <strong>HNK{</strong>, ikke HKN{}, formentlig et
         ordspil på keyBoARD-temaet, eller en bevidst tastefejl): <span class="flag">HNK{w3w_7h47_700k_qu173_4_7urn}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
@@ -84,7 +88,7 @@ søgerummet før du gætter: en case-varieret 13-tegns streng er kun 2^13 muligh
 situation som mange web-shells: du kan køre kommandoer, men ikke "sidde" i en pty.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

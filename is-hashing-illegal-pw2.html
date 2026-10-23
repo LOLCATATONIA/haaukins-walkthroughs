@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Is Hashing Illegal? (PW2) — tutorial (MD5-crack)</title>
+<title>Haaukins: Is Hashing Illegal? (PW2) tutorial (MD5-crack)</title>
 <meta name="description" content="Guide til Haaukins Is Hashing Illegal (PW2): identificér en MD5-hash og knæk den med en rockyou dictionary-attack.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/is-hashing-illegal-pw2.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Is Hashing Illegal? (PW2) — tutorial (MD5-crack)">
+<meta property="og:title" content="Haaukins: Is Hashing Illegal? (PW2) tutorial (MD5-crack)">
 <meta property="og:description" content="Guide til Haaukins Is Hashing Illegal (PW2): identificér en MD5-hash og knæk den med en rockyou dictionary-attack.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/is-hashing-illegal-pw2.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Is Hashing Illegal? (PW2)", "description": "Guide til Haaukins Is Hashing Illegal (PW2): identificér en MD5-hash og knæk den med en rockyou dictionary-attack.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/is-hashing-illegal-pw2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -25,11 +29,11 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><em>Fil: <code>evidence/credentials/pw-02.txt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
+<p><em>Fil: <code>evidence/credentials/pw-02.txt</code>, del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
              <p>En ulæselig credential: <code>380fbafd2a92eb8d442b419f18e43fce</code> = 32 hex-tegn = <strong>MD5</strong>.</p>
-             <pre><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 0 -a 0 hash.txt rockyou.txt        # eller <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=raw-md5
+             <pre><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 0 -a 0 hash.txt rockyou.txt        # eller <span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=raw-md5
 # python: hashlib.md5(word).hexdigest() == target</code></pre>
-             <p>En lille dansk ordliste gav intet — den fulde <code>rockyou.txt</code> (14,3M ord) knækkede den.</p>
+             <p>En lille dansk ordliste gav intet. Den fulde <code>rockyou.txt</code> (14,3M ord) knækkede den.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{canttouchme}</span></p>
 </details>
@@ -43,7 +47,7 @@ at hashe en masse kandidater og sammenligne. Derfor virker det kun på svage/gæ
 tilfældig 20-tegns adgangskode knækker rockyou aldrig.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

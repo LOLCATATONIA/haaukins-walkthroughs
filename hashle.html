@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Hashle — tutorial</title>
+<title>Haaukins: Hashle tutorial</title>
 <meta name="description" content="Guide til Haaukins Hashle: en Wordle-på-MD5-service; brug feedbacken til at filtrere rockyou ned til én kandidat.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hashle.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Hashle — tutorial">
+<meta property="og:title" content="Haaukins: Hashle tutorial">
 <meta property="og:description" content="Guide til Haaukins Hashle: en Wordle-på-MD5-service; brug feedbacken til at filtrere rockyou ned til én kandidat.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hashle.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hashle", "description": "Guide til Haaukins Hashle: en Wordle-på-MD5-service; brug feedbacken til at filtrere rockyou ned til én kandidat.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hashle.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -20,12 +24,12 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Hashle</h1>
-<p class="subtitle">Brug Wordle-feedback til at filtrere rockyou — ikke gætte.</p>
+<p class="subtitle">Brug Wordle-feedback til at filtrere rockyou, ikke gætte.</p>
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> hashle.hkn 1337</code> viser MD5(gæt) (32 hex-cifre) + en Wordle-feedback på
+<p><code><span class="gloss" tabindex="0" data-tip="Netcat: rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> hashle.hkn 1337</code> viser MD5(gæt) (32 hex-cifre) + en Wordle-feedback på
              hex-cifrene mod target-MD5: grøn = rigtigt ciffer på rigtig position, gul = ciffer findes et andet
              sted, sort = fraværende. Du har 6 gæt. Gæt noget (fx <code>password</code>), og brug feedbacken til
              at <strong>filtrere</strong> rockyou, i stedet for at gætte blindt videre.</p>
@@ -74,7 +78,7 @@ muligheder. Når du ser begrænsede gæt men rig feedback, så flyt arbejdet OFF
 kandidatliste med den feedback du allerede har fået, i stedet for at brænde forsøg.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

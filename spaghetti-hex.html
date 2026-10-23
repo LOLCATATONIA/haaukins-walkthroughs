@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Spaghetti Hex — tutorial (EXIF &amp; Baconian cipher)</title>
-<meta name="description" content="Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking — med de vigtige flag-format-konventioner.">
+<title>Haaukins: Spaghetti Hex, tutorial (EXIF &amp; Baconian cipher)</title>
+<meta name="description" content="Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking, med de vigtige flag-format-konventioner.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/spaghetti-hex.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Spaghetti Hex — tutorial (EXIF &amp; Baconian cipher)">
-<meta property="og:description" content="Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking — med de vigtige flag-format-konventioner.">
+<meta property="og:title" content="Haaukins: Spaghetti Hex, tutorial (EXIF &amp; Baconian cipher)">
+<meta property="og:description" content="Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking, med de vigtige flag-format-konventioner.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/spaghetti-hex.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Spaghetti Hex (-0 til -4)", "description": "Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking — med de vigtige flag-format-konventioner.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/spaghetti-hex.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Spaghetti Hex (-0 til -4)", "description": "Guide til Haaukins Spaghetti Hex-serien: JPEG-signaturer, EXIF-forensics (device/location), Baconian cipher efter EOI, og WinZip-AES-cracking, med de vigtige flag-format-konventioner.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/spaghetti-hex.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -31,12 +35,12 @@
              <li><strong>-0/-1 (signaturer):</strong> JPEG starter med <code>FF D8 FF</code>, slutter med
              <code>FF D9</code>.</li>
              <li><strong>-2/-3 (EXIF):</strong> <code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span> carbonara.jpg</code> giver device (<code>iphone 13</code>);
-             en <em>manipuleret</em> ExifIFD-pointer gemte <code>Location: Venice</code> (det synlige "Rome" var decoy —
+             en <em>manipuleret</em> ExifIFD-pointer gemte <code>Location: Venice</code> (det synlige "Rome" var decoy,
              læs den rå EXIF).</li>
              <li><strong>-4 (Baconian):</strong> 22 grupper á 5 bit efter JPEG-EOI = Baconian cipher (opgaven sagde
              "using BACON"). Klassisk 24-bogstavs (I=J, U=V) → <code>COOKINGWATERINTHESAUCE</code>.</li>
-             <li><strong>Zip:</strong> WinZip-AES — knæk kun mod den lille fil-entry for fart
-             (<code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker — knækker hashes mod en wordlist.">hashcat</span> -m 13600</code>) → password <code>Barilla</code>; <code><span class="gloss" tabindex="0" data-tip="Arkiv-værktøj (7-Zip) der bl.a. kan udpakke password-beskyttede arkiver.">7z</span> x -pBarilla</code>.</li>
+             <li><strong>Zip:</strong> WinZip-AES, knæk kun mod den lille fil-entry for fart
+             (<code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 13600</code>) → password <code>Barilla</code>; <code><span class="gloss" tabindex="0" data-tip="Arkiv-værktøj (7-Zip) der bl.a. kan udpakke password-beskyttede arkiver.">7z</span> x -pBarilla</code>.</li>
              </ul>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p><strong>Format-konventioner (vigtige):</strong> signaturer = hex m. mellemrum + uppercase; tekst-svar
@@ -58,7 +62,7 @@ ord-længder. Og som gennemgående tema i hele denne serie: når svaret afvises,
 (casing, mellemrum, præfiks) næsten altid problemet, ikke indholdet.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

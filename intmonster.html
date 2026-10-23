@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Intmonster — tutorial (char-overflow)</title>
+<title>Haaukins: Intmonster, tutorial (char-overflow)</title>
 <meta name="description" content="Guide til Haaukins Intmonster: vind et &#x27;uvindbart&#x27; nc-spil ved at udnytte en char-overflow og rækkefølgen af win-tjekket.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/intmonster.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Intmonster — tutorial (char-overflow)">
+<meta property="og:title" content="Haaukins: Intmonster, tutorial (char-overflow)">
 <meta property="og:description" content="Guide til Haaukins Intmonster: vind et &#x27;uvindbart&#x27; nc-spil ved at udnytte en char-overflow og rækkefølgen af win-tjekket.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/intmonster.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Intmonster", "description": "Guide til Haaukins Intmonster: vind et 'uvindbart' nc-spil ved at udnytte en char-overflow og rækkefølgen af win-tjekket.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/intmonster.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,14 +27,14 @@
 <p class="subtitle">Vind et 'uvindbart' spil via en char-overflow.</p>
 <div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
-<p><code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> intmonster.hkn 9000</code>: du gør 10 skade/runde, monsteret 15 — du dør først. Men
+<p><code><span class="gloss" tabindex="0" data-tip="Netcat: rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> intmonster.hkn 9000</code>: du gør 10 skade/runde, monsteret 15, du dør først. Men
              kildekoden afslører: <code>char myHealth</code> (8-bit, max 127), og
              <code>myHealth = (char)abs(myHealth - poison)</code> lader dig sætte health til 127 ved
              <code>poison = health + 127</code> (gratis heal). Monster-død tjekkes <em>før</em> monsteret slår.</p>
 <h2>Exploit</h2>
-<p>Angrib til lav health, drik gift (reset til 127), gentag — 9 angreb kræves (monster 90/10).</p>
+<p>Angrib til lav health, drik gift (reset til 127), gentag. 9 angreb kræves (monster 90/10).</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget udskrives når monsterHealth ≤ 0 (afleveres som DDC):</p>
         <p>Flag (per-instans): <span class="flag">DDC{j8oZfWrouvq9}</span></p>
@@ -46,7 +50,7 @@ tjekkes før monsteret slår) er lige så udnytteligt som selve overflow'et. Læ
 "hvad hvis dette tal bliver meget stort eller negativt?".</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

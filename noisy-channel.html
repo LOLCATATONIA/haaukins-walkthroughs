@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Noisy Channel — tutorial (svag RSA + en vishing-optagelse med skjulte tonetal)</title>
-<meta name="description" content="Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard&#x27;s rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler — kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.">
+<title>Haaukins: Noisy Channel (tutorial: svag RSA + en vishing-optagelse med skjulte tonetal)</title>
+<meta name="description" content="Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard&#x27;s rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler. Kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/noisy-channel.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Noisy Channel — tutorial (svag RSA + en vishing-optagelse med skjulte tonetal)">
-<meta property="og:description" content="Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard&#x27;s rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler — kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.">
+<meta property="og:title" content="Haaukins: Noisy Channel (tutorial: svag RSA + en vishing-optagelse med skjulte tonetal)">
+<meta property="og:description" content="Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard&#x27;s rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler. Kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/noisy-channel.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Noisy Channel", "description": "Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard's rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler — kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/noisy-channel.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Noisy Channel", "description": "Guide til Haaukins Noisy Channel: en 257-bit RSA-nøgle falder på sekunder til Pollard's rho, og en vishing-samtale skjuler et password og et CPR-nummer som enkelt-tone-akustiske signaler. Kalibrér frekvens-til-ciffer-tabellen via det kendte password, og brute-force selve flag-formatet når cifferordenen ikke kan udledes matematisk.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/noisy-channel.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -26,12 +30,12 @@
 
 <h2>Opgaven</h2>
 <p>To downloadbare filer (ingen VPN/live-host nødvendig): <code>it_is_so_dangerous.txt</code>
-             (RSA-parametre) og <code>Conversation.m4a</code> — en ægte 3:22 lang vishing-opkald-optagelse,
+             (RSA-parametre) og <code>Conversation.m4a</code>, en ægte 3:22 lang vishing-opkald-optagelse,
              hvor "Ahmed fra cyberbanken" overtaler offeret "Jens" til at oprette en ny konto og indtaste et
              nyt password og sit CPR-nummer via telefon-toner.</p>
 <h2>RSA-delen: en bevidst svag 257-bit nøgle</h2>
 <p><code>it_is_so_dangerous.txt</code> giver <code>N</code>, <code>e</code> og
-             ciffertekst direkte. <code>N</code> er kun <strong>257 bit</strong> — håbløst lille til RSA
+             ciffertekst direkte. <code>N</code> er kun <strong>257 bit</strong>, håbløst lille til RSA
              (normal er ≥2048 bit). <strong>Pollard's rho</strong> (Brent-varianten, ren Python, ingen
              eksterne biblioteker) faktoriserer den på omkring 110 sekunder, fordi <code>p</code> og
              <code>q</code> er stærkt ubalancerede (52-bit vs. 205-bit):</p>
@@ -60,25 +64,25 @@ print(m.to_bytes((m.bit_length()+7)//8, 'big'))
 <p>Transskriberet med lokal Whisper. På en almindelig Kali:</p>
              <pre><code>sudo apt install -y ffmpeg
 pip install openai-whisper
-<span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model — transskriberer lydfiler lokalt.">whisper</span> samtale.wav --model base</code></pre>
+<span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model: transskriberer lydfiler lokalt.">whisper</span> samtale.wav --model base</code></pre>
              <p>(Vi kørte selv <code>nix shell nixpkgs#openai-whisper nixpkgs#ffmpeg</code>, samme resultat.
              Whisper fejler STILLE, exit 0, ingen fejlmeddelelse, hvis <code>ffmpeg</code> ikke findes i
              samme shell, installér altid begge sammen.)</p>
              <p>Samtalen beder Jens om at indtaste sit nye 6-cifrede password og senere sit CPR-nummer, begge
              via telefon-toner lige efter et "long beep". <strong>Vigtig faldgrube:</strong> det er ikke
-             almindelig telefon-DTMF (to samtidige toner fra et 697-941Hz/1209-1633Hz-gitter) — det er
+             almindelig telefon-DTMF (to samtidige toner fra et 697-941Hz/1209-1633Hz-gitter), det er
              <strong>kun én enkelt tone pr. ciffer</strong>, en custom kodning.</p>
 <h2>Kalibrér tabellen via det allerede kendte password</h2>
 <p>Fordi RSA-delen allerede afslørede passwordet (<code>523635</code>), kan
              frekvens→ciffer-tabellen kalibreres direkte uden at skulle gætte: mål dominant-frekvensen i
-             hver toneblok (STFT, ren FFT — ingen DTMF-antagelse) og match mod de kendte cifre i
+             hver toneblok (STFT, ren FFT, ingen DTMF-antagelse) og match mod de kendte cifre i
              rækkefølge:</p>
              <pre><code>Blok-frekvenser (password 523635): 460, 340, 620, 420, 620, 460 Hz
 Cifre (kendt fra RSA):               5,   2,   3,   6,   3,   5</code></pre>
              <p>→ <code>2→340Hz, 3→620Hz, 5→460Hz, 6→420Hz</code>. Frekvenserne ligger på et
-             <strong>40Hz-spacet gitter</strong>: <code>{300,340,380,420,460,500,540,580,620,660}</code> —
+             <strong>40Hz-spacet gitter</strong>: <code>{300,340,380,420,460,500,540,580,620,660}</code>,
              tydeligvis designet til præcis 10 cifre (0-9), men UDEN en udregnelig formel (hverken lineær
-             <code>freq=base+N·step</code> eller en MIDI/semitone-skala gav et rent mønster) — en bevidst
+             <code>freq=base+N·step</code> eller en MIDI/semitone-skala gav et rent mønster), en bevidst
              vilkårlig/shufflet tabel.</p>
              <p>Vi har klippet den rene password-tone-sekvens ud til dig, så du kan se/høre præcis hvordan
              den lyder uden selv at skulle lede efter den i den fulde samtale:</p>
@@ -86,7 +90,7 @@ Cifre (kendt fra RSA):               5,   2,   3,   6,   3,   5</code></pre>
 <h2>CPR-vinduet: svag energi, kræver lav tærskel</h2>
 <p>CPR-indtastningen ligger senere i samtalen, delvist camoufleret med nævnt
              "støvsugerstøj". En automatisk energi-tærskel-baseret segmentering overser typisk 2-3 svage
-             toner — brug i stedet en <strong>mål-frekvens-scanner</strong> der eksplicit tjekker hver af de
+             toner. Brug i stedet en <strong>mål-frekvens-scanner</strong> der eksplicit tjekker hver af de
              10 gitter-frekvenser i hvert tidsvindue, i stedet for kun at tage den stærkeste top pr.
              frame:</p>
              <pre><code>from scipy.signal import stft
@@ -104,14 +108,14 @@ for gf in grid:
              <pre><code>300,660,500,420,380,580,340,540,620,460 Hz
   9,  0,  4,  6,  1,  7,  2,  8,  3,  5   (via tabellen ovenfor)</code></pre>
              <p>Her er vores udklippede, isolerede CPR-tone-sekvens, til samme formål som password-klippet
-             ovenfor — opgaven handler om at AFKODE tonerne, ikke om at redigere lydfiler, så vi sparer dig
+             ovenfor. Opgaven handler om at AFKODE tonerne, ikke om at redigere lydfiler, så vi sparer dig
              udklipningen:</p>
              <audio controls style="width:100%;max-width:420px"><source src="assets/noisy-channel-cpr.wav" type="audio/wav"></audio>
 <h2>Flag-formatet er selv en gættekonkurrence</h2>
 <p>Hverken passwordet alene (<code>HKN{523635}</code>, <code>DDC{523635}</code> m.fl.) eller
-             CPR-nummeret som rå streng er flaget — begge giver <code>400 Unknown flag</code>. Da selve
+             CPR-nummeret som rå streng er flaget. Begge giver <code>400 Unknown flag</code>. Da selve
              cifferordenen for 6 af de 10 gitter-frekvenser (0,1,4,7,8,9) ikke kan udledes matematisk uden
-             flere ankerpunkter, er den resterende usikkerhed kun <code>6! = 720</code> permutationer — lille
+             flere ankerpunkter, er den resterende usikkerhed kun <code>6! = 720</code> permutationer, lille
              nok til at brute-force direkte mod platformens eget svar-API, i stedet for at gætte formatet
              blindt:</p>
              <pre><code>import itertools
@@ -136,7 +140,7 @@ angrebet (under ~512-bit RSA falder til Pollard's rho), og lydsignaler kan bære
 bølgeformen.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

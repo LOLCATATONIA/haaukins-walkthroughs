@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Broken but not Lost — tutorial (forkert filendelse)</title>
-<meta name="description" content="Guide til Haaukins Broken but not Lost: filen er ikke korrupt — navnet lyver. file afslører et JPEG med flaget skrevet i billedet.">
+<title>Haaukins: Broken but not Lost tutorial (forkert filendelse)</title>
+<meta name="description" content="Guide til Haaukins Broken but not Lost: filen er ikke korrupt, navnet lyver. file afslører et JPEG med flaget skrevet i billedet.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/broken-but-not-lost.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Broken but not Lost — tutorial (forkert filendelse)">
-<meta property="og:description" content="Guide til Haaukins Broken but not Lost: filen er ikke korrupt — navnet lyver. file afslører et JPEG med flaget skrevet i billedet.">
+<meta property="og:title" content="Haaukins: Broken but not Lost tutorial (forkert filendelse)">
+<meta property="og:description" content="Guide til Haaukins Broken but not Lost: filen er ikke korrupt, navnet lyver. file afslører et JPEG med flaget skrevet i billedet.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/broken-but-not-lost.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Broken but not Lost", "description": "Guide til Haaukins Broken but not Lost: filen er ikke korrupt — navnet lyver. file afslører et JPEG med flaget skrevet i billedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/broken-but-not-lost.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Broken but not Lost", "description": "Guide til Haaukins Broken but not Lost: filen er ikke korrupt, navnet lyver. file afslører et JPEG med flaget skrevet i billedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/broken-but-not-lost.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -20,12 +24,12 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Broken but not Lost</h1>
-<p class="subtitle">Filen er ikke i stykker — filnavnet lyver bare.</p>
+<p class="subtitle">Filen er ikke i stykker, filnavnet lyver bare.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p><em>Fil: <code>evidence/corrupted/01-3xt</code> — del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
+<p><em>Fil: <code>evidence/corrupted/01-3xt</code>, del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
              <p>En "ødelagt" fil <code>01-3xt</code>. Men <code>file</code> læser de faktiske magic bytes:</p>
              <pre><code>file 01-3xt            # -> JPEG image data   (navnet løj!)
 cp 01-3xt 01.jpg       # åbn -> flaget står skrevet i billedet</code></pre>
@@ -33,7 +37,7 @@ cp 01-3xt 01.jpg       # åbn -> flaget står skrevet i billedet</code></pre>
 <p>Flag: <span class="flag">HKN{1mp0rt4nc3_0f_3xt3nsi0ns}</span></p>
         <figure class="shot">
         <img src="assets/broken-but-not-lost-flag.jpg" alt="Det omdøbte billede: en kat i en papkasse med flaget HKN{1mp0rt4nc3_0f_3xt3nsi0ns} malet ind i billedet.">
-        <figcaption>Når filen åbnes som <code>.jpg</code>: flaget står skrevet direkte i billedet (per-instans-opgaver kan vise et andet flag — her er pointen <em>hvor</em> det står).</figcaption>
+        <figcaption>Når filen åbnes som <code>.jpg</code>: flaget står skrevet direkte i billedet (per-instans-opgaver kan vise et andet flag, her er pointen <em>hvor</em> det står).</figcaption>
         </figure>
 </details>
 <h2>Hvad du har lært</h2>
@@ -45,7 +49,7 @@ når du får en ukendt eller "ødelagt" fil. Samme pointe går igen i <a href="d
 (en ZIP forklædt som JPEG). Gør det til en refleks: kør <code>file</code> før du tror på navnet.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

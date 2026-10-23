@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: In the City — tutorial (pcap → billede → zip-password)</title>
+<title>Haaukins: In the City, tutorial (pcap → billede → zip-password)</title>
 <meta name="description" content="Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: In the City — tutorial (pcap → billede → zip-password)">
+<meta property="og:title" content="Haaukins: In the City, tutorial (pcap → billede → zip-password)">
 <meta property="og:description" content="Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "In the City", "description": "Guide til Haaukins In the City: udtræk HTTP-objekter fra en pcap, læs zip-passwordet der er malet ind i et af billederne, og åbn den krypterede zip.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/in-the-city.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -20,21 +24,21 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>In the City</h1>
-<p class="subtitle">"Look closely" var bogstaveligt — zip-passwordet er malet ind i et billede.</p>
+<p class="subtitle">"Look closely" var bogstaveligt: zip-passwordet er malet ind i et billede.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r trace.pcap --export-objects http,out    # 5 JPG'er + secret.zip (ZipCrypto)
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark: filtrerer og læser pcap-trafik.">tshark</span> -r trace.pcap --export-objects http,out    # 5 JPG'er + secret.zip (ZipCrypto)
 # "look closely" = kig VISUELT på billederne; passwordet står på hyperreality_wormhole.jpg
 unzip -P SALAMISLICE secret.zip     # -> secret.txt = flaget</code></pre>
-             <p><strong>Fælde:</strong> pcap'en har også en iøjnefaldende 1-byte "I/M" covert-kanal — det er en
+             <p><strong>Fælde:</strong> pcap'en har også en iøjnefaldende 1-byte "I/M" covert-kanal. Det er en
              <em>afledning</em>; den koder ikke passwordet. Se på billederne FØR du dykker i pakke-niveau.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Zip-password <code>SALAMISLICE</code> → flag <span class="flag">HKN{4n-0p3n-d00r}</span>.</p>
         <figure class="shot">
         <img src="assets/in-the-city-flag.png" alt="Zoom af hyperreality_wormhole.jpg: ordet SALAMISLICE skrevet lodret i mørk tekst på et gult skilt.">
-        <figcaption>Zoom af <code>hyperreality_wormhole.jpg</code>: zip-passwordet <code>SALAMISLICE</code> er malet <em>lodret</em> ind på et af de gule skilte i Chinatown-fotoet — nemt at overse, derfor "look closely".</figcaption>
+        <figcaption>Zoom af <code>hyperreality_wormhole.jpg</code>: zip-passwordet <code>SALAMISLICE</code> er malet <em>lodret</em> ind på et af de gule skilte i Chinatown-fotoet, nemt at overse, derfor "look closely".</figcaption>
         </figure>
 </details>
 <h2>Hvad du har lært</h2>
@@ -48,7 +52,7 @@ for iøjnefaldende "covert channels" der viser sig at være afledninger, det fla
 altid det rigtige.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Public WiFi — tutorial (OSINT)</title>
+<title>Haaukins: Public WiFi, tutorial (OSINT)</title>
 <meta name="description" content="Guide til Haaukins Public WiFi: find det sidste netværksnavn (SSID) i en netværkslog.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/public-wifi.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Public WiFi — tutorial (OSINT)">
+<meta property="og:title" content="Haaukins: Public WiFi, tutorial (OSINT)">
 <meta property="og:description" content="Guide til Haaukins Public WiFi: find det sidste netværksnavn (SSID) i en netværkslog.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/public-wifi.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Public WiFi", "description": "Guide til Haaukins Public WiFi: find det sidste netværksnavn (SSID) i en netværkslog.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/public-wifi.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -25,9 +29,9 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p>Denne opgave hører til <code>forensics_dcis-osint.zip</code> — <strong>bevis-bundtet</strong> fra
+<p>Denne opgave hører til <code>forensics_dcis-osint.zip</code>, <strong>bevis-bundtet</strong> fra
 Introduction-opgaven (en forensisk dump af en mistænkts laptop).
-Kortlæg altid hele bundtet først — <code>find . -type f | sort</code> — og hold øje med <code>journal.md</code>,
+Kortlæg altid hele bundtet først (<code>find . -type f | sort</code>), og hold øje med <code>journal.md</code>,
 chatlogs og skjulte mapper (<code>.trash/</code>, <code>.backup/</code>). Halvdelen af kampen er at ramme
 <strong>flag-formatet</strong> præcist.</p>
 <h2>Find svaret</h2>
@@ -47,7 +51,7 @@ og trusselsanalytikere gør. Og flag-format-fælderne her (skrevne tal, et beste
 træner en bredere disciplin: svar præcist på det der spørges om, ikke på det der ligner svaret.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

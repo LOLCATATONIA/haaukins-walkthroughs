@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Always Be Crypting — tutorial (knæk en substitutionscipher med en crib)</title>
+<title>Haaukins: Always Be Crypting (tutorial: knæk en substitutionscipher med en crib)</title>
 <meta name="description" content="Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Always Be Crypting — tutorial (knæk en substitutionscipher med en crib)">
+<meta property="og:title" content="Haaukins: Always Be Crypting (tutorial: knæk en substitutionscipher med en crib)">
 <meta property="og:description" content="Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Always Be Crypting", "description": "Guide til Haaukins Always Be Crypting (hardcore-eventet): en interaktiv netcat-service viser en selvforklarende substitutionscipher-tekst; knæk nøglen via et crib i stedet for blind frekvensanalyse, og byg flaget live via server-protokollen.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/always-be-crypting.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -20,17 +24,17 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Always Be Crypting</h1>
-<p class="subtitle">Cifferteksten forklarer sin egen løsningsmetode — du skal bare genkende den.</p>
+<p class="subtitle">Cifferteksten forklarer sin egen løsningsmetode, du skal bare genkende den.</p>
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad møder du?</h2>
-<p><code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> abcrypt.hkn 1337</code> stiller nogle ja/nej-spørgsmål om terminalfarver, og viser
+<p><code><span class="gloss" tabindex="0" data-tip="Netcat: rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> abcrypt.hkn 1337</code> stiller nogle ja/nej-spørgsmål om terminalfarver, og viser
              derefter en lang, krypteret tekst. Teksten er krypteret med en klassisk
              <strong>monoalfabetisk substitutionscipher</strong> (hvert bogstav A-Z er erstattet 1:1 med et
              andet bogstav, konsekvent gennem hele teksten).</p>
 <h2>Crib i stedet for frekvensanalyse</h2>
-<p>Cifferteksten er ikke tilfældig — den er en standard-forklaring af, hvordan man knækker
+<p>Cifferteksten er ikke tilfældig, den er en standard-forklaring af, hvordan man knækker
              netop denne type cipher ("one way to solve an encrypted message, if we know its language, is
              to find a different plaintext of the same language long enough to..."). Det betyder du kan
              <strong>gætte de første ord</strong> ("ONE WAY TO SOLVE...") og udvide nøglen bogstav for
@@ -40,7 +44,7 @@ ciphertext = "VJW ZCB KV AVILW ..."
 # gæt: "ONE WAY TO SOLVE" matcher mønstret "VJW ZCB KV AVILW" i længde
 # => V=O, J=N, W=E, Z=A, C=W, B=Y, K=T, V=O (konsistent!), A=S, I=L, L=V, W=E (konsistent!)
 # udvid ordet for ord indtil hele 26-bogstavs-nøglen er låst</code></pre>
-             <p>Hele teksten giver meningsfuldt engelsk når nøglen er færdig — det er din bekræftelse på at
+             <p>Hele teksten giver meningsfuldt engelsk når nøglen er færdig: det er din bekræftelse på at
              du har ramt rigtigt, uden at skulle køre en eneste frekvenstælling.</p>
 <h2>Byg flaget via serverens protokol</h2>
 <p>Serveren beder derefter om input i formatet <code>CIPHERBOGSTAV:PLAINBOGSTAV</code>
@@ -68,7 +72,7 @@ genkende cipher-typen på dens struktur: bevarede ordlængder peger på simpel s
 moderne blokchiffer.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

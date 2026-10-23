@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Red light green light — tutorial (timing-gate &amp; PRNG)</title>
-<meta name="description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.">
+<title>Haaukins: Red light green light, tutorial (timing-gate &amp; PRNG)</title>
+<meta name="description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt, uden at floode serverens input-kø.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Red light green light — tutorial (timing-gate &amp; PRNG)">
-<meta property="og:description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.">
+<meta property="og:title" content="Haaukins: Red light green light, tutorial (timing-gate &amp; PRNG)">
+<meta property="og:description" content="Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt, uden at floode serverens input-kø.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Red light, green light", "description": "Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt — uden at floode serverens input-kø.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Red light, green light", "description": "Guide til Haaukins Red light green light: forudsig en srand(time)-baseret lys-timer og styr en bot der kun løber i grønt, uden at floode serverens input-kø.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/red-light-green-light.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -23,16 +27,16 @@
 <p class="subtitle">Forudsig en tids-seedet lys-timer og løb kun i grønt.</p>
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Vinde-logikken (statisk RE)</h2>
 <p>Et <code>SIGALRM</code> flipper <code>greenlight</code> hvert <code>(rand()%7)+3</code> sek. At køre
-             (<code>isRunning==1</code>) når lyset bliver rødt = instant tab (tjekkes synkront i handleren — kun
+             (<code>isRunning==1</code>) når lyset bliver rødt = instant tab (tjekkes synkront i handleren, kun
              forebyggelse virker). <code>distanceRun</code> akkumulerer over grønne vinduer; &gt;7 → <code>cat /root/flag.txt</code>.</p>
 <h2>Exploit: forudsig timeren + styr send-kadencen</h2>
 <p><code>srand(time(NULL))</code> gør hver forsinkelse forudsigelig hvis du kender serverens klokke-sekund.
              Observér første grønne vindues længde → pin klokke-skew (±10s) med en glibc-<code>random()</code>-reimpl →
              forudsig alle vinduer → <code>runFast</code> kun med sikker margin. (glibc's <code>rand()</code> bruger
-             samme TYPE_3-generator som <code>random()</code>, så Pythons <code>random</code> matcher ikke — brug samme
+             samme TYPE_3-generator som <code>random()</code>, så Pythons <code>random</code> matcher ikke. Brug samme
              reimpl som i <a href="ransomgang-returns.html">RansomGang Returns</a>.)</p>
              <p><strong>Kritisk fælde:</strong> skriv <em>langsommere</em> end serverens ~1Hz <code>fgets()</code>-forbrug
              (fx hver 1.2s). Flooder du, bygger der en FIFO-kø af gamle beslutninger → fasen desynkroniserer og du taber
@@ -51,7 +55,7 @@ Og forudsigelig tilfældighed fra <code>srand(time())</code> er en reel, tilbage
 svaghed.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

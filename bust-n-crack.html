@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Bust-N-Crack — tutorial (Bust &amp; Crack)</title>
+<title>Haaukins: Bust-N-Crack tutorial (Bust &amp; Crack)</title>
 <meta name="description" content="Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Bust-N-Crack — tutorial (Bust &amp; Crack)">
+<meta property="og:title" content="Haaukins: Bust-N-Crack tutorial (Bust &amp; Crack)">
 <meta property="og:description" content="Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Bust-N-Crack", "description": "Guide til Haaukins Bust-N-Crack: find en glemt fil via Apache directory listing (Bust), knæk den krypterede SSH-nøgle med ssh2john, og brug den som pivot (Crack).", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/bust-n-crack.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,14 +27,14 @@
 <p class="subtitle">Directory listing → en krypteret nøgle → ssh2john → pivot ind.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Find serveren</h2>
 <p>Opgavens hostname, fx <code>bustncrack.com</code>, er trods <code>.com</code>-endelsen en
              Haaukins-intern lab-host. Den findes ikke på det rigtige internet. Start lab'et, find dets IP, og
              tilføj navnet til <code>/etc/hosts</code> (se <a href="kom-i-gang.html">Kom i gang</a> hvis du ikke
              allerede har gjort det). Tjek derefter at webserveren svarer:</p>
              <pre><code>curl -s -o /dev/null -w "%{http_code}\n" http://bustncrack.com/</code></pre>
-<h2>Bust — directory listing</h2>
+<h2>Bust: directory listing</h2>
 <p>Apache directory listing er slået til, men stien er ikke linket fra forsiden. Du skal selv
              finde den. En hurtig content-discovery-scan:</p>
              <pre><code><span class="gloss" tabindex="0" data-tip="Brute-forcer skjulte URL-stier/filer/subdomæner på en webserver.">gobuster</span> dir -u http://bustncrack.com/ -w /usr/share/wordlists/dirb/common.txt
@@ -40,14 +44,14 @@
              <pre><code>curl -sO http://bustncrack.com/privacy/flag.txt
 curl -sO http://bustncrack.com/privacy/key.txt
 cat flag.txt     # dette er Bust-flaget</code></pre>
-<h2>Crack — ssh2john + pivot</h2>
+<h2>Crack: ssh2john + pivot</h2>
 <p><code>key.txt</code> er en adgangskode-beskyttet PEM-nøgle. Den kan ikke bruges direkte til
-             <code>ssh</code> uden passphrasen. Knæk den offline med <code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code> + <code><span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span></code>
+             <code>ssh</code> uden passphrasen. Knæk den offline med <code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code> + <code><span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span></code>
              (hurtigere end at gætte den live mod SSH-serveren, og uden at risikere lockout):</p>
              <pre><code>ssh2john key.txt > key.hash
 john --format=SSH --wordlist=/usr/share/wordlists/rockyou.txt key.hash
 john --show key.hash                                   # -> ChangeMe
-<span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi — certifikater, kryptering, hashing.">openssl</span> rsa -in key.txt -passin pass:ChangeMe -check    # bekræft at passphrasen er rigtig</code></pre>
+<span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi: certifikater, kryptering, hashing.">openssl</span> rsa -in key.txt -passin pass:ChangeMe -check    # bekræft at passphrasen er rigtig</code></pre>
              <p>Passphrasen i sig selv er <em>ikke</em> flaget. Nøglen er et pivot-middel ind på en SSH-konto.
              Afkryptér nøglen (fjern passphrase-kravet) og log ind med den:</p>
              <pre><code>openssl rsa -in key.txt -passin pass:ChangeMe -out dec_key
@@ -71,7 +75,7 @@ til et hash du kan angribe lokalt, langt hurtigere og mere stealthy end at hamre
 tjenesten. Og husk at det du knækker sjældent er målet, det er nøglen til næste dør.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Water Tank — tutorial (Modbus TCP uden auth, forbi en read-only web-dashboard)</title>
+<title>Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi en read-only web-dashboard)</title>
 <meta name="description" content="Guide til Haaukins Water Tank: et pænt web-dashboard er kun en read-only afspejling; den rigtige kontrolkanal er Modbus TCP på port 502 uden nogen autentificering.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/water-tank.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Water Tank — tutorial (Modbus TCP uden auth, forbi en read-only web-dashboard)">
+<meta property="og:title" content="Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi en read-only web-dashboard)">
 <meta property="og:description" content="Guide til Haaukins Water Tank: et pænt web-dashboard er kun en read-only afspejling; den rigtige kontrolkanal er Modbus TCP på port 502 uden nogen autentificering.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/water-tank.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Water Tank", "description": "Guide til Haaukins Water Tank: et pænt web-dashboard er kun en read-only afspejling; den rigtige kontrolkanal er Modbus TCP på port 502 uden nogen autentificering.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/water-tank.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -27,11 +31,11 @@
 <h2>Web-laget er kun en afspejling</h2>
 <p><code>http://water-tank.hkn</code> poller <code>/update</code> hvert 1,5 sekund og
              viser <code>security</code>, <code>water_level</code>, <code>temperature</code> som JSON.
-             <code>/update</code> er GET-only (405 på andre metoder) — ingen skriv-vej via web-laget.</p>
-             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p1-10000 --open &lt;ip&gt;
+             <code>/update</code> er GET-only (405 på andre metoder), ingen skriv-vej via web-laget.</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p1-10000 --open &lt;ip&gt;
 # 80/tcp  open  http
 # 502/tcp open  mbap        &lt;-- Modbus TCP!</code></pre>
-             <p>Port 502 (Modbus TCP, "mbap") er den rigtige kontrolkanal — og Modbus har INGEN indbygget
+             <p>Port 502 (Modbus TCP, "mbap") er den rigtige kontrolkanal, og Modbus har INGEN indbygget
              autentificering i sin standardform.</p>
 <h2>En minimal rå Modbus-klient</h2>
 <p>Protokollen er simpel nok til en ~30-linjers rå socket-implementering (MBAP-header +
@@ -52,7 +56,7 @@ send_recv(struct.pack("&gt;BHH", 0x03, addr, count), host)
 send_recv(struct.pack("&gt;BHH", 0x06, addr, value), host)
 # skriv én coil (function code 0x05), 0xFF00=true, 0x0000=false
 send_recv(struct.pack("&gt;BHH", 0x05, addr, 0xFF00 if val else 0x0000), host)</code></pre>
-             <p>Holding register 1 = temperatur, register 2 = water_level — matcher nøjagtigt
+             <p>Holding register 1 = temperatur, register 2 = water_level, matcher nøjagtigt
              web-dashboardets viste værdier. Coil 0/1 hænger sammen med security-systemet.</p>
 <h2>Angrebet: sluk security, sæt water_level over kapacitet</h2>
 <pre><code>write_coil(0, False)
@@ -76,7 +80,7 @@ socket-klient ofte er hurtigere end at fejlsøge et bibliotek. Samme tema som
 OT-systemer stoler på netværks-isolation i stedet for adgangskontrol.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

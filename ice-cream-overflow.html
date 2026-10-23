@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Ice Cream Overflow — tutorial (gets struct-overflow)</title>
+<title>Haaukins: Ice Cream Overflow, tutorial (gets struct-overflow)</title>
 <meta name="description" content="Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Ice Cream Overflow — tutorial (gets struct-overflow)">
+<meta property="og:title" content="Haaukins: Ice Cream Overflow, tutorial (gets struct-overflow)">
 <meta property="og:description" content="Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Ice Cream Overflow", "description": "Guide til Haaukins Ice Cream Overflow: udnyt gets() til at overflowe et nabofelt i samme struct på en SUID-root binær.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ice-cream-overflow.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">gets() overflow af et nabofelt i samme struct (SUID-root).</p>
 <div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En SETUID-root binær <code>icecream-shop</code> (med kildekode) læser felter med <code>gets()</code>
              (ingen længde-check) ind i en struct, og giver flaget hvis <code>relationship == "my boss"</code>. Felterne
@@ -43,7 +47,7 @@ og er derfor altid en rød klud. Kombinationen SUID-root + en sådan bug er neto
 til en rettighedsforøgelse i den virkelige verden.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

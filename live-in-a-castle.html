@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Who Wants to Live in a Castle? — tutorial (steghide + password i billedet)</title>
+<title>Haaukins: Who Wants to Live in a Castle?, tutorial (steghide + password i billedet)</title>
 <meta name="description" content="Guide til Haaukins &#x27;Who Wants to Live in a Castle?&#x27; Pt.1 &amp; Pt.2: steghide-passwordet står skrevet synligt i et vindue i bybilledet (ikke LSB-stego); udtræk mødested + plan, og identificér paladset visuelt.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/live-in-a-castle.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Who Wants to Live in a Castle? — tutorial (steghide + password i billedet)">
+<meta property="og:title" content="Haaukins: Who Wants to Live in a Castle?, tutorial (steghide + password i billedet)">
 <meta property="og:description" content="Guide til Haaukins &#x27;Who Wants to Live in a Castle?&#x27; Pt.1 &amp; Pt.2: steghide-passwordet står skrevet synligt i et vindue i bybilledet (ikke LSB-stego); udtræk mødested + plan, og identificér paladset visuelt.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/live-in-a-castle.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Who Wants to Live in a Castle? (Pt.1 & Pt.2)", "description": "Guide til Haaukins 'Who Wants to Live in a Castle?' Pt.1 & Pt.2: steghide-passwordet står skrevet synligt i et vindue i bybilledet (ikke LSB-stego); udtræk mødested + plan, og identificér paladset visuelt.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/live-in-a-castle.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -20,7 +24,7 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Who Wants to Live in a Castle? (Pt.1 &amp; Pt.2)</h1>
-<p class="subtitle">Navnet "bitwise_secrecy" lokker mod LSB-stego — men nøglen står synligt i motivet.</p>
+<p class="subtitle">Navnet "bitwise_secrecy" lokker mod LSB-stego, men nøglen står synligt i motivet.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
@@ -32,28 +36,28 @@
 <p>Navnet <em>bitwise_secrecy</em> og "hiding information in pictures" skriger LSB/bit-plane-steganografi.
              Men udtømmende afprøvning (<code><span class="gloss" tabindex="0" data-tip="Finder skjult data i PNG/BMP-billeders LSB-bits (steganografi).">zsteg</span></code>, <code><span class="gloss" tabindex="0" data-tip="Skjuler/finder data i JPEG-billeder via steganografi.">jsteg</span></code>, <code><span class="gloss" tabindex="0" data-tip="Universelt steganografi-værktøj til at skjule/udtrække data i billeder.">outguess</span></code>, EXIF, bit-planer,
              trailing data) giver <strong>intet</strong>. Nøglen ligger <strong>synligt i selve motivet</strong>: zoom ind
-             på et vindue i den hvide bygning nederst mod midten — der står <code>pw: 41659</code>.</p>
+             på et vindue i den hvide bygning nederst mod midten: der står <code>pw: 41659</code>.</p>
              <figure class="shot">
              <img src="assets/live-in-a-castle-pw.jpg" alt="Zoom af bybilledet: et vindue på en hvid bygning hvor der står 'pw: 41659'.">
-             <figcaption>Passwordet er malet ind i et vindue i bybilledet — "hidden in plain sight", ikke i bits.</figcaption>
+             <figcaption>Passwordet er malet ind i et vindue i bybilledet, "hidden in plain sight", ikke i bits.</figcaption>
              </figure>
 <h2>Udtræk med steghide</h2>
 <p>Det er <code><span class="gloss" tabindex="0" data-tip="Skjuler/udtrækker data gemt inde i billed- eller lydfiler (steganografi).">steghide</span></code>-passwordet (steghide understøtter JPEG):</p>
              <pre><code>steghide extract -sf bitwise_secrecy.jpeg -p 41659
 #  -> secret.zip  ->  secret/plan.txt  +  secret/meeting-point.png</code></pre>
-<h2>Pt.2 — planen (plan.txt)</h2>
+<h2>Pt.2: planen (plan.txt)</h2>
 <p><code>plan.txt</code> (signeret "– J") beskriver næste skridt: væk fra centraliseret infrastruktur,
-             fuldt decentraliseret onion-baseret C2, ephemeral bridges, safehouse i Lissabon — "a new start". Flaget står
+             fuldt decentraliseret onion-baseret C2, ephemeral bridges, safehouse i Lissabon, "a new start". Flaget står
              til sidst i beskeden.</p>
-<h2>Pt.1 — mødestedet (meeting-point.png)</h2>
+<h2>Pt.1: mødestedet (meeting-point.png)</h2>
 <p><code>meeting-point.png</code> viser et palads-interiør. <strong>Pas på:</strong> GPS-EXIF'en
-             (22°26'N 74°13'W = midt i Bahamas) er en <em>bevidst</em> afledning — PNG-kommentaren siger ligefrem
+             (22°26'N 74°13'W = midt i Bahamas) er en <em>bevidst</em> afledning: PNG-kommentaren siger ligefrem
              "Haha, I learned how to cover my tracks." GPS-metadata er trivielt at forfalske, så stol ikke på det.
              Identificér rummet <strong>visuelt</strong> (reverse image search) → det er entydigt Pena-paladset
              (Palácio da Pena) i Sintra. Flag-format var <code>{Kongens_Nytorv}</code>-stil → stednavnet.</p>
              <figure class="shot">
              <img src="assets/live-in-a-castle-meeting.jpg" alt="Det udtrukne meeting-point.png: et rigt dekoreret palads-interiør med hvidt stuk-loft, rød løber og lyserød sofa.">
-             <figcaption>Det udtrukne <code>meeting-point.png</code> — palads-interiøret. Reverse image search giver entydigt Pena-paladset (Sintra); GPS-EXIF'en (Bahamas) er en bevidst afledning.</figcaption>
+             <figcaption>Det udtrukne <code>meeting-point.png</code>, palads-interiøret. Reverse image search giver entydigt Pena-paladset (Sintra); GPS-EXIF'en (Bahamas) er en bevidst afledning.</figcaption>
              </figure>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <ul>
@@ -72,7 +76,7 @@ arkitektur/vartegn), ikke via et felt nogen frit kunne have sat. "Hidden in plai
 avanceret stego oftere end man skulle tro.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

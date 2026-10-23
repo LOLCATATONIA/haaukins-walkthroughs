@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Hasher 2 — tutorial</title>
-<meta name="description" content="Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister — brug en engelsk ordbog filtreret til 7-bogstavs ord.">
+<title>Haaukins: Hasher 2 tutorial</title>
+<meta name="description" content="Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister, brug en engelsk ordbog filtreret til 7-bogstavs ord.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-2.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Hasher 2 — tutorial">
-<meta property="og:description" content="Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister — brug en engelsk ordbog filtreret til 7-bogstavs ord.">
+<meta property="og:title" content="Haaukins: Hasher 2 tutorial">
+<meta property="og:description" content="Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister, brug en engelsk ordbog filtreret til 7-bogstavs ord.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-2.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hasher 2", "description": "Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister — brug en engelsk ordbog filtreret til 7-bogstavs ord.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hasher 2", "description": "Guide til Haaukins Hasher 2: knæk en MD5 der IKKE er i password-lister, brug en engelsk ordbog filtreret til 7-bogstavs ord.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hasher-2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -25,7 +29,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p>En MD5 af et "7-bogstavs engelsk ord, ikke i password-lister". Så drop rockyou — brug en engelsk
+<p>En MD5 af et "7-bogstavs engelsk ord, ikke i password-lister". Så drop rockyou, brug en engelsk
              ordbog (<code>words_alpha.txt</code>) filtreret til 7 bogstaver.</p>
              <pre><code>import hashlib
 target = "..."   # hashen fra opgaven
@@ -46,7 +50,7 @@ altid din ordliste til hvad du leder efter, i stedet for at kaste den største l
 alt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

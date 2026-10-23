@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Elevator — tutorial (custom SUID root-shell)</title>
+<title>Haaukins: Elevator, tutorial (custom SUID root-shell)</title>
 <meta name="description" content="Guide til Haaukins Elevator: anonym FTP → SSH → en indbygget SUID root-shell binær giver direkte root.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/elevator.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Elevator — tutorial (custom SUID root-shell)">
+<meta property="og:title" content="Haaukins: Elevator, tutorial (custom SUID root-shell)">
 <meta property="og:description" content="Guide til Haaukins Elevator: anonym FTP → SSH → en indbygget SUID root-shell binær giver direkte root.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/elevator.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Elevator", "description": "Guide til Haaukins Elevator: anonym FTP → SSH → en indbygget SUID root-shell binær giver direkte root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/elevator.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">FTP-anon → SSH → en indbygget SUID root-shell.</p>
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Sporet: samme foothold-mønster, en anden privesc</h2>
 <ol class="steps">
 <li><strong>Ingen creds udleveret</strong>, så scan efter en tjeneste du kan nå uden login. Som i
@@ -51,7 +55,7 @@ privesc i den virkelige verden netop fordi udviklere laver dem for at "gøre nog
 root" og glemmer at de kan misbruges.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

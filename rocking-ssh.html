@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Rocking SSH — tutorial</title>
+<title>Haaukins: Rocking SSH, tutorial</title>
 <meta name="description" content="Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou (&#x27;a rocking way&#x27;).">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Rocking SSH — tutorial">
+<meta property="og:title" content="Haaukins: Rocking SSH, tutorial">
 <meta property="og:description" content="Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou (&#x27;a rocking way&#x27;).">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Rocking SSH", "description": "Guide til Haaukins Rocking SSH: brute-force brugeren john på rockingssh.com med rockyou ('a rocking way').", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/rocking-ssh.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -20,12 +24,12 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Rocking SSH</h1>
-<p class="subtitle">"A rocking way" = rockyou — brute SSH-brugeren john.</p>
+<p class="subtitle">"A rocking way" = rockyou, brute SSH-brugeren john.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
-<pre><code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
+<pre><code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l <span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
 <span class="gloss" tabindex="0" data-tip="Leverer et SSH-password ikke-interaktivt, til brug i scripts.">sshpass</span> -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'cat ~/flag.txt'</code></pre>
              <p><code>-t 4</code> for SSH (OpenSSH afviser for mange parallelle). Credentials er statiske; flaget
              er per-instans.</p>
@@ -43,7 +47,7 @@ rigtig tjeneste er den slags online-brute desuden støjende og udløser lockouts
 af et hash er næsten altid at foretrække når det er muligt.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

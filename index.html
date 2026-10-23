@@ -3,26 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins CTF — tutorials & guides</title>
-<meta name="description" content="Pædagogiske trin-for-trin tutorials til Haaukins CTF-opgaver (AAU/DCIS). Søg dit lab-navn og hop direkte til guiden: forensics, web exploitation, reverse engineering, pwn, boot2root, netværk og IoT.">
+<title>Haaukins CTF: tutorials & guides</title>
+<meta name="description" content="Trin-for-trin guides til Haaukins CTF-opgaver (AAU/DCIS). Søg dit lab-navn og hop direkte til guiden: forensics, web exploitation, reverse engineering, pwn, boot2root, netværk og IoT.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Haaukins CTF — tutorials & guides">
-<meta property="og:description" content="Søg dit Haaukins-lab-navn og hop direkte til en pædagogisk trin-for-trin guide.">
+<meta property="og:title" content="Haaukins CTF: tutorials & guides">
+<meta property="og:description" content="Søg dit Haaukins-lab-navn og hop direkte til en trin-for-trin guide.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <div class="wrap">
-<h1>Haaukins CTF — tutorials</h1>
-<p class="subtitle">Pædagogiske, selvbærende guides til Haaukins-opgaver. Find dit lab og hop direkte til guiden.</p>
+<h1>Haaukins CTF-tutorials</h1>
+<p class="subtitle">Trin-for-trin guides til Haaukins CTF-opgaverne. Find dit lab, og se hvordan vi kom frem til løsningen, ikke kun facit.</p>
 <div class="callout">🎓 <strong>Til dig der sidder fast lige nu:</strong> prøv selv først! Guiderne forklarer
-metoden; det konkrete flag ligger i en spoiler du selv åbner. Mange Haaukins-flag er per-instans — det er
-fremgangsmåden der genbruges.</div>
+metoden, det konkrete flag ligger i en spoiler du selv åbner. Mange Haaukins-flag er per-instans, så det er
+fremgangsmåden der genbruges, ikke den konkrete streng.</div>
 <div class="callout">🧭 <strong>Ny her?</strong> Start med <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og
-lab-opsætning</a> — forudsætningen for stort set alle opgaverne nedenfor, men som ingen af de enkelte guider
-gentager.</div>
+lab-opsætning</a>. Den dækker det de fleste opgaver nedenfor forudsætter, uden at hver enkelt guide gentager det.</div>
 
 <input class="search" id="q" type="search" placeholder="🔎 Søg efter lab-navn, kategori eller teknik …" autocomplete="off">
 <div class="chips"><span class="chip" onclick="q.value='';q.dispatchEvent(new Event('input'))">Alle</span><span class="chip" onclick="q.value='Forensics';q.dispatchEvent(new Event('input'))">Forensics</span><span class="chip" onclick="q.value='Crypto';q.dispatchEvent(new Event('input'))">Crypto</span><span class="chip" onclick="q.value='Web exploitation';q.dispatchEvent(new Event('input'))">Web exploitation</span><span class="chip" onclick="q.value='Starters';q.dispatchEvent(new Event('input'))">Starters</span><span class="chip" onclick="q.value='Operational Technologies';q.dispatchEvent(new Event('input'))">Operational Technologies</span><span class="chip" onclick="q.value='Reverse Engineering';q.dispatchEvent(new Event('input'))">Reverse Engineering</span><span class="chip" onclick="q.value='Pwn';q.dispatchEvent(new Event('input'))">Pwn</span><span class="chip" onclick="q.value='Boot2Root';q.dispatchEvent(new Event('input'))">Boot2Root</span><span class="chip" onclick="q.value='Network / Recon';q.dispatchEvent(new Event('input'))">Network / Recon</span></div>
@@ -136,16 +139,16 @@ gentager.</div>
 <tr><td><a href="noisy-channel.html">Noisy Channel</a></td><td>Forensics</td><td>RSA-faktorisering (Pollard&#x27;s rho), akustisk enkelt-tone-signalering, STFT-frekvensanalyse, brute-force af flag-format</td></tr>
 </tbody>
 </table>
-<p id="noresult" style="display:none;color:var(--muted)">Ingen opgaver matcher — prøv et andet søgeord.</p>
+<p id="noresult" style="display:none;color:var(--muted)">Ingen opgaver matcher. Prøv et andet søgeord.</p>
 
 <h2>Teknik-primers</h2>
 <p>Korte baggrundsforklaringer som flere opgaver bygger på:</p>
-<ul><li><a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> — Læs denne side FØRST. Alle netværksopgaver (dvs. de fleste) forudsætter at du har gjort dette.</li><li><a href="wireguard-vpn.html">WireGuard-VPN på Linux: fuld opsætning og fejlsøgning</a> — Den fulde WireGuard-gennemgang: installation, verificering af forbindelsen, og fejlsøgning når noget ikke virker.</li><li><a href="arp-mitm.html">Primer: ARP-spoofing &amp; man-in-the-middle</a> — Hvorfor du ikke bare kan sniffe — og hvordan du bliver mellemmand.</li></ul>
+<ul><li><a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>: Læs denne side FØRST. Alle netværksopgaver (dvs. de fleste) forudsætter at du har gjort dette.</li><li><a href="wireguard-vpn.html">WireGuard-VPN på Linux: fuld opsætning og fejlsøgning</a>: Den fulde WireGuard-gennemgang: installation, verificering af forbindelsen, og fejlsøgning når noget ikke virker.</li><li><a href="arp-mitm.html">Primer: ARP-spoofing &amp; man-in-the-middle</a>: Hvorfor du ikke bare kan sniffe, og hvordan du bliver mellemmand.</li></ul>
 
 <footer>
-Trin-for-trin løsningsstøtte til <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a> CTF (AAU /
-De Danske Cybermesterskaber) — en dansk undervisningsplatform hvor opgaverne løses på platformens egne,
-formålsbyggede lab-miljøer. Forudsætter egen autoriseret adgang; brug det til at lære metoden, ikke som en
+Trin-for-trin løsningsstøtte til <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a> CTF (AAU,
+De Danske Cybermesterskaber), en dansk undervisningsplatform hvor opgaverne løses på platformens egne,
+formålsbyggede lab-miljøer. Forudsætter egen autoriseret adgang. Brug det til at lære metoden, ikke som en
 genvej uden om den.
 </footer>
 </div>

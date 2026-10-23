@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Hackable App part 2 — tutorial (blind boolean SQLi)</title>
+<title>Haaukins: Hackable App part 2, tutorial (blind boolean SQLi)</title>
 <meta name="description" content="Guide til Haaukins Hackable App part 2: &#x27;blind guesses&#x27; = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Hackable App part 2 — tutorial (blind boolean SQLi)">
+<meta property="og:title" content="Haaukins: Hackable App part 2, tutorial (blind boolean SQLi)">
 <meta property="og:description" content="Guide til Haaukins Hackable App part 2: &#x27;blind guesses&#x27; = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Hackable App part 2", "description": "Guide til Haaukins Hackable App part 2: 'blind guesses' = blind boolean SQL injection i /guessnotes; udtræk en privat note (flaget) via et Good/Bad-Guess-orakel.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hackable-app-part2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">"Blind guesses" = blind boolean SQL injection med et Good/Bad-orakel.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En notes-app (<code>hackable2.hkn</code>) med <code>/guessnotes</code> ("guess a private note of a
              given user", felter <code>user_name</code>+<code>note</code>, svar "Good Guess"/"Bad Guess"). "Blind
@@ -90,7 +94,7 @@ Samme princip som Hashle og padding-oracles: lidt feedback pr. forsøg, gentaget
 helheden.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: PWN Strings — tutorial</title>
-<meta name="description" content="Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata — ingen live service nødvendig.">
+<title>Haaukins: PWN Strings, tutorial</title>
+<meta name="description" content="Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata, ingen live service nødvendig.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: PWN Strings — tutorial">
-<meta property="og:description" content="Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata — ingen live service nødvendig.">
+<meta property="og:title" content="Haaukins: PWN Strings, tutorial">
+<meta property="og:description" content="Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata, ingen live service nødvendig.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "PWN Strings", "description": "Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata — ingen live service nødvendig.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "PWN Strings", "description": "Guide til Haaukins PWN Strings: flaget ligger som printbar streng i .rodata, ingen live service nødvendig.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/pwn-strings.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -20,7 +24,7 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>PWN Strings</h1>
-<p class="subtitle">Flaget ligger i .rodata — fuldt offline.</p>
+<p class="subtitle">Flaget ligger i .rodata, fuldt offline.</p>
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
@@ -41,7 +45,7 @@ variant <a href="pwn-strings-gdb.html">PWN Strings GDB</a> viser hvad man gør n
 ligger i klartekst.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

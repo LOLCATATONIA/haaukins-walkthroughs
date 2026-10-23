@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Follow Telnet Stream — tutorial</title>
+<title>Haaukins: Follow Telnet Stream tutorial</title>
 <meta name="description" content="Guide til Haaukins Follow Telnet Stream: fang en telnet-session via MITM og genopbyg den med tshark follow-stream for at læse login og flag.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/follow-telnet-stream.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Follow Telnet Stream — tutorial">
+<meta property="og:title" content="Haaukins: Follow Telnet Stream tutorial">
 <meta property="og:description" content="Guide til Haaukins Follow Telnet Stream: fang en telnet-session via MITM og genopbyg den med tshark follow-stream for at læse login og flag.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/follow-telnet-stream.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Follow Telnet Stream", "description": "Guide til Haaukins Follow Telnet Stream: fang en telnet-session via MITM og genopbyg den med tshark follow-stream for at læse login og flag.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/follow-telnet-stream.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,22 +27,22 @@
 <p class="subtitle">Genopbyg en aflyttet telnet-session og læs flaget ud af strømmen.</p>
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En klient logger periodisk ind på en <strong>telnet-server</strong> (port 23). Telnet er fra 1969
              og krypterer intet, så en MITM kan læse hele sessionen: prompt, brugernavn, password og det der skrives
              bagefter.</p>
 <h2>Trin for trin</h2>
 <ol class="steps">
-             <li>Find serveren: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p23 --open &lt;subnet&gt;/24</code>.</li>
+             <li>Find serveren: <code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p23 --open &lt;subnet&gt;/24</code>.</li>
              <li>MITM + gem trafikken til en pcap:
              <pre><code>sudo sysctl -w net.ipv4.ip_forward=1
 sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote -w /tmp/telnet.pcap /&lt;server&gt;// ///</code></pre>
              Lad køre til et login sker, tryk <code>q</code>.</li>
              <li>Genopbyg sessionen som læsbar tekst:
-             <pre><code>for i in 0 1 2 3; do <span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r /tmp/telnet.pcap -q -z follow,tcp,ascii,$i; done</code></pre></li>
+             <pre><code>for i in 0 1 2 3; do <span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark: filtrerer og læser pcap-trafik.">tshark</span> -r /tmp/telnet.pcap -q -z follow,tcp,ascii,$i; done</code></pre></li>
              </ol>
-             <p>Telnet-forhandlingsbytes (IAC) ses som støj — ignorér dem; login og kommandoer er læsbare.</p>
+             <p>Telnet-forhandlingsbytes (IAC) ses som støj. Ignorér dem, login og kommandoer er stadig læsbare.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Strømmen viser login'et (<code>JensMP</code>/<code>PepsiMax</code>) og flaget bliver
         ekko'et i sessionen.</p>
@@ -53,7 +57,7 @@ mange IoT-protokoller. Når du har en pcap og ser en TCP-session til en kendt kl
 "follow stream" næsten altid det første du skal gøre, før du graver i enkeltpakker.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

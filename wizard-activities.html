@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Wizard Activities — tutorial (reparér PNG-signatur)</title>
+<title>Haaukins: Wizard Activities, tutorial (reparér PNG-signatur)</title>
 <meta name="description" content="Guide til Haaukins Wizard Activities: 02-m4g1c.png har fået sin PNG-signatur overskrevet med &#x27;wrong xd&#x27;; ret de 8 magic bytes, så åbner billedet med flaget skrevet i motivet.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/wizard-activities.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Wizard Activities — tutorial (reparér PNG-signatur)">
+<meta property="og:title" content="Haaukins: Wizard Activities, tutorial (reparér PNG-signatur)">
 <meta property="og:description" content="Guide til Haaukins Wizard Activities: 02-m4g1c.png har fået sin PNG-signatur overskrevet med &#x27;wrong xd&#x27;; ret de 8 magic bytes, så åbner billedet med flaget skrevet i motivet.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/wizard-activities.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Wizard Activities", "description": "Guide til Haaukins Wizard Activities: 02-m4g1c.png har fået sin PNG-signatur overskrevet med 'wrong xd'; ret de 8 magic bytes, så åbner billedet med flaget skrevet i motivet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/wizard-activities.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -25,9 +29,9 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Hvad går opgaven ud på?</h2>
-<p>Filen <code>02-m4g1c.png</code> (fra DCIS-OSINT-bundtet — samme bundt som
+<p>Filen <code>02-m4g1c.png</code> (fra DCIS-OSINT-bundtet, samme bundt som
              <a href="broken-but-not-lost.html">Broken but not Lost</a>) kan ikke åbnes. <code>file</code> siger blot
-             <code>data</code> — ingen genkendt filtype:</p>
+             <code>data</code>, ingen genkendt filtype:</p>
              <pre><code>file 02-m4g1c.png          # -> data (ingen magic match)
 xxd 02-m4g1c.png | head -1  # -> 7772 6f6e 6720 7864 ...  = "wrong xd"</code></pre>
              <p>De første 8 bytes (PNG-signaturen) er overskrevet med den bogstavelige tekst <code>wrong xd</code>.
@@ -41,9 +45,9 @@ d[:8] = bytes([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a])
 open("fixed.png","wb").write(d)
 PY
 file fixed.png             # -> PNG image data, 3648 x 2432</code></pre>
-             <p>Åbn <code>fixed.png</code> — flaget står skrevet direkte i billedet.</p>
+             <p>Åbn <code>fixed.png</code>: flaget står skrevet direkte i billedet.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
-<p>Flag: <span class="flag">HKN{m4g1c_h3ed3rs}</span> ("magic headers" — netop det du rettede).</p>
+<p>Flag: <span class="flag">HKN{m4g1c_h3ed3rs}</span> ("magic headers", netop det du rettede).</p>
         <figure class="shot">
         <img src="assets/wizard-activities-flag.jpg" alt="Det reparerede billede: en kat der kigger frem bag et hvidt gardin, med flaget HKN{m4g1c_h3ed3rs} skrevet nederst til venstre.">
         <figcaption>Efter reparationen åbner PNG'en (kat bag et gardin) med flaget skrevet i motivet.</figcaption>
@@ -60,7 +64,7 @@ Conversation</a>, bare med alle 8 signatur-bytes ødelagt i stedet for én. At k
 magic bytes udenad gør den slags reparation til et par minutters arbejde.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Powering HAAUKINS — tutorial (MQTT SCADA-spoof)</title>
+<title>Haaukins: Powering HAAUKINS, tutorial (MQTT SCADA-spoof)</title>
 <meta name="description" content="Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Powering HAAUKINS — tutorial (MQTT SCADA-spoof)">
+<meta property="og:title" content="Haaukins: Powering HAAUKINS, tutorial (MQTT SCADA-spoof)">
 <meta property="og:description" content="Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Powering HAAUKINS", "description": "Guide til Haaukins Powering HAAUKINS: spoof MQTT status-topics (retained) på et vindmølle-powergrid for at ramme præcist HaaukinsPower=100% og udløse flaget via WebSocket.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/powering-haaukins.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">Spoof retained MQTT-status på et vindmølle-grid til et præcist effekt-target.</p>
 <div class="badges"><span class="badge cat">Operational Technologies</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Recon</h2>
 <pre><code><span class="gloss" tabindex="0" data-tip="MQTT-klient til at abonnere på topics på en MQTT-broker.">mosquitto_sub</span> -h danwind.hkn -p 1883 -t '#' -v</code></pre>
              <p>Giver 6 møller på <code>windmills/{id}/status</code> = <code>{ID,Speed,Running,Power}</code>.
@@ -62,7 +66,7 @@ din spoofede værdi straks. Og læg mærke til at målet var PRÆCIST, ikke maks
 belønner at ramme en bestemt driftstilstand, ikke at skrue alt i bund.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

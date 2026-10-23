@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: BrowserAuth — tutorial (User-Agent auth-bypass)</title>
+<title>Haaukins: BrowserAuth, tutorial (User-Agent auth-bypass)</title>
 <meta name="description" content="Guide til Haaukins BrowserAuth: en pcap afslører at den &#x27;passwordless&#x27; auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: BrowserAuth — tutorial (User-Agent auth-bypass)">
+<meta property="og:title" content="Haaukins: BrowserAuth, tutorial (User-Agent auth-bypass)">
 <meta property="og:description" content="Guide til Haaukins BrowserAuth: en pcap afslører at den &#x27;passwordless&#x27; auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "BrowserAuth", "description": "Guide til Haaukins BrowserAuth: en pcap afslører at den 'passwordless' auth blot er en statisk User-Agent-header; forfalsk den for at få flaget.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/browserauth.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,14 +27,14 @@
 <p class="subtitle">"Passwordless" auth der blot tjekker en statisk User-Agent-header.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>En "passwordless" auth på <code>browserauth.hkn</code> + en udleveret <code>capture.pcap</code>.
              Hintet: "what is http headers and what is a user agent?"</p>
 <h2>Trin for trin</h2>
 <p>Hintet peger på HTTP-headers og User-Agent, så led i den udleverede trafik efter hvad
              der adskiller en gyldig request fra en afvist. Her bærer selve User-Agent-strengen "login'et":</p>
-             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark — filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -Y http.request -O http
+             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark: filtrerer og læser pcap-trafik.">tshark</span> -r capture.pcap -Y http.request -O http
 #  GET /secrets/YWdlbnRfMDA3/flag
 #  User-Agent: BrowserAuth/9472.2843.8275.1753   <- fungerer som token
 #  YWdlbnRfMDA3 = base64("agent_007") = bruger-id</code></pre>
@@ -49,7 +53,7 @@ på identitet eller rettighed, så forfalsk den med <code>curl -H</code>. Samme 
 rolle gemt i en cookie: alt klienten kontrollerer, kontrollerer angriberen.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

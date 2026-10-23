@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Beginner Crypto-stigen — tutorial (5 trin, StringHexNumber til Littlest_e)</title>
-<meta name="description" content="Guide til Haaukins&#x27; beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl — tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.">
+<title>Haaukins: Beginner Crypto-stigen (tutorial: 5 trin, StringHexNumber til Littlest_e)</title>
+<meta name="description" content="Guide til Haaukins&#x27; beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl: tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/beg-crypto-ladder.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Beginner Crypto-stigen — tutorial (5 trin, StringHexNumber til Littlest_e)">
-<meta property="og:description" content="Guide til Haaukins&#x27; beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl — tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.">
+<meta property="og:title" content="Haaukins: Beginner Crypto-stigen (tutorial: 5 trin, StringHexNumber til Littlest_e)">
+<meta property="og:description" content="Guide til Haaukins&#x27; beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl: tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/beg-crypto-ladder.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Beginner Crypto-stigen (StringHexNumber → Littlest_e)", "description": "Guide til Haaukins' beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl — tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/beg-crypto-ladder.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Beginner Crypto-stigen (StringHexNumber → Littlest_e)", "description": "Guide til Haaukins' beginner-crypto-stige (hardcore-eventet): fem korte opgaver der hver demonstrerer én klassisk krypto-fejl: tal-som-tekst-encoding, lækket OTP-nøgle, direkte RSA-parametre, FactorDB-opslag, og lav-eksponent RSA uden modulo-reduktion.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/beg-crypto-ladder.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -24,36 +28,36 @@
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>1) StringHexNumber (8p) — tal er bare tekst i forklædning</h2>
+<h2>1) StringHexNumber (8p): tal er bare tekst i forklædning</h2>
 <p>Filen giver ét stort decimaltal. Pointen ("strings er basically hex, hex er basically
              et tal") er at tallet er flagets ASCII-bytes tolket som ét stort big-endian heltal:</p>
              <pre><code>n = 24600430021583729480940870221389668374653
 h = hex(n)[2:]
 if len(h) % 2: h = '0' + h
 print(bytes.fromhex(h))   # b'HKN{zqq-MF-HQgQX}'</code></pre>
-<h2>2) SafestPad (12p) — one-time pad, men nøglen er ikke hemmelig</h2>
+<h2>2) SafestPad (12p): one-time pad, men nøglen er ikke hemmelig</h2>
 <p>Filen giver nøgle OG ciphertext direkte i klartekst. One-time pad er kun perfekt
-             sikker hvis nøglen holdes hemmelig — her er den lækket, så det er bare en ligefrem XOR:</p>
+             sikker hvis nøglen holdes hemmelig: her er den lækket, så det er bare en ligefrem XOR:</p>
              <pre><code>key = b'LOREMIPSUMDOLORSI'
 enc = b'\x04\x04\x1c&gt;)\x11}\$\x0f\x1ai\n\x7f!\x06\x044'
 pt = bytes(k ^ c for k, c in zip(key, enc))   # b'HKN{dX-wZW-E3nTW}'</code></pre>
-<h2>3) RSAttack1 (14p) — &quot;parametrene er ikke hemmelige&quot;</h2>
-<p>Filen giver <code>p, q, N, e</code> og ciphertext direkte — opgaven siger det selv:
+<h2>3) RSAttack1 (14p): &quot;parametrene er ikke hemmelige&quot;</h2>
+<p>Filen giver <code>p, q, N, e</code> og ciphertext direkte. Opgaven siger det selv:
              "as long as you keep your parameters hidden". Standard RSA-dekryption:</p>
              <pre><code>phi = (p - 1) * (q - 1)
 d = pow(e, -1, phi)
 m = pow(c, d, N)
 flag = bytes.fromhex(hex(m)[2:])   # HKN{zRj-bf-quKD2}</code></pre>
-<h2>4) RSAttack2 (16p) — &quot;måske har en anden allerede gjort arbejdet&quot;</h2>
-<p>Kun <code>N, e, c</code> gives — men <code>N</code> er lille nok til at være kendt af
+<h2>4) RSAttack2 (16p): &quot;måske har en anden allerede gjort arbejdet&quot;</h2>
+<p>Kun <code>N, e, c</code> gives, men <code>N</code> er lille nok til at være kendt af
              FactorDB:</p>
              <pre><code>curl -s "http://factordb.com/api?query=$N"
 # status "FF" = fuldt faktoriseret → factors[0], factors[1] er p og q</code></pre>
              <p>Derefter samme RSA-dekryption som i trin 3 med de fundne p/q.</p>
-<h2>5) Littlest_e (28p) — lav-eksponent RSA uden modulo-reduktion</h2>
-<p>Kun ciphertext gives — N og e er "redacted", men hintet siger "smallest possible e"
+<h2>5) Littlest_e (28p): lav-eksponent RSA uden modulo-reduktion</h2>
+<p>Kun ciphertext gives. N og e er "redacted", men hintet siger "smallest possible e"
              og "might need an external library for precision". Med <code>e=3</code> og en besked kort
-             nok at <code>m³ &lt; N</code>, sker der <strong>ingen</strong> modulo-reduktion —
+             nok at <code>m³ &lt; N</code>, sker der <strong>ingen</strong> modulo-reduktion:
              cifferteksten ER simpelthen <code>m³</code> som et almindeligt heltal. Tag den eksakte
              integer-kubikrod:</p>
              <pre><code>def icbrt(n):
@@ -68,7 +72,7 @@ flag = bytes.fromhex(hex(m)[2:])   # HKN{zRj-bf-quKD2}</code></pre>
 m = icbrt(c)
 assert m**3 == c          # bekræfter en EKSAKT kubikrod (ingen mod-reduktion)
 flag = bytes.fromhex(hex(m)[2:])   # HKN{EOz-YUh-rSuL}</code></pre>
-             <p>Pythons <code>int</code> har arbitrær præcision indbygget — "external library for
+             <p>Pythons <code>int</code> har arbitrær præcision indbygget: "external library for
              precision" er en rød sild, ingen gmpy2/sympy nødvendig for selve kubikroden.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag pr. trin:</p>
@@ -91,7 +95,7 @@ e lille (3) og beskeden kort, så m^e aldrig wrappede modulo N (tag kubikroden)?
 en CTF, så løb den tjekliste FØR du overvejer noget tungt, den rammer overraskende ofte.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

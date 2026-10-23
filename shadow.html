@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Shadow — tutorial (læsbar /etc/shadow)</title>
+<title>Haaukins: Shadow, tutorial (læsbar /etc/shadow)</title>
 <meta name="description" content="Guide til Haaukins Shadow: en world-readable /etc/shadow lader dig knække root-hashen (sha512crypt) og blive root via su.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/shadow.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Shadow — tutorial (læsbar /etc/shadow)">
+<meta property="og:title" content="Haaukins: Shadow, tutorial (læsbar /etc/shadow)">
 <meta property="og:description" content="Guide til Haaukins Shadow: en world-readable /etc/shadow lader dig knække root-hashen (sha512crypt) og blive root via su.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/shadow.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Shadow", "description": "Guide til Haaukins Shadow: en world-readable /etc/shadow lader dig knække root-hashen (sha512crypt) og blive root via su.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/shadow.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,7 +27,7 @@
 <p class="subtitle">Læs root-hashen fra en world-readable /etc/shadow og knæk den.</p>
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Sporet: hvorfor lige /etc/shadow?</h2>
 <ol class="steps">
 <li><strong>Læs hintet bogstaveligt.</strong> Opgaven giver dig SSH-adgang (<code>user1:start</code>)
@@ -42,7 +46,7 @@ Præfikset <code>$6$</code> betyder sha512crypt. Det fortæller dig præcis hvil
 du skal bruge.</li>
 <li><strong>Knæk hashen offline</strong> (ingen grund til at røre serveren):
 <pre><code>echo 'root:$6$S.geY3nC$6Gcx...' > root.hash
-<span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=sha512crypt --wordlist=rockyou.txt root.hash   # -> conga</code></pre></li>
+<span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=sha512crypt --wordlist=rockyou.txt root.hash   # -> conga</code></pre></li>
 <li><strong>Bliv root med password'et.</strong> Direkte root-SSH er slået fra
 (<code>PermitRootLogin no</code>), og <code>su</code> kræver en rigtig terminal, så brug en
 pty via <code>ssh -tt</code>:
@@ -63,7 +67,7 @@ afslører dens form algoritmen: <code>$6$</code> = sha512crypt, <code>$1$</code>
 <code>$2b$</code> = bcrypt, hvilket fortæller john/hashcat hvilken mode de skal bruge.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

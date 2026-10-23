@@ -3,15 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Galois Force Field 2 — tutorial (knæk en checksum med lineær algebra, ikke en solver)</title>
-<meta name="description" content="Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær — knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.">
+<title>Haaukins: Galois Force Field 2 (tutorial: knæk en checksum med lineær algebra, ikke en solver)</title>
+<meta name="description" content="Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær. Knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/galois-force-field-2.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Galois Force Field 2 — tutorial (knæk en checksum med lineær algebra, ikke en solver)">
-<meta property="og:description" content="Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær — knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.">
+<meta property="og:title" content="Haaukins: Galois Force Field 2 (tutorial: knæk en checksum med lineær algebra, ikke en solver)">
+<meta property="og:description" content="Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær. Knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/galois-force-field-2.html">
-<meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Galois Force Field 2", "description": "Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær — knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/galois-force-field-2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Galois Force Field 2", "description": "Guide til Haaukins Galois Force Field 2: en tabel-baseret password-checksum er for langsom til symbolsk eksekvering (angr/Z3), men viser sig at være fuldt GF(2)-lineær. Knæk den med differentiel GDB-probing og Gaussisk elimination i stedet.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/galois-force-field-2.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
 <script src="assets/hire-widget.js" defer></script>
@@ -20,26 +24,26 @@
 <div class="wrap">
 <nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
 <h1>Galois Force Field 2</h1>
-<p class="subtitle">Når Z3 kører 45 minutter uden resultat, er spørgsmålet ikke "hvordan går jeg hurtigere" — det er "er dette problem overhovedet det jeg tror det er".</p>
+<p class="subtitle">Når Z3 kører 45 minutter uden resultat, er spørgsmålet ikke "hvordan går jeg hurtigere": det er "er dette problem overhovedet det jeg tror det er".</p>
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Opgaven</h2>
 <p>En ikke-strippet ELF-binær <code>pwdcheck</code> beder om et password og svarer
              "Permission granted." eller "FAIL". <code>check()</code>-funktionen er en tæt løkke af
-             <code>imul</code> og tabelopslag — en custom checksum inspireret af Galois-felt-aritmetik.</p>
-             <p><strong>Første forsøg (mislykket):</strong> symbolsk eksekvering med <code>angr</code>/Z3 —
+             <code>imul</code> og tabelopslag: en custom checksum inspireret af Galois-felt-aritmetik.</p>
+             <p><strong>Første forsøg (mislykket):</strong> symbolsk eksekvering med <code>angr</code>/Z3:
              sæt et symbolsk password, lad solveren finde et input der giver <code>check()==1</code>.
              Kørte 45+ minutter uden resultat; den tunge multiplikations-aritmetik gør SMT-solving
              upraktisk langsom her.</p>
 <h2>Spørg om linearitet, ikke om en løsning</h2>
 <p>I stedet for "find et input der virker", spørg: <strong>er checksummen lineær over
-             GF(2)?</strong> Hvis den er (som en CRC), er hele problemet simpel lineær algebra — ingen
+             GF(2)?</strong> Hvis den er (som en CRC), er hele problemet simpel lineær algebra, ingen
              solver nødvendig. Test det med <strong>superposition</strong>: sæt et GDB-breakpoint lige før
              <code>check()</code> returnerer, og læs den interne 192-bit tilstand direkte (3 globale
              64-bit ord) for 4 varianter af et testpassword, hvor to tegn uafhængigt varieres (baseline,
              tegn A ændret, tegn B ændret, begge ændret):</p>
-             <pre><code># probe.<span class="gloss" tabindex="0" data-tip="GNU Debugger — kører/inspicerer et program instruktion for instruktion.">gdb</span>
+             <pre><code># probe.<span class="gloss" tabindex="0" data-tip="GNU Debugger: kører/inspicerer et program instruktion for instruktion.">gdb</span>
 break *check+1121
 run
 print/x *(unsigned long*)&amp;__libddc_start
@@ -48,15 +52,15 @@ print/x *((unsigned long*)&amp;__libddc_start + 2)</code></pre>
              <pre><code>echo "testpassword" | gdb -batch -x probe.gdb --args ./pwdcheck</code></pre>
              <p>Hvis funktionen er lineær (affin) over GF(2), gælder <code>accum(b0) ⊕ accum(b1) ⊕
              accum(b2) ⊕ accum(b3) = 0</code> for alle 3 ord. Testet mellem positioner OG mellem
-             enkelt-bit-forskelle — begge gange nøjagtigt 0. Checksummen er fuldt GF(2)-lineær.</p>
+             enkelt-bit-forskelle, begge gange nøjagtigt 0. Checksummen er fuldt GF(2)-lineær.</p>
 <h2>Byg en basis og løs med Gaussisk elimination</h2>
 <p>For hvert password-tegn og hver af dets 8 bits, mål bidraget via et
              bit-differentierende tegnpar (fx <code>'a'</code>/<code>'c'</code> for bit 1). Med 18 tegn ×
              8 bit får du 144 basisvektorer i et 192-dimensionalt GF(2)-rum. At finde et password der
              rammer et bestemt mål er nu et almindeligt lineært ligningssystem (XOR som addition, 192-bit
-             heltal som vektorer) — løst med Gaussisk elimination.</p>
+             heltal som vektorer), løst med Gaussisk elimination.</p>
              <p><strong>Faldgrube:</strong> et forkert gættet password-længde (fx 10 eller 12 tegn, matchet
-             til flag-formatet) giver et <em>matematisk bevist inkonsistent</em> system — løkken i
+             til flag-formatet) giver et <em>matematisk bevist inkonsistent</em> system. Løkken i
              <code>check()</code> kører <code>strlen(password)</code> gange, ikke
              <code>ceil(strlen/8)</code>, så et kort password giver langt fra de 192 kontrollerbare bit
              der er nødvendige. Brug i stedet den maksimalt tilladte længde (18 tegn, grænsen sat af
@@ -64,7 +68,7 @@ print/x *((unsigned long*)&amp;__libddc_start + 2)</code></pre>
 <h2>Fra løsning til læsbart flag</h2>
 <p>Med 144 ubekendte men kun rank 136 er der 2⁸=256 ækvivalente løsninger (8
              frihedsgrader i nulrummet). Iterér over alle 256 og filtrér for dem der starter med
-             <code>DDC{</code> og ender med <code>}</code> — den rigtige dukker op med det samme:
+             <code>DDC{</code> og ender med <code>}</code>: den rigtige dukker op med det samme:
              <code>b'DDC{q0b-qY-t3dXB}\x00'</code> (den sidste null-byte er bare
              streng-terminering, ikke en del af passwordet).</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
@@ -83,7 +87,7 @@ simpel lineær algebra (Gaussisk elimination). Det gælder CRC'er, mange custom-
 del letvægts-ciphers: test strukturen før du bruteforcer den.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

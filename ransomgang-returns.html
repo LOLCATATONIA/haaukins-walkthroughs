@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: RansomGang Returns — tutorial (UPX + PRNG-prædiktion)</title>
+<title>Haaukins: RansomGang Returns, tutorial (UPX + PRNG-prædiktion)</title>
 <meta name="description" content="Guide til Haaukins RansomGang Returns: &#x27;no section header&#x27; var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: RansomGang Returns — tutorial (UPX + PRNG-prædiktion)">
+<meta property="og:title" content="Haaukins: RansomGang Returns, tutorial (UPX + PRNG-prædiktion)">
 <meta property="og:description" content="Guide til Haaukins RansomGang Returns: &#x27;no section header&#x27; var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "RansomGang Returns", "description": "Guide til Haaukins RansomGang Returns: 'no section header' var UPX-packing (ikke stripping); upx -d afslører fuld debug-info, og en login-kode fra et tids-seedet PRNG hvis seed printes i banneret.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/ransomgang-returns.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -23,18 +27,18 @@
 <p class="subtitle">"No section header" = UPX-packing; login-koden kommer fra et seed serveren selv lækker.</p>
 <div class="badges"><span class="badge cat">Reverse Engineering</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
-<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
+<div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>&#x27;The new trick&#x27; = UPX, ikke rigtig stripping</h2>
 <p>Binæren ser statisk linket + uden section headers ud (ligner stripping). Men:</p>
              <pre><code>grep -a UPX ransomgangreturns      # -> "UPX 3.96"-signatur
-<span class="gloss" tabindex="0" data-tip="Pakker/udpakker (komprimerer) en eksekverbar fil — kan ligne stripping, men er reversibel.">upx</span> -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-info</code></pre>
+<span class="gloss" tabindex="0" data-tip="Pakker/udpakker (komprimerer) en eksekverbar fil: kan ligne stripping, men er reversibel.">upx</span> -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-info</code></pre>
              <p>Tjek altid for en packer-signatur før manuel symbol-fri RE.</p>
 <h2>Login-logikken (statisk på den udpakkede binær)</h2>
-<p>En tråd beregner login-koden ud fra boot-epoch'en — som <strong>printes direkte i banneret</strong>:</p>
-             <pre><code>srandom(epoch); r1=rand(); <span class="gloss" tabindex="0" data-tip="Kommandoen for radare2 — reverse-engineering-værktøj til binær analyse.">r2</span>=rand();
+<p>En tråd beregner login-koden ud fra boot-epoch'en, som <strong>printes direkte i banneret</strong>:</p>
+             <pre><code>srandom(epoch); r1=rand(); <span class="gloss" tabindex="0" data-tip="Kommandoen for radare2: reverse-engineering-værktøj til binær analyse.">r2</span>=rand();
 kode = epoch - (r1 % 10000) + (r2 % 10000);</code></pre>
              <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk.
-             <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc — du skal
+             <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc, du skal
              genimplementere glibc's egen TYPE_3 additive generator (31-ords cirkulær buffer, separation 3):</p>
              <pre><code>def glibc_random(seed):
     deg, sep = 31, 3
@@ -67,7 +71,7 @@ r1, r2 = next(g), next(g)
 kode = epoch - (r1 % 10000) + (r2 % 10000)</code></pre>
              <p>Jeg har selv verificeret denne implementation byte-for-byte mod en rigtig glibc <code>random()</code>
              (kompileret et lille C-testprogram og sammenlignet output for samme seed) før den blev sat her. Send
-             koden → match → <code>system("/bin/sh")</code> på <code><span class="gloss" tabindex="0" data-tip="Netcat — rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> …:1338</code>.</p>
+             koden → match → <code>system("/bin/sh")</code> på <code><span class="gloss" tabindex="0" data-tip="Netcat: rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> …:1338</code>.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{F0RBRYDELSE_B3TALER_S1G_1KK3}</span></p>
 </details>
@@ -83,7 +87,7 @@ ens: glibc's <code>rand()</code>/<code>random()</code> matcher ikke Pythons Mers
 du skal genimplementere den rigtige algoritme.</p>
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.

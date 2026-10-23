@@ -10,7 +10,11 @@
 <meta property="og:title" content="Haaukins: Kom i gang (VPN, Hosts og lab-opsætning)">
 <meta property="og:description" content="Forudsætningen for alle netværksopgaver på Haaukins: login, start af lab, WireGuard-VPN-opsætning, og tilføjelse af hosts. Læs denne før du starter en opgave.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kom i gang: VPN, Hosts og lab-opsætning", "description": "Forudsætningen for alle netværksopgaver på Haaukins: login, start af lab, WireGuard-VPN-opsætning, og tilføjelse af hosts. Læs denne før du starter en opgave.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/kom-i-gang.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/gloss.js" defer></script>
@@ -39,7 +43,7 @@ sudo pacman -S wireguard-tools</code></pre><p>Hvis du får <code>resolvconf: com
 wg show                         # kræver evt. sudo; viser peer + handshake-tidspunkt</code></pre><p>Ingen handshake efter et minuts tid? Tjek at UDP-porten i din konfigs <code>Endpoint</code>-linje ikke er blokeret af en firewall, og at din systemtid er nogenlunde korrekt (WireGuard er følsom over for store tidsforskelle).</p><p>Denne side dækker det du skal bruge for at komme videre. Vil du have split tunnel-forklaringen, en fuld routing-diagnose og løsningen på den klassiske "VPN virker, men hostname gør ikke"-fælde efter en lab-genstart, så se <a href="wireguard-vpn.html">WireGuard-VPN på Linux</a>.</p>
 <h2>5. Find host-IP&#x27;erne og opdatér din Hosts-fil</h2>
 <p>Selvom din VPN er oppe, kender din computer endnu ikke navnene på labbets servere (fx <code>magic-key.hkn</code>). Kun platformen ved hvilket IP de har fået tildelt <em>denne gang</em> (det kan ændre sig hver gang labbet genstartes). To måder at finde dem på:</p><ol class="steps"><li><strong>Platformens egen Hosts-side</strong> (hvis tilgængelig). Viser hostname → IP direkte efter du har startet lab'et.</li><li><strong>Scan selv subnettet.</strong> Din <code>.conf</code>-fil fortæller dig subnettet i en kommentar (fx <code>YOUR LAB SUBNET IS: 77.222.61.0/24</code>). Scan det:
-<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -sn 77.222.61.0/24          # find hvilke IP'er der svarer
+<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -sn 77.222.61.0/24          # find hvilke IP'er der svarer
 # match dem op mod hostnavnet ved at teste HTTP/SSH/osv. på hver kandidat, fx:
 curl -s http://77.222.61.193/ -H "Host: secret-server.hkn" | head</code></pre></li></ol><p>Tilføj derefter mapningerne til <code>/etc/hosts</code> (kræver sudo, da filen normalt ikke er skrivbar for din bruger):</p><pre><code>sudo sh -c 'echo "77.222.61.38  magic-key.hkn" &gt;&gt; /etc/hosts'</code></pre><p>eller redigér filen direkte med en editor. Verificér til sidst:</p><pre><code>curl -s -o /dev/null -w "%{http_code}\n" http://magic-key.hkn/</code></pre><div class="callout">⚠️ <strong>Faldgrube: IP'et ændrer sig ved lab-genstart.</strong> Genstarter du lab'et (fx fordi timeren udløb, eller du nulstillede det for at få en frisk instans), får serverne ofte <em>nye</em> IP'er på et helt andet subnet. Dine gamle linjer i <code>/etc/hosts</code> peger så på et dødt/forkert IP. Husk at opdatere dem igen, ikke bare tilføje nye linjer oveni.</div>
 <h2>Tjekliste før du går i gang med en opgave</h2>
@@ -50,7 +54,7 @@ curl -s http://77.222.61.193/ -H "Host: secret-server.hkn" | head</code></pre></
 
 <footer>
 Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
-er en dansk undervisningsplatform til sikkerhedstræning (AAU / De Danske Cybermesterskaber) — alle opgaver
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
 løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
 har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
 genvej uden om selv at forstå den.
