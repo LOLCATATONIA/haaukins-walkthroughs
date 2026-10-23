@@ -120,3 +120,25 @@ footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--border
   max-width: min(280px, 70vw); box-shadow: 0 4px 14px rgba(0,0,0,.25);
   font-family: var(--sans); line-height: 1.4; text-align: left;
 }
+
+/* "hyr mig"-widget: fast nederst til højre, dismissible (husket via localStorage) */
+#hire-widget {
+  position: fixed; right: 16px; bottom: 16px; z-index: 500;
+  width: 250px; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  font-size: 14px; line-height: 1.5;
+}
+#hire-widget p { margin: 0 0 8px; padding-right: 16px; }
+#hire-widget p:first-of-type { font-weight: 600; }
+#hire-widget .hw-link {
+  display: inline-block; font-weight: 600; color: var(--link);
+}
+#hire-widget .hw-close {
+  position: absolute; top: 4px; right: 6px; background: none; border: none;
+  color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1;
+  padding: 6px; border-radius: 6px;
+}
+#hire-widget .hw-close:hover { color: var(--fg); background: var(--border); }
+@media (max-width: 560px) {
+  #hire-widget { left: 16px; right: 16px; width: auto; bottom: 12px; }
+}
