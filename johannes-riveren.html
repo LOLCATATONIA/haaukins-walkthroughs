@@ -37,8 +37,8 @@ unzip -P &lt;password&gt; secret.zip &amp;&amp; cat flag.txt</code></pre>
 <h2>Hvor ses dette igen?</h2>
 <p>Opgavens navn ER hintet, en dansk ordleg om "John the Ripper", og det mønster (titlen peger
 på værktøjet eller teknikken) går igen i hele dette CTF. <code>zip2john</code> hører til en hel
-familie af <code>*2john</code>-værktøjer (<code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code>, <code>rar2john</code>,
-<code>keepass2john</code>, <code>office2john</code>) der konverterer et krypteret artefakt til et
+familie af <code>*2john</code>-værktøjer (<code><span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span></code>, <code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet RAR-fil til et format John kan angribe.">rar2john</span></code>,
+<code><span class="gloss" tabindex="0" data-tip="Konverterer en KeePass-password-database til et format John kan angribe.">keepass2john</span></code>, <code><span class="gloss" tabindex="0" data-tip="Konverterer et password-beskyttet Office-dokument til et format John kan angribe.">office2john</span></code>) der konverterer et krypteret artefakt til et
 hash john/hashcat kan angribe offline. Når du møder en adgangskodebeskyttet fil, så spørg: findes
 der en <code>...2john</code> for dette format? Som regel ja.</p>
 <footer>

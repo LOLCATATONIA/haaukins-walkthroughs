@@ -48,7 +48,7 @@ class H(BaseHTTPRequestHandler):
         self.end_headers()
 
 HTTPServer(('0.0.0.0', 80), H).serve_forever()"</code></pre>
-             <p>Capturer samtidig med <code>tcpdump -s0 -w cap.pcap 'tcp port 80'</code> som ground truth, i
+             <p>Capturer samtidig med <code><span class="gloss" tabindex="0" data-tip="Fanger netværkstrafik til en pcap-fil direkte fra kommandolinjen.">tcpdump</span> -s0 -w cap.pcap 'tcp port 80'</code> som ground truth, i
              tilfælde af at servercodet ovenfor går glip af noget.</p>
 <h2>Carve &amp; afkod QR&#x27;en</h2>
 <p>QR-PNG'en ligger i POST-body'en (ét TCP-segment). Carve den ud mellem PNG-signaturen og IEND, og afkod:</p>

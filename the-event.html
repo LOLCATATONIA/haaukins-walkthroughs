@@ -36,7 +36,7 @@ curl http://&lt;host&gt;/guestbook/data/data.txt</code></pre>
 <h2>Hvad du har lært</h2>
 <ul><li>CMS'er/gæstebøger gemmer ofte data i en web-læsbar flatfil; <code>gobuster -x txt,bak,php</code> finder dem.</li><li>Læs den RÅ datafil (skjult/farvet tekst), ikke kun den renderede side. Ignorér decoy-sider (:8080-'Trap').</li></ul>
 <h2>Hvor ses dette igen?</h2>
-<p>Content-discovery (<code>gobuster</code>/<code>ffuf</code> med fil-endelser som
+<p>Content-discovery (<code>gobuster</code>/<code><span class="gloss" tabindex="0" data-tip="Hurtig webfuzzer — brute-forcer URL-stier, parametre eller headers.">ffuf</span></code> med fil-endelser som
 <code>txt,bak,php,old,zip</code>) afslører tit filer der aldrig var meningen at ligge offentligt:
 backups, rå datastores, config. Og husk forskellen på den RENDEREDE side og dens KILDE: tekst kan
 være skjult med CSS-farve, <code>display:none</code> eller HTML-kommentarer, synligt i kilden men

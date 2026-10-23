@@ -32,7 +32,7 @@
 <p>Map addr→enhed ved at skrive én ad gangen og aflæse displayet: <code>addr 0</code> og <code>11</code>
              er ubrugte; junction <code>Jn</code> = coil <code>n</code>; pumperne = holding-register 1 og 2.</p>
 <h2>Vind-konfiguration</h2>
-<p>Brug <code>pymodbus</code> (<code>pip install pymodbus</code>) til selve Modbus-delen:</p>
+<p>Brug <code><span class="gloss" tabindex="0" data-tip="Python-bibliotek til at læse/skrive Modbus/TCP-registre og -coils.">pymodbus</span></code> (<code>pip install pymodbus</code>) til selve Modbus-delen:</p>
              <pre><code>python3 -c "
 from pymodbus.client import ModbusTcpClient
 c = ModbusTcpClient('water-city.hkn', port=502)

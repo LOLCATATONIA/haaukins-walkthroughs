@@ -31,7 +31,7 @@
              opgavens navn. Men du behøver IKKE gøre det: selve flag-strengen <code>correctcrack()</code>
              bygger er allerede fuldt bestemt statisk.</p>
 <h2>Spor strcat-kæden statisk, uden at eksekvere noget</h2>
-<pre><code>r2 -A pwn_strings
+<pre><code><span class="gloss" tabindex="0" data-tip="Kommandoen for radare2 — reverse-engineering-værktøj til binær analyse.">r2</span> -A pwn_strings
 [0x...]> pdf @ sym.correctcrack      # strcat'er 7 .data-fragmenter sammen</code></pre>
              <p>7 hex-literal-stumper i <code>.data</code> samles i strcat-rækkefølge:</p>
              <pre><code>484B + 4E7B58 + 6E6 + F2D51 + 5234 + 2D4459 + 34517D

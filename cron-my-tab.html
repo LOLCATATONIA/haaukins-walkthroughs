@@ -51,8 +51,8 @@ cat /tmp/c_root</code></pre></li>
 <ul><li>En fil der køres som root af cron + din gruppe kan skrive = privesc (selv <code>---x-w----</code>).</li><li>Lad payloaden gendanne scriptet, efterlad ikke en root-backdoor.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>Scheduled jobs (cron, systemd-timers) der kører som root, men peger på et script en
-lav-privilegeret bruger kan ændre, er en klassisk privesc. Lede-værktøjer som <code>pspy</code>
-(se processer uden root) og <code>linpeas</code> finder netop den slags automatisk. To vigtige
+lav-privilegeret bruger kan ændre, er en klassisk privesc. Lede-værktøjer som <code><span class="gloss" tabindex="0" data-tip="Overvåger kørende processer uden root, afslører fx cron-jobs der kører som root.">pspy</span></code>
+(se processer uden root) og <code><span class="gloss" tabindex="0" data-tip="Automatiseret enumereringsscript der leder efter privilege-escalation-veje på Linux.">linpeas</span></code> finder netop den slags automatisk. To vigtige
 vaner: en write-bit (<code>-w-</code>) er nok, du behøver ikke read; og ryd altid op efter dig,
 gendan det oprindelige script så du ikke efterlader en vedvarende root-bagdør, både af etiske og
 praktiske grunde.</p>

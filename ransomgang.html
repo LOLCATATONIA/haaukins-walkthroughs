@@ -24,7 +24,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
 <h2>Stage 1 — statisk analyse af en hjemmerullet login (radare2)</h2>
-<p>Binæren er stripped + PIE (ingen symboler), downloadet over HTTP fra opgaven selv. <code>r2 -A</code>
+<p>Binæren er stripped + PIE (ingen symboler), downloadet over HTTP fra opgaven selv. <code><span class="gloss" tabindex="0" data-tip="Kommandoen for radare2 — reverse-engineering-værktøj til binær analyse.">r2</span> -A</code>
              + <code>afl</code> (funktionsliste) + <code>pdf @ main</code> (disassembler main) kortlægger logikken
              uden symboler. Den justerer en global tæller (<code>.data</code>) ud fra 6 betingelser på input-byte 0-5,
              og accepterer kun koden hvis tælleren rammer <strong>præcis 7</strong>:</p>

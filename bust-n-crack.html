@@ -65,7 +65,7 @@ $ cat /home/haxor/flag.txt                              # Crack-flaget</code></p
 <p>Hele kæden her er et miniature-pentest: find en eksponeret ressource (directory listing),
 udtræk et stykke materiale (den krypterede nøgle), knæk det offline, og brug det som pivot til
 næste trin (SSH). Den mest overførbare vane er at knække ting OFFLINE: <code>ssh2john</code>,
-<code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code>, <code>keepass2john</code> og lignende konverterer et krypteret artefakt
+<code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code>, <code><span class="gloss" tabindex="0" data-tip="Konverterer en KeePass-password-database til et format John kan angribe.">keepass2john</span></code> og lignende konverterer et krypteret artefakt
 til et hash du kan angribe lokalt, langt hurtigere og mere stealthy end at hamre på selve
 tjenesten. Og husk at det du knækker sjældent er målet, det er nøglen til næste dør.</p>
 <footer>

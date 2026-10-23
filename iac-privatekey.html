@@ -24,7 +24,7 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinene viser metoden; det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>SSH ind og læs historikken</h2>
-<pre><code>sshpass -p haaukins ssh haaukins@securevpn.hkn   # bruger/password givet i opgaveteksten
+<pre><code><span class="gloss" tabindex="0" data-tip="Leverer et SSH-password ikke-interaktivt, til brug i scripts.">sshpass</span> -p haaukins ssh haaukins@securevpn.hkn   # bruger/password givet i opgaveteksten
 cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
              <p>Det er et Terraform-repo (DigitalOcean-droplets + Cloudflare DNS). Commit-beskederne
              fortæller selv historien, ingen grund til at gætte:</p>

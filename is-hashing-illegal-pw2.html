@@ -36,7 +36,7 @@
 <ul><li>32 hex-tegn (lowercase) = MD5. Identificér hashen på længde/format først.</li><li>Standard dictionary = rockyou; <code>hashcat -m 0</code> / <code>john --format=raw-md5</code>.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>At identificere en hash på dens form er altid første skridt, før du knækker den: 32 hex =
-MD5 eller NTLM, 40 = SHA-1, 64 = SHA-256. Værktøjer som <code>hashid</code> eller
+MD5 eller NTLM, 40 = SHA-1, 64 = SHA-256. Værktøjer som <code><span class="gloss" tabindex="0" data-tip="Gætter hvilken hash-algoritme en given hash-streng sandsynligvis er.">hashid</span></code> eller
 <code>hashcat --identify</code> hjælper. En hash er envejs, så "cracking" er i virkeligheden bare
 at hashe en masse kandidater og sammenligne. Derfor virker det kun på svage/gættelige inputs, en
 tilfældig 20-tegns adgangskode knækker rockyou aldrig.</p>

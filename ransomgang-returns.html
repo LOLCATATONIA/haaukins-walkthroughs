@@ -26,11 +26,11 @@
 <h2>&#x27;The new trick&#x27; = UPX, ikke rigtig stripping</h2>
 <p>Binæren ser statisk linket + uden section headers ud (ligner stripping). Men:</p>
              <pre><code>grep -a UPX ransomgangreturns      # -> "UPX 3.96"-signatur
-upx -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-info</code></pre>
+<span class="gloss" tabindex="0" data-tip="Pakker/udpakker (komprimerer) en eksekverbar fil — kan ligne stripping, men er reversibel.">upx</span> -d ransomgangreturns -o unpacked   # udpakket = unstripped MED fuld debug-info</code></pre>
              <p>Tjek altid for en packer-signatur før manuel symbol-fri RE.</p>
 <h2>Login-logikken (statisk på den udpakkede binær)</h2>
 <p>En tråd beregner login-koden ud fra boot-epoch'en — som <strong>printes direkte i banneret</strong>:</p>
-             <pre><code>srandom(epoch); r1=rand(); r2=rand();
+             <pre><code>srandom(epoch); r1=rand(); <span class="gloss" tabindex="0" data-tip="Kommandoen for radare2 — reverse-engineering-værktøj til binær analyse.">r2</span>=rand();
 kode = epoch - (r1 % 10000) + (r2 % 10000);</code></pre>
              <p>Da epoch'en lækkes til klienten, kan hele <code>random()</code>-sekvensen genskabes 100% deterministisk.
              <strong>Men:</strong> Pythons <code>random</code> (Mersenne Twister) matcher <em>ikke</em> glibc — du skal

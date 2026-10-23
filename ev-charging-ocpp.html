@@ -31,7 +31,7 @@
 <h2>Recon &amp; capture</h2>
 <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -Pn -sT -p- &lt;central-system&gt;      # fx 8887/tcp = OCPP central system
 # trafikken er ofte synlig passivt på lab-segmentet — ingen MITM nødvendig:
-sudo tcpdump -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</code></pre>
+sudo <span class="gloss" tabindex="0" data-tip="Fanger netværkstrafik til en pcap-fil direkte fra kommandolinjen.">tcpdump</span> -i eth0 -s0 -w ocpp.pcap 'host &lt;central&gt; and tcp port 8887'</code></pre>
 <h2>Af-maskér WebSocket-frames (nøgletrinnet)</h2>
 <p>To fælder: (1) capturer du <em>midt i</em> en etableret WS, så tshark ikke dissekerer den (den så ikke
              HTTP-upgrade-handshaket); (2) <strong>klient→server-frames er maskerede</strong> (XOR med en 4-byte nøgle pr.

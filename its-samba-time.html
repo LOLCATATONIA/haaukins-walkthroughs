@@ -28,10 +28,10 @@
 <code>-sV</code>-scan giver dig den præcise version, og en gammel version peger ofte direkte på et
 kendt CVE med en færdig exploit:</p>
 <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner — finder åbne porte og services på en host.">nmap</span> -sV -p139,445 &lt;ip&gt;        # Samba 3.0.20  -> slå op: CVE-2007-2447
-smbclient -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>
+<span class="gloss" tabindex="0" data-tip="Kommandolinje-klient til at liste/hente filer fra en SMB/Windows-fildeling.">smbclient</span> -L //&lt;ip&gt;/ -N --option='client min protocol=NT1'   # shares: tmp (skrivbar)</code></pre>
              <p>Reverse/bind-shells er netværksblokeret (ingen rute tilbage til din VPN-IP, og kun 139/445 er
              åbne indgående). <code>smbclient</code> og Metasploits shell-moduler kan ikke udnytte dette, så brug
-             <code>impacket</code>'s lav-niveau SMB1-kontrol til selv at styre brugernavnet der sendes under
+             <code><span class="gloss" tabindex="0" data-tip="Python-bibliotek til at tale netværksprotokoller (SMB, Kerberos, ...) direkte.">impacket</span></code>'s lav-niveau SMB1-kontrol til selv at styre brugernavnet der sendes under
              login. CVE-2007-2447's sårbarhed er at <code>username map script</code> kører brugernavnet som en
              shell-kommando, <em>før</em> login overhovedet fejler:</p>
              <pre><code>pip install impacket   # hvis den ikke allerede er installeret
