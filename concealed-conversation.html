@@ -34,7 +34,7 @@
 <h2>Find de 12 ZIP&#x27;er i UDP-trafikken</h2>
 <p>Wireshark genkender ikke indholdet på denne UDP-port, så se selv på de rå payload-bytes
              for hver pakke:</p>
-             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark: filtrerer og læser pcap-trafik.">tshark</span> -r packages.pcap -T fields -e frame.number -e udp.payload
+             <pre><code><span class="gloss" tabindex="0" data-tip="Kommandolinje-udgaven af Wireshark: filtrerer og læser pcap-trafik.">tshark</span> -r packages.pcap -T fields -e udp.payload
 # hver linje er én pakkes payload som hex, fx 504b0304...</code></pre>
              <p>Hver linje starter med <code>504b0304</code> (= <code>PK\x03\x04</code> i hex), så hele UDP-payloaden
              er altså en gyldig ZIP-fil. Skriv dem til disk og pak ud:</p>

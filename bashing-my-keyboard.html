@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Bashing My Keyboard (tutorial: dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)</title>
+<title>Haaukins: Bashing My Keyboard (tutorial: død JS-kode afslører cookie-gate og RCE, vim+doas giver root)</title>
 <meta name="description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Bashing My Keyboard (tutorial: dødt JS-kode afslører cookie-gate og RCE, vim+doas giver root)">
+<meta property="og:title" content="Haaukins: Bashing My Keyboard (tutorial: død JS-kode afslører cookie-gate og RCE, vim+doas giver root)">
 <meta property="og:description" content="Guide til Haaukins Bashing My Keyboard: en kommenteret JS-funktion afslører både at uploadede .py-filer køres som script, og en case-sensitiv cookie-gate til uploadet; brute-force cookien, få RCE, og brug doas+vim til root.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/bashing-my-keyboard.html">
 <meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
@@ -28,7 +28,7 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Læs det døde kode i kommentaren</h2>
+<h2>Læs den døde kode i kommentaren</h2>
 <p><code>http://keyboard-bashing.hkn</code> er en fil-upload-side. <code>/static/js/upload.js</code>
              har en hel funktion pakket i en kommentar:</p>
              <pre><code>// Implement this properly. For now using flask backend, it only runs python files!!!!
@@ -78,7 +78,7 @@ cat /etc/doas.conf
         ordspil på keyBoARD-temaet, eller en bevidst tastefejl): <span class="flag">HNK{w3w_7h47_700k_qu173_4_7urn}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Dødt kode i en JS-kommentar er stadig ægte kildekode-læk; læs det, selv når det ser "outkommenteret væk" ud.</li><li>En case-sensitiv 13-tegns cookie er kun 8192 muligheder; altid værd at brute-force frem for at gætte.</li><li>vim -es ("ex silent mode") lader dig køre shell-kommandoer via en upload-baseret RCE uden at have en interaktiv pty.</li></ul>
+<ul><li>Død kode i en JS-kommentar er stadig ægte kildekode-læk; læs den, selv når den ser "outkommenteret væk" ud.</li><li>En case-sensitiv 13-tegns cookie er kun 8192 muligheder; altid værd at brute-force frem for at gætte.</li><li>vim -es ("ex silent mode") lader dig køre shell-kommandoer via en upload-baseret RCE uden at have en interaktiv pty.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>Klient-side JavaScript (inkl. udkommenteret kode) er fuldt synligt for enhver, og udviklere
 efterlader tit hele angrebsplanen der: hvilke filtyper serveren kører, en "midlertidig" cookie-gate,

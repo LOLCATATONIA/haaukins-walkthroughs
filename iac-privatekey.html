@@ -47,7 +47,8 @@ cd ~/infrastructure &amp;&amp; git log --oneline --all</code></pre>
              rockyou pegede på, og det er den opgavetitlens "<strong>protected</strong>" refererer til.</p>
              <pre><code>git cat-file -p &lt;wg2-blob&gt; | sed -n '/BEGIN RSA/,/END RSA/p' > wg2_enc.key
 <span class="gloss" tabindex="0" data-tip="Konverterer en krypteret SSH-nøgle til et format John kan angribe.">ssh2john</span> wg2_enc.key > wg2.john &amp;&amp; john --wordlist=rockyou.txt wg2.john   # -> sexygirl1
-ssh-keygen -p -P sexygirl1 -N '' -f wg2_dec.key</code></pre>
+cp wg2_enc.key wg2_dec.key                          # ssh-keygen -p dekrypterer IN-PLACE
+ssh-keygen -p -P sexygirl1 -N '' -f wg2_dec.key     # fjern passphrase fra kopien</code></pre>
 <h2>Nøglen hører ikke til DENNE maskine</h2>
 <p>Prøver man den dekrypterede nøgle direkte mod <code>securevpn.hkn</code>, bliver den
              afvist. Nøglen er til en AF DE TO DROPLETS Terraform-koden selv opretter (wg-1/wg-2),
@@ -65,7 +66,7 @@ ssh -i wg2_dec.key -o PubkeyAcceptedKeyTypes=+ssh-rsa root@34.25.151.110 'cat /r
 <h2>Hvad du har lært</h2>
 <ul><li><code>git rev-list --all --objects</code> + <code>git cat-file</code> henter 'slettede' hemmeligheder frem.</li><li>Passphrase-beskyttede nøgler: <code>ssh2john</code> + john; nyere OpenSSH kræver <code>+ssh-rsa</code>.</li><li>En fundet SSH-nøgle autoriserer ikke nødvendigvis den maskine du allerede er på, tjek om IaC-koden selv opretter ANDRE hosts (her: scan undernettet).</li><li>Læs titlen for at vælge den rigtige nøgle (decoy-fælde).</li></ul>
 <h2>Hvor ses dette igen?</h2>
-<p>At "slette" en hemmelighed fra en fil og committe fjernder den ikke, den gamle version
+<p>At "slette" en hemmelighed fra en fil og committe fjerner den ikke, den gamle version
 lever videre som et git-objekt i historikken. Det er en af de hyppigste rigtige secret-læk:
 API-nøgler, passwords og private nøgler der blev fjernet i en senere commit, men stadig kan hentes
 frem. Værktøjer som <code><span class="gloss" tabindex="0" data-tip="Scanner (bl.a.) git-historik for højt-entropi-strenge og kendte secret-mønstre.">trufflehog</span></code> og <code><span class="gloss" tabindex="0" data-tip="Scanner et git-repo&#x27;s historik for lækkede secrets/nøgler.">gitleaks</span></code> scanner netop hele

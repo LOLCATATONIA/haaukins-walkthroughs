@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Car Park, tutorial (root er let, men flaget er ikke på disk)</title>
+<meta name="description" content="Guide til Haaukins Car Park: root-RCE er trivielt, men flaget ligger ikke i noget filsystem. En skjult note peger på et IP-kamera på en anden lab-host, og flaget står overlejret i selve CCTV-streamen.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/car-park.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Car Park, tutorial (root er let, men flaget er ikke på disk)">
+<meta property="og:description" content="Guide til Haaukins Car Park: root-RCE er trivielt, men flaget ligger ikke i noget filsystem. En skjult note peger på et IP-kamera på en anden lab-host, og flaget står overlejret i selve CCTV-streamen.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/car-park.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Car Park", "description": "Guide til Haaukins Car Park: root-RCE er trivielt, men flaget ligger ikke i noget filsystem. En skjult note peger på et IP-kamera på en anden lab-host, og flaget står overlejret i selve CCTV-streamen.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/car-park.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Car Park</h1>
+<p class="subtitle">Root er ikke målet. Når flaget ikke er på disken, er det et spor, ikke en blindgyde.</p>
+<div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Sporet: let root, men hvor er flaget?</h2>
+<ol class="steps">
+<li><strong>Load appen i en browser først.</strong> <code>car-park.hkn</code> er en SvelteKit-frontend
+(port 80) med en Go/Fiber-API (port 3000). Login <code>admin</code>/<code>shadow1</code> på forsiden
+giver et "Scam-HQ"-kontrolpanel. Den rendrede app er det der afslører både en <strong>Run</strong>-knap
+og hele kamera-temaet, som blind curl-recon let ville misse.</li>
+<li><strong>Kontrolpanelet giver root-RCE gratis.</strong> Fil-upload plus Run-knappen på en
+<code>.sh</code>-fil eksekverer scriptet som <strong>root</strong>, med output i panelet.
+<pre><code># upload et script, kør det:
+POST /api/file/upload      (felt: upload)
+POST /api/file/run/&lt;fil&gt;
+# id  -> uid=0(root)</code></pre></li>
+<li><strong>Og så: intet flag på disken.</strong> En grundig jagt som root gav NUL.
+<pre><code>grep -ra -E "(HKN|DDC|CTF|FLAG)\{" /         # hele filsystemet
+# + Go/Fiber-binæren, /api.db (SQLite, kun brugeren admin),
+#   proces-env, proces-hukommelse, åbne fds: alt tomt</code></pre>
+(Binærens <code>flag.Flag</code> er bare Go's stdlib <code>flag</code>-pakke, ikke et flag.)</li>
+</ol>
+<p>Det er selve vendepunktet: root uden et flag på disken betyder ikke "grep hårdere", det betyder
+"flaget ligger et andet sted". Skift fra at lede i filer til at lede efter noget der peger VÆK fra
+denne host.</p>
+<h2>Den skjulte note: et billede der ikke er et billede</h2>
+<p><code>find / -iname "*flag*"</code> gav intet, men <code>/home/admin/</code> indeholdt
+<code>secret.jpeg</code> (410 bytes, world-writable). 410 bytes er mistænkeligt lille for et JPEG.
+Tjek typen frem for at stole på endelsen:</p>
+<pre><code>file /home/admin/secret.jpeg
+# ASCII text        &lt;- ikke et billede overhovedet
+cat /home/admin/secret.jpeg</code></pre>
+<pre><code>Admin labour control / ToDo: ... Fire Jim ... Find new IP for cameras ...
+USER: admin
+PASS: YV7qBoOcPls2WQN
+// Hallway - Offline   /scam-HQ/hallway/ipcam.sdp
+// Main office - Online /scam-HQ/main/ipcam.sdp
+// Bathroom - Offline  /scam-HQ/bathroom/ipcam.sdp</code></pre>
+<p>Noten giver to ting login-siden ikke gjorde: admins RIGTIGE password (ikke <code>shadow1</code>),
+og tre IP-kameraer, hvor <strong>Main office er online</strong>. Flaget er ikke en fil, det ligger i
+en kamera-stream.</p>
+<h2>Pivot: find kamera-serveren på lab-subnettet</h2>
+<p>Kameraerne er ikke lokale filer, og <code>.sdp</code>-stierne peger ikke på noget på
+denne host. Containerens egen IP (fra <code>ip addr</code> eller <code>hostname -I</code> som root)
+er <code>34.27.35.254</code>, så kamera-serveren er sandsynligvis en nabo på samme subnet. Scan
+<code>/24</code>'et for de porte en RTSP/streaming-server bruger:</p>
+<pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p 554,8554,1935,8888,8889 --open 34.27.35.0/24
+# 34.27.35.47: 554/rtsp 1935/rtmp 8888 8889   (MediaMTX)</code></pre>
+<p>Port 554 er RTSP's standardport, og MediaMTX er en kendt RTSP/RTMP-server. Kameraet kører altså
+på en separat lab-host, præcis som noten antydede ("find new IP for cameras").</p>
+<h2>Se streamen: flaget står i billedet</h2>
+<p>RTSP på <code>.47</code> svarer <code>401</code> uden auth, så brug note-credentials.
+Stream-pathen er bogstaveligt <code>.sdp</code>-navnet fra noten. <code>ffprobe</code>/<code>ffmpeg</code>
+kommer fra <code>apt install ffmpeg</code>:</p>
+<pre><code>ffprobe -rtsp_transport tcp \
+  -i "rtsp://admin:YV7qBoOcPls2WQN@34.27.35.47:554/scam-HQ/main/ipcam.sdp"
+# Stream: Video 1280x720     &lt;- online
+
+ffmpeg -rtsp_transport tcp \
+  -i "rtsp://admin:YV7qBoOcPls2WQN@34.27.35.47:554/scam-HQ/main/ipcam.sdp" \
+  -frames:v 1 -y frame.png</code></pre>
+<p>Åbn <code>frame.png</code> og KIG. Det er en CCTV-optagelse af scam-callcenteret ("Camera 04",
+12-18-2021), og flaget er overlejret nederst i billedet. Ingen fil at <code>cat</code>'e, kun et
+øje på et videobillede.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{evidence-secured-scammer-behind-bars-insured}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><strong>Root er ikke målet, flaget er.</strong> "Jeg er root men finder intet flag på disken" er et SPOR, ikke en blindgyde: det betyder flaget ligger i en anden tjeneste, en database på en anden host, eller som her en media-stream. Hold op med at grep'e, og begynd at lede efter noget der peger væk fra hosten.</li><li><strong>Tjek filtype, ikke endelse.</strong> <code>secret.jpeg</code> var ren tekst. <code>file &lt;navn&gt;</code> afslører den slags på et øjeblik, og en mistænkelig filstørrelse (410 bytes for et "JPEG") er et vink i sig selv.</li><li><strong>En note på én host udleverer ofte nøglen til en anden.</strong> Rigtige credentials plus tre kamera-stier sendte os videre til en nabo-host. Scan lab-subnettets <code>/24</code> når et spor peger på en tjeneste der ikke kører lokalt.</li><li><strong>Flaget kan bo i en video- eller lyd-feed.</strong> Træk et enkelt frame ud med <code>ffmpeg -frames:v 1</code> og se på det. Overlejret tekst i en CCTV-stream er en fil intet <code>grep</code> nogensinde ville finde.</li><li><strong>Browser-first betaler sig.</strong> Run-knappen og kamera-temaet gav sig kun til kende i den rendrede app, ikke i rå API-kald.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Mønstret "fuld adgang til host, men flaget er et andet sted" går igen i mange
+Boot2Root-opgaver: flaget kan ligge i en database, en besked-kø, en anden containers volumen, eller
+en netværks-stream. Den generelle refleks er at lede efter noget der PEGER videre (en note, et sæt
+credentials, en konfigurationsfil med en IP) frem for at lede efter selve flag-strengen igen og igen
+på samme maskine. "Filtype frem for endelse" er samme årvågenhed som i stego-opgaver, se
+<a href="friendly-image.html">Friendly Image</a>, hvor et billede gemmer mere end det viser. Og
+subnet-pivot'et, at scanne <code>/24</code>'et for at finde en nabo-tjeneste, er samme bevægelse som
+i <a href="network-scanning.html">netværks-scanning-primeren</a>: når ét spor nævner en host du ikke
+kan se lokalt, så find den på nettet.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

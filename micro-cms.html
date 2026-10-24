@@ -35,7 +35,7 @@ curl http://microcms.com/secret/          # "This is a secret: HKN{...}"</code><
 <h2>Micro CMS URL: IDOR / broken access control</h2>
 <p>Opgaveteksten siger kun at der er en bug "when you change URL path". Siderne vises via
              <code>page.php?view=N</code>, men kun <code>view=1</code> og <code>view=2</code> er linket fra
-             forsiden. Enumerér de næste ID'er for at se om der findes mere:</p>
+             forsiden. Enumerér de næste ID'er for at se om der findes flere:</p>
              <pre><code>for n in $(seq 1 10); do
   echo -n "view=$n: "; curl -s "http://microcms.com/page.php?view=$n" | grep -oiE '&lt;h1&gt;[^&lt;]*'
 done

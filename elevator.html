@@ -38,7 +38,7 @@ ssh pablo@elevator.hkn</code></pre></li>
 <pre><code>find / -perm -4000 -type f 2>/dev/null   # /usr/bin/rootshell/shell  <- custom, ikke standard!</code></pre>
 En ikke-standard SUID-binær skiller sig ud fra den sædvanlige liste og er værd at undersøge først.</li>
 <li><strong>Reverse den for at forstå hvad den gør</strong> (<code>strings</code> rækker tit):
-<pre><code>strings /usr/bin/rootshell/shell   # setuid(0); system("/bin/bash")</code></pre>
+<pre><code>strings /usr/bin/rootshell/shell   # afslører strengene/symbolerne: setuid, system, /bin/bash, rootshell.c</code></pre>
 Det er bogstaveligt en bevidst root-shell. Kør den og fodr den en kommando:
 <pre><code>echo 'cat /root/flag.txt' | /usr/bin/rootshell/shell</code></pre></li>
 </ol>
@@ -49,8 +49,8 @@ Det er bogstaveligt en bevidst root-shell. Kør den og fodr den en kommando:
 <ul><li>Samme foothold-mønster som <a href="escalator.html">Escalator</a>, men privesc = en bevidst SUID root-shell.</li><li><code>setuid(0); system()</code> kører <code>/bin/bash</code> som root.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>En custom SUID-binær er altid værd at reverse'e: kør <code>strings</code> på den, for mange
-(som her) indeholder bogstaveligt <code>setuid(0); system("/bin/bash")</code> eller et kald til en
-anden kommando, og afslører dermed hvordan den giver root. Hjemmelavede SUID-helpers er en klassisk
+(som her) afslører symbolerne/strengene <code>setuid</code>, <code>system</code> og <code>/bin/bash</code>
+eller et kald til en anden kommando, og røber dermed hvordan den giver root. Hjemmelavede SUID-helpers er en klassisk
 privesc i den virkelige verden netop fordi udviklere laver dem for at "gøre noget nemmere som
 root" og glemmer at de kan misbruges.</p>
 <footer>

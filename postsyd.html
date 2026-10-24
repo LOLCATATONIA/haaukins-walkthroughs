@@ -49,7 +49,7 @@ gdb -batch -ex 'info functions' ./pakkesystem</code></pre>
              <code>adminAcces()</code></strong>, som disassembly af <code>main</code> bekræfter aldrig
              kaldes (kun menuvalg 1-4 er koblet).</p>
 <h2>Kald den direkte via gdb</h2>
-<p><code>adminAcces()</code> XOR-dekoder (<code>+1</code> pr. byte) en streng i
+<p><code>adminAcces()</code> Caesar-dekoder (<code>+1</code> pr. byte) en streng i
              <code>.data</code> og <code>printf</code>'er den. Kald den bare manuelt:</p>
              <pre><code>sudo gdb -batch \
   -ex 'break main' -ex 'run' \

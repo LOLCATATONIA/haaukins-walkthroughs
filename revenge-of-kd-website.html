@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haaukins: Revenge of KD&#x27;s Website, tutorial (LFI, og at omgå en leak-guard med /proc/self/cwd)</title>
+<meta name="description" content="Guide til Haaukins Revenge of KD&#x27;s Website: en LFI er let, men flaget vogtes af en is_flag-guard. To nærliggende angreb er bevidste fælder, og den rigtige vej udnytter at os.path.abspath() og open() følger symlinks forskelligt.">
+<link rel="canonical" href="https://lolcatatonia.github.io/haaukins-walkthroughs/revenge-of-kd-website.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Haaukins: Revenge of KD&#x27;s Website, tutorial (LFI, og at omgå en leak-guard med /proc/self/cwd)">
+<meta property="og:description" content="Guide til Haaukins Revenge of KD&#x27;s Website: en LFI er let, men flaget vogtes af en is_flag-guard. To nærliggende angreb er bevidste fælder, og den rigtige vej udnytter at os.path.abspath() og open() følger symlinks forskelligt.">
+<meta property="og:url" content="https://lolcatatonia.github.io/haaukins-walkthroughs/revenge-of-kd-website.html">
+<meta property="og:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lolcatatonia.github.io/haaukins-walkthroughs/assets/og-default.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Revenge of KD's Website", "description": "Guide til Haaukins Revenge of KD's Website: en LFI er let, men flaget vogtes af en is_flag-guard. To nærliggende angreb er bevidste fælder, og den rigtige vej udnytter at os.path.abspath() og open() følger symlinks forskelligt.", "url": "https://lolcatatonia.github.io/haaukins-walkthroughs/revenge-of-kd-website.html", "inLanguage": "da", "about": {"@type": "Thing", "name": "Haaukins CTF"}}</script>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/gloss.js" defer></script>
+<script src="assets/hire-widget.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><a href="index.html">← Alle Haaukins-tutorials</a></nav>
+<h1>Revenge of KD&#x27;s Website</h1>
+<p class="subtitle">Guarden tjekker én sti to gange med to forskellige semantikker. Dét er hullet.</p>
+<div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
+<div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
+
+<h2>Sporet: en LFI i ?post=</h2>
+<ol class="steps">
+<li><strong>Browser-first viser angrebsfladen.</strong> Forsiden lister blog-poster som
+<code>/?post=pokedex.txt</code>. En parameter der navngiver en fil er en klassisk LFI-kandidat.</li>
+<li><strong>Bekræft LFI med den billigste test.</strong>
+<pre><code>GET /?post=/etc/passwd            -&gt; root:x:0:0:...
+GET /?post=../../../../etc/passwd -&gt; root:x:0:0:...</code></pre>
+Begge virker, så vi kan læse vilkårlige filer.</li>
+<li><strong>Noter hvad serveren IKKE er.</strong> Den kører <code>gunicorn</code> (Python), så
+PHP-wrappers som <code>php://filter</code> giver <code>500</code>, ikke kildekode. Den sædvanlige
+PHP-LFI-værktøjskasse gælder ikke her, vi må læse kilden direkte.</li>
+</ol>
+<h2>Læs kilden: hvad vogter flaget?</h2>
+<p>CWD indeholder <code>posts/</code>, så <code>?post=../main.py</code> rammer
+app-kilden et niveau op. Den afslører hele logikken:</p>
+<pre><code>FLAG = readfile("flag.txt")                  # det rigtige flag: CWD/flag.txt
+app.config["SECRET_KEY"] = json.loads(readfile("config.json"))["SECRET_KEY"]
+
+def is_flag(path, flag):                      # "Please no leak my flag"
+    return os.path.exists(os.path.abspath(path)) and readfile(path) == flag
+
+@app.route('/', methods=['GET','POST'])
+def index():
+    privilige = session.get("account_type", "USER")   # default USER
+    requested = get_query(request).get('post', 'index.txt')
+    path = os.path.join("posts", requested)
+    if not privilige == "ADMIN":
+        if is_flag(path, FLAG):               # blokerer KUN hvis du ikke er ADMIN
+            return "ERROR: that's not one of my posts, stop that!"
+    text = readfile(path)
+    return render_template_string(readfile('page.html'), path=path, text=text)</code></pre>
+<p>To ting at bemærke med det samme. For det første: <code>render_template_string</code> renderer
+den faste <code>page.html</code> med <code>text</code> som kontekst-variabel, ikke vores input som
+skabelon, så der er <strong>ingen SSTI</strong>. For det andet: guarden slår kun til for ikke-ADMIN,
+og den afviser enhver sti hvis indhold er lig flaget. Det udelukker den naive idé om "bare peg på
+flag-filen ad en anden vej", for enhver sti til samme fil giver samme bytes og rammer guarden.</p>
+<h2>De to fælder: derfor hedder den &quot;Revenge&quot;</h2>
+<p>To oplagte veje er bevidst spærret, og at genkende dem som fælder sparer timer:</p>
+<p><strong>Fælde 1, decoy mod /root.</strong> <code>posts/flag.txt</code> findes og siger blot
+<em>"My super secret flag was moved to root folder"</em>. Men <code>?post=/root/flag.txt</code>
+giver <code>500</code>: filen er ejet af root og ulæselig for gunicorn-brugeren. Noten er en rød
+sild.</p>
+<p><strong>Fælde 2, forge en ADMIN-cookie.</strong> <code>config.json</code> kan læses via LFI og
+indeholder en <code>SECRET_KEY</code>, så fristelsen er at signere en egen session med
+<code>account_type=ADMIN</code>. Men læs filen: den er ikke gyldig JSON (den har
+<code>//</code>-kommentarer og <code>KEY = "..."</code>-syntaks). <code>json.loads()</code> kaster
+derfor, og <code>except</code>-grenen sætter <code>SECRET_KEY = os.urandom(32).hex()</code>, en
+tilfældig nøgle per proces. En forged cookie afvises, man forbliver USER. Dét er selve "Revenge":
+udvikleren troede nøglen virkede, men udviklerens egen config gør den ubrugelig. Verificér altid at en
+config faktisk PARSER, før du investerer i at forge noget der signeres med den.</p>
+<p>Tilbage står: det rigtige flag er <code>CWD/flag.txt</code>, og guarden blokerer det for USER.
+Vi må narre selve guarden.</p>
+<h2>Bypass: abspath() er leksikalsk, open() følger symlinks</h2>
+<p>Hele guarden hviler på én linje:</p>
+<pre><code>os.path.exists(os.path.abspath(path)) and readfile(path) == flag</code></pre>
+<p>Den slår samme <code>path</code> op på to forskellige måder. <code>os.path.abspath()</code>
+normaliserer <code>..</code> <strong>rent leksikalsk</strong>, som ren strengmanipulation, uden at
+røre disken. <code>open()</code> (inde i <code>readfile</code>) lader derimod <strong>kernen</strong>
+følge symlinks undervejs. Hvis vi kan få de to til at pege forskellige steder hen, så
+<code>abspath()</code> lander på en sti der IKKE eksisterer, kortslutter <code>os.path.exists()</code>
+til <code>False</code>, og hele <code>is_flag</code> bliver <code>False</code> uden overhovedet at
+læse filen. Guarden er sprunget over, men <code>open()</code> bagefter når stadig det rigtige
+<code>flag.txt</code>.</p>
+<p>Nøglen er <code>/proc/self/cwd</code>, en magisk symlink kernen vedligeholder til processens
+arbejdsmappe. <code>abspath()</code> aner ikke at det er en symlink og behandler det som almindelige
+mappenavne, mens <code>open()</code> følger den til app-dir'en.</p>
+<h2>Den CWD-agnostiske payload</h2>
+<p>Rekognoscering viste at CWD ligger 2 niveauer dybt:
+<code>?post=/proc/self/cwd/../../etc/passwd</code> gav <code>/etc/passwd</code>, mens ét enkelt
+<code>..</code> gav <code>500</code>. Den endelige payload går <code>../..</code> op til roden og
+re-entrer via <code>/proc/self/cwd</code> igen:</p>
+<pre><code>?post=/proc/self/cwd/../../proc/self/cwd/flag.txt</code></pre>
+<p>Nu divergerer de to opslag præcis som ønsket:</p>
+<pre><code>abspath() (leksikalsk):  proc, self, cwd, .., .., proc, self, cwd, flag.txt
+                         -&gt; /proc/proc/self/cwd/flag.txt  -&gt; findes IKKE
+                         -&gt; is_flag = False  -&gt; guard forbigået
+
+open() (kerne):          cwd -&gt; app-dir, ../.. -&gt; /, proc/self/cwd -&gt; app-dir igen
+                         -&gt; læser CWD/flag.txt  -&gt; FLAGET</code></pre>
+<pre><code>DDC{what_other_weird_unintended_will_people_find}</code></pre>
+<p>Flag-navnet anerkender selv at det er en utilsigtet vej. Det er ofte sådan de dyreste CTF-flag
+ser ud.</p>
+<details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
+<p>Flag: <span class="flag">DDC{what_other_weird_unintended_will_people_find}</span></p>
+</details>
+<h2>Hvad du har lært</h2>
+<ul><li><strong>En indholds-baseret leak-guard kan ikke omgås ved at variere stien til samme fil.</strong> <code>readfile(path) == FLAG</code> giver samme resultat uanset hvilken sti der peger på filen, for bytes er de samme. Angrebet må ramme KONTROLLEN, ikke indholdet.</li><li><strong>abspath() og open() er ikke enige om symlinks.</strong> <code>os.path.abspath()</code> normaliserer <code>..</code> leksikalsk uden at røre disken, mens <code>open()</code> lader kernen følge symlinks. Når én kodelinje bruger begge til at tjekke OG læse samme sti, er der et TOCTOU-agtigt hul.</li><li><strong>/proc/self/cwd er guld til den slags divergens.</strong> Det er en magisk symlink til processens arbejdsmappe, som leksikalsk sti-normalisering ikke kan se igennem, men kernen følger. Perfekt til at få to sti-opslag til at pege hver sit sted hen.</li><li><strong>En "nøgle" er værdiløs hvis dens config ikke parser.</strong> SECRET_KEY faldt tilbage til <code>os.urandom(32)</code> fordi <code>config.json</code> ikke var gyldig JSON. Bekræft at en config faktisk indlæses, før du bygger et cookie-forge-angreb oven på den.</li><li><strong>Python-LFI er ikke PHP-LFI.</strong> Under gunicorn giver <code>php://filter</code> intet. Læs i stedet kilden direkte med <code>../</code> ud fra en kendt undermappe (her <code>posts/</code>), og husk at <code>render_template_string</code> på en FAST skabelon med brugerdata som kontekst ikke er SSTI.</li></ul>
+<h2>Hvor ses dette igen?</h2>
+<p>Den generelle lektie er at et sikkerhedstjek og den efterfølgende handling bør
+operere på NØJAGTIG samme ressource, opslået på samme måde. Når de ikke gør (her <code>abspath()</code>
+til at tjekke, <code>open()</code> til at læse), opstår en TOCTOU-lignende divergens, samme familie som
+race conditions mellem <code>access()</code> og <code>open()</code> i C, eller mellem en
+path-normaliserende WAF og den backend der faktisk åbner filen. <code>/proc/self/cwd</code> og de
+øvrige <code>/proc</code>-magiske symlinks dukker op igen og igen i LFI- og path-traversal-opgaver,
+det er værd at have dem i værktøjskassen. Se <a href="web-exploitation-ladder.html">web-exploitation-stigen</a>
+for LFI og path-traversal i en enklere form, og <a href="jwt.html">JWT</a> for kontrasten til denne
+opgaves cookie-fælde: dér VIRKER nøgle-angrebet, fordi signeringen rent faktisk er svag.</p>
+<footer>
+Del af <a href="index.html">Haaukins CTF-tutorials</a>. <a href="https://www.haaukins.dk/" target="_blank">Haaukins</a>
+er en dansk undervisningsplatform til sikkerhedstræning (AAU, De Danske Cybermesterskaber). Alle opgaver
+løses på platformens egne, formålsbyggede lab-miljøer, aldrig på andres systemer. Guiden forudsætter du selv
+har autoriseret adgang (fx som studerende eller deltager) og er løsningsstøtte til at lære metoden, ikke en
+genvej uden om selv at forstå den.
+</footer>
+</div>
+<aside id="hire-widget">
+<button class="hw-close" type="button" aria-label="Luk">×</button>
+<p>👋 Håber det her hjalp!</p>
+<p>For langhåret til dig? Overvej at ansætte ham der skrev det.</p>
+<a class="hw-link" href="https://www.linkedin.com/in/alexandermangaard/en" target="_blank" rel="noopener">LinkedIn →</a>
+</aside>
+</body>
+</html>

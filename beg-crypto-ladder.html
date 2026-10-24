@@ -39,7 +39,7 @@ print(bytes.fromhex(h))   # b'HKN{zqq-MF-HQgQX}'</code></pre>
 <p>Filen giver nøgle OG ciphertext direkte i klartekst. One-time pad er kun perfekt
              sikker hvis nøglen holdes hemmelig: her er den lækket, så det er bare en ligefrem XOR:</p>
              <pre><code>key = b'LOREMIPSUMDOLORSI'
-enc = b'\x04\x04\x1c&gt;)\x11}\$\x0f\x1ai\n\x7f!\x06\x044'
+enc = b'\x04\x04\x1c&gt;)\x11}$\x0f\x1ai\n\x7f!\x06\x044'
 pt = bytes(k ^ c for k, c in zip(key, enc))   # b'HKN{dX-wZW-E3nTW}'</code></pre>
 <h2>3) RSAttack1 (14p): &quot;parametrene er ikke hemmelige&quot;</h2>
 <p>Filen giver <code>p, q, N, e</code> og ciphertext direkte. Opgaven siger det selv:

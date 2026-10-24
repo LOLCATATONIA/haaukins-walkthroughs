@@ -61,7 +61,7 @@ curl "http://hgls-delivery.hkn/index.php?CJSecretPackage=../../../../../../var/l
 <p>Flag: <span class="flag">HKN{h3r3-15-y0ur-pr3c10u5-p4ck463}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>En loggende, skrivbar service (FTP, mail, SSH-banner) der også er LFI-inkluderbar er en klassisk log-poisoning-RCE-kombination.</li><li>En SUID-flagget sprogtolk (php, python, perl) giver effektiv root ved start, men almindelige exec-funktioner dropper ofte privilegierne igen; synkronisér uid EKSPLICIT (posix_setuid(0)) før du kalder ud til et shell.</li><li>find / -iname "*flag*" fanger ikke-standard filnavne som ren "find /root -name flag.txt" ville misse.</li></ul>
+<ul><li>En loggende, skrivbar service (FTP, mail, SSH-banner) der også er LFI-inkluderbar er en klassisk log-poisoning-RCE-kombination.</li><li>En SUID-flagget sprogtolk (php, python, perl) giver effektiv root ved start, men almindelige exec-funktioner dropper ofte privilegierne igen; synkronisér uid EKSPLICIT (posix_setuid(0)) før du kalder ud til en shell.</li><li>find / -iname "*flag*" fanger ikke-standard filnavne som ren "find /root -name flag.txt" ville misse.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>Log-poisoning er et skole-eksempel på at kæde to svagheder: en LFI (du kan læse en vilkårlig
 fil) bliver til RCE når filen er en LOG du selv kan skrive ind i (FTP-brugernavn, User-Agent,

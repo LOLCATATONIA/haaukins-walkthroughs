@@ -36,7 +36,7 @@
 {{cycler.__init__.__globals__.os.popen('env').read()}}   # RCE som root -> FLAG=HKN{...}</code></pre>
              <p><strong>Fælder:</strong> undgå <code>{ } " '</code> i din kommando (bryder Jinja-udtrykket). Brug
              <code>env</code>, <code>cat /path</code>. Stored SSTI kan 'brick'e en side ved en malformet payload, brug
-             et frisk post, ét rent payload ad gangen. Flaget lå i en env-var, ikke en fil.</p>
+             et friskt post, én ren payload ad gangen. Flaget lå i en env-var, ikke en fil.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flaget lå i en env-var (fundet via <code>env</code>), afleveret som DDC:</p>
         <p>Flag: <span class="flag">DDC{c0mments_4r3_4_n4sty_th1ng}</span></p>

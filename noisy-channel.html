@@ -36,9 +36,9 @@
 <h2>RSA-delen: en bevidst svag 257-bit nøgle</h2>
 <p><code>it_is_so_dangerous.txt</code> giver <code>N</code>, <code>e</code> og
              ciffertekst direkte. <code>N</code> er kun <strong>257 bit</strong>, håbløst lille til RSA
-             (normal er ≥2048 bit). <strong>Pollard's rho</strong> (Brent-varianten, ren Python, ingen
+             (normal er ≥2048 bit). <strong>Pollard's rho</strong> (Floyd-varianten, ren Python, ingen
              eksterne biblioteker) faktoriserer den på omkring 110 sekunder, fordi <code>p</code> og
-             <code>q</code> er stærkt ubalancerede (52-bit vs. 205-bit):</p>
+             <code>q</code> er stærkt ubalancerede (52-bit vs. 206-bit):</p>
              <pre><code>import random, math
 
 def pollard_rho(n):
@@ -64,7 +64,7 @@ print(m.to_bytes((m.bit_length()+7)//8, 'big'))
 <p>Transskriberet med lokal Whisper. På en almindelig Kali:</p>
              <pre><code>sudo apt install -y ffmpeg
 pip install openai-whisper
-<span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model: transskriberer lydfiler lokalt.">whisper</span> samtale.wav --model base</code></pre>
+<span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model: transskriberer lydfiler lokalt.">whisper</span> Conversation.m4a --model base   # whisper læser m4a direkte via ffmpeg</code></pre>
              <p>(Vi kørte selv <code>nix shell nixpkgs#openai-whisper nixpkgs#ffmpeg</code>, samme resultat.
              Whisper fejler STILLE, exit 0, ingen fejlmeddelelse, hvis <code>ffmpeg</code> ikke findes i
              samme shell, installér altid begge sammen.)</p>

