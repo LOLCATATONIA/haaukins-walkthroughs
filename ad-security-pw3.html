@@ -33,10 +33,14 @@
              <p><code>43239E3A0AF748020D5B426A4977D7E5</code>: 32 hex <strong>uppercase</strong>, og "AD"
              (Active Directory) i titlen = <strong>NTLM</strong> = <code>MD4(UTF-16LE(password))</code>.</p>
 <h2>Fremgangsmåde</h2>
-<p><code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 1000</code> er nemmest. I ren Python mangler <code>hashlib</code> MD4, brug
-             OpenSSL legacy-provider (sanity-check) eller en egen MD4 (verificér mod RFC 1320):</p>
+<p>Det er en NTLM-hash, så <code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 1000</code> knækker den direkte mod rockyou:</p>
+             <pre><code>hashcat -m 1000 43239E3A0AF748020D5B426A4977D7E5 rockyou.txt
+# 43239e3a0af748020d5b426a4977d7e5:supersecret</code></pre>
+             <p>Ren Python er lidt besværligt her, fordi <code>hashlib</code> har droppet MD4. Du kan
+             sanity-tjekke NTLM via OpenSSL's legacy-provider, eller bruge en egen MD4 (verificeret mod
+             RFC 1320) i en rockyou-løkke:</p>
              <pre><code>printf "" | iconv -f UTF-8 -t UTF-16LE | <span class="gloss" tabindex="0" data-tip="Svensk-kniv til TLS/kryptografi: certifikater, kryptering, hashing.">openssl</span> dgst -md4 -provider legacy -provider default
-# 31d6cfe0...089c0 = NTLM af tomt password</code></pre>
+# 31d6cfe0...089c0 = NTLM af tomt password (sanity-check)</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{supersecret}</span></p>
 </details>

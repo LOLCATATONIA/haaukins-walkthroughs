@@ -30,11 +30,21 @@
 
 <h2>Hvad går opgaven ud på?</h2>
 <p><em>Fil: <code>evidence/experiments/m0rse.wav</code>, del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
-             <p>En kort WAV med rytmiske pulser = morse. Hurtigst: en online morse-<strong>audio</strong>-decoder
-             (auto-tempo) → <code>MOMMYSBOY</code>.</p>
+             <p>En kort WAV med rytmiske pulser = morse. Hurtigst: en morse-<strong>audio</strong>-decoder
+             (fx browser-værktøjet på <code>morsecode.world</code>, auto-tempo) → <code>MOMMYSBOY</code>.</p>
 <h2>Vil du forstå signalet?</h2>
-<p>Læs PCM-samples (<code>wave</code>), udjævn støj, tærskel til on/off, run-length-encode, og
-             klassificér varigheder (prik ≈1 enhed, streg ≈3, pauser 1/3/7) → slå op i morse-tabellen.</p>
+<p>Den manuelle vej, hvis du vil se mekanikken: læs PCM-samplene, byg en on/off-envelope og
+             run-length-encode den, og klassificér varighederne (prik ≈1 enhed, streg ≈3, pauser 1/3/7):</p>
+             <pre><code>python3 - &lt;&lt;'PY'
+import wave, numpy as np
+w = wave.open("m0rse.wav"); sr = w.getframerate()
+a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(float)
+env = np.abs(a)                     # amplitude-envelope
+on  = env &gt; env.max()*0.2           # tærskel til on/off
+# find løbelængder af on/off: on kort=prik, on lang=streg;
+# off 1=intra-tegn, 3=mellem bogstaver, 7=mellem ord  -> slå op i morse-tabellen
+PY</code></pre>
+             <p>Tegnene staves ud til <code>MOMMYSBOY</code> (opgaven krævede lowercase).</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Opgaven krævede lowercase.</p><p>Flag: <span class="flag">HKN{mommysboy}</span></p>
 </details>

@@ -36,7 +36,7 @@
 <p>Tjek først at mistanken er rigtig. Filen har CRLF-linjeslut, så <code>cat -A
              Deltagerliste.txt</code> viser hver linje som <code>...^M$</code> (<code>^M</code> = CR, <code>$</code>
              = LF); en linje med trailing space ser ud som <code>navn ^M$</code>, en uden som <code>navn^M$</code>.
-             Derfor <code>rstrip(b'\r\n')</code> nedenfor: vi skal fjerne både <code>\r</code> og <code>\n</code>
+             Derfor <code>rstrip(b'\r\n')</code> nedenfor: jeg skal fjerne både <code>\r</code> og <code>\n</code>
              for at kunne se det afsluttende mellemrum. Kræver <code>pycryptodome</code> (<code>pip install pycryptodome</code>):</p>
              <pre><code>lines = open("Deltagerliste.txt", "rb").readlines()                # 128 linjer, rå bytes
 bits  = ''.join('1' if l.rstrip(b'\r\n').endswith(b' ') else '0' for l in lines)

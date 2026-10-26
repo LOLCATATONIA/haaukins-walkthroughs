@@ -38,10 +38,10 @@ siger <code>Goodbye</code> og afslutter.</li>
 gemt RIP er <strong>72 bytes</strong>, bestemt black-box med et cyklisk mønster. Binæren er en
 non-PIE 64-bit ELF med base <code>0x400000</code>, så alle adresser er faste.</li>
 <li><strong>Navnet er et hint.</strong> Flaget hedder senere <code>brop</code> (Blind ROP), opgavens
-tiltænkte teknik. Men den tiltænkte teknik er ikke altid den simpleste der virker, som vi skal se.</li>
+tiltænkte teknik. Men den tiltænkte teknik er ikke altid den simpleste der virker, som jeg skal se.</li>
 </ol>
 <h2>Primitivet: en arbitrær-læsning, ikke en shell</h2>
-<p>Med 72 bytes til gemt RIP og faste adresser kan vi bygge en kort ROP-kæde hvis
+<p>Med 72 bytes til gemt RIP og faste adresser kan jeg bygge en kort ROP-kæde hvis
 eneste formål er at læse hukommelse. Byggeklodserne (fundet black-box) er:</p>
 <pre><code>offset   = 72
 pop rdi; ret = 0x40130b      # sæt første argument
@@ -54,9 +54,9 @@ i processen.</p>
 <h2>Den afgørende indsigt: non-PIE betyder at flaget har en fast adresse</h2>
 <p>Her er pointen der gør opgaven triviel. Binæren er non-PIE, så <code>.data</code> og
 <code>.bss</code> ligger på faste, kendte adresser. Programmer loader ofte flaget ind i en global
-buffer ved opstart. Hvis det er tilfældet her, behøver vi ikke nogen libc, ingen shell og ingen
+buffer ved opstart. Hvis det er tilfældet her, behøver jeg ikke nogen libc, ingen shell og ingen
 anden forbindelse, kun at pege læse-primitiven på det rigtige sted.</p>
-<p>Så i stedet for at bygge en exploit, scanner vi det statiske data-område (<code>0x403000</code>
+<p>Så i stedet for at bygge en exploit, scanner jeg det statiske data-område (<code>0x403000</code>
 til ca. <code>0x405800</code>) med puts-primitiven og ser efter flag-formatet i det der kommer
 tilbage. Flaget lå på <code>0x403008</code>.</p>
 <h2>Løsningen</h2>

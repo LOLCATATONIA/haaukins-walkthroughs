@@ -28,7 +28,7 @@
 <div class="badges"><span class="badge cat">Web exploitation</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
-<h2>Sporet: hvad fortæller cookien os, hvis vi spørger den?</h2>
+<h2>Sporet: hvad fortæller cookien mig, hvis jeg spørger den?</h2>
 <p>Opgaveteksten er "Visit serializator.com. Login as Admin to reach the goal!" men giver
 ingen admin-credentials. Allerede titlen "Serializator" peger mod serialisering som mekanismen.</p>
 <ol class="steps">
@@ -37,7 +37,7 @@ credentials.
 <pre><code>curl -i --resolve serializator.com:80:&lt;ip&gt; --data "user=test&amp;password=test"   http://serializator.com/index.php
 # Set-Cookie: session=Tzo0OiJVc2VyIjoyOntzOjg6InVzZXJuYW1lIjtzOjQ6InRlc3QiO3M6NzoiaXNBZG1pbiI7YjowO30%3D</code></pre>
 At login lykkes med PÅFUNDNE credentials er selv et spor: spærren for admin-adgang ligger ikke i
-login-tjekket, den må ligge i noget der afgøres EFTER login, altså i den session-cookie vi lige
+login-tjekket, den må ligge i noget der afgøres EFTER login, altså i den session-cookie jeg lige
 fik.</li>
 <li><strong>Cookien ligner base64. Afkod den, altid.</strong> Enhver streng af base64-alfabetets
 tegn er værd at prøve at afkode, før man antager den er krypteret.
@@ -46,7 +46,7 @@ tegn er værd at prøve at afkode, før man antager den er krypteret.
 Læsbar tekst, ikke krypteret. Mønsteret <code>O:len:"Class":n:{...}</code> er PHP's eget
 serialiseringsformat, serveren gemmer simpelthen objektet rå i cookien.</li>
 <li><strong>Feltet der afgør alt står lige der, i klartekst.</strong> <code>isAdmin;b:0</code> er
-et booleansk false. Næste spørgsmål: er der en signatur der forhindrer os i at ændre det? Det
+et booleansk false. Næste spørgsmål: er der en signatur der forhindrer mig i at ændre det? Det
 eneste sikre svar er at prøve.</li>
 <li><strong>Flip værdien, re-encode, send den tilbage.</strong></li>
 </ol>

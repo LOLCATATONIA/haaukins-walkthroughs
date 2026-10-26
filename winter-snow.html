@@ -31,16 +31,18 @@
 <h2>Hvad går opgaven ud på?</h2>
 <p><em>Fil: <code>evidence/corrupted/03-sn0w.txt</code>, del af <code>forensics_dcis-osint.zip</code> fra Introduction-opgaven.</em></p>
              <p>En tekstfil med mærkelige haler af mellemrum og tabs efter hver linje = Matthew Kwans
-             <strong><code><span class="gloss" tabindex="0" data-tip="Skjuler tekst i whitespace for enden af linjer i en tekstfil.">snow</span></code></strong>-værktøj (data gemt i trailing whitespace, ICE-krypteret).</p>
+             <strong>snow</strong>-værktøj (data gemt i trailing whitespace, ICE-krypteret). På Kali hedder
+             pakken og binæren <code>stegsnow</code>.</p>
 <h2>Trin for trin</h2>
-<pre><code>snow -C -p 8329 03-sn0w.txt        # -C = dekomprimér; -p = password</code></pre>
+<pre><code>apt install stegsnow                    # Kali-pakke (Debian 'stegsnow')
+stegsnow -C -p 8329 03-sn0w.txt         # -C = dekomprimér; -p = password</code></pre>
              <p>Passwordet (<code>8329</code>) stod synligt i cover-teksten (linje 3: "- 8329"). Læs cover-materialet
              <em>før</em> du brute-forcer.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{wh1t3sp4ce_st3g0}</span></p>
 </details>
 <h2>Hvad du har lært</h2>
-<ul><li>Haler af mellemrum/tabs = <code>snow</code> whitespace-stego.</li><li><code>-C</code> er nødvendig (ellers binært vrøvl); nøglen lå i den synlige tekst.</li></ul>
+<ul><li>Haler af mellemrum/tabs = <code>stegsnow</code> (Matthew Kwans snow) whitespace-stego.</li><li><code>-C</code> er nødvendig (ellers binært vrøvl); nøglen lå i den synlige tekst.</li></ul>
 <h2>Hvor ses dette igen?</h2>
 <p>Den vigtigste vane her er at læse cover-materialet FØR du brute-forcer. Stego-opgaver (og
 password-opgaver generelt) lægger ofte nøglen i fuldt syn: i teksten, i et metadata-felt, i et

@@ -37,14 +37,19 @@
              <code>user.brute2root.hkn</code>.</p>
 <h2>Trin 1: en Flask-app med et IDOR, låst af et sikkert session-design, men IKKE af adgangskontrollen</h2>
 <p><code>user.brute2root.hkn</code> er en register/login-app hvor hver bruger har en
-             note-side. Session-cookien er Flask-signeret med en tilfældig <code>os.urandom(32)</code>-nøgle,
-             så den kan IKKE forfalskes udefra. Men selve dataformatet i cookien er informativt:</p>
-             <pre><code>{"logged_in": true, "userid": "&lt;hash&gt;"}
-# hvor userid = MD5(username + ":" + password)</code></pre>
-             <p>Note-siden ligger på <code>/&lt;userid&gt;</code>, og her er den egentlige sårbarhed: der er
-             intet tjek for at <code>userid</code>'et i URL'en rent faktisk tilhører den indloggede bruger,
-             et klassisk IDOR. Enhver indlogget bruger kan læse en anden brugers note ved at ændre
-             userid'et i stien.</p>
+             note-side. Registrér en testkonto og kig på session-cookien. Den er Flask-signeret med en
+             tilfældig <code>os.urandom(32)</code>-nøgle, så den kan IKKE forfalskes udefra, men payloaden
+             kan læses direkte (base64 før cookiens første <code>.</code>):</p>
+             <pre><code># testbruger: alice / password123
+{"logged_in": true, "userid": "&lt;32-tegns hex&gt;"}</code></pre>
+             <p>Et 32-tegns hex er en MD5. Test den oplagte hypotese mod den kendte testbruger:</p>
+             <pre><code>python3 -c 'import hashlib; print(hashlib.md5(b"alice:password123").hexdigest())'
+# == userid fra cookien  ->  userid = MD5(username + ":" + password)</code></pre>
+             <p>Hypotesen holder (og kildekoden i trin 3 bekræfter den). Note-siden ligger på
+             <code>/&lt;userid&gt;</code>, og her er den egentlige sårbarhed: der er intet tjek for at
+             <code>userid</code>'et i URL'en rent faktisk tilhører den indloggede bruger, et klassisk
+             IDOR. Enhver indlogget bruger kan læse en anden brugers note ved at ændre userid'et i
+             stien.</p>
 <h2>Trin 2: forsidens eget hint peger på et andet, separat login</h2>
 <p>Forsiden nævner selv: <em>"'moderator', use the other site:
              moderator.brute2root.hkn"</em>. Det er et separat login med sin egen database (ingen

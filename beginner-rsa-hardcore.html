@@ -28,7 +28,7 @@
 <div class="badges"><span class="badge cat">Crypto</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Sporet: hvad er mærkeligt ved det, vi får udleveret?</h2>
+<h2>Sporet: hvad er mærkeligt ved det, jeg får udleveret?</h2>
 <ol class="steps">
 <li><strong>Opgaveteksten siger det selv.</strong> Den fortæller direkte at udvikleren
 "published p and q and e and not n and e which he should have done as the company public key".
@@ -59,7 +59,7 @@ m = pow(c, d, n)
 flag_bytes = m.to_bytes((m.bit_length() + 7) // 8, 'big')
 print(flag_bytes)            # b'HKN{a_rsa_challenge}'</code></pre>
              <p>Under et sekund at køre. Ingen faktorisering, ingen brute force, kun ren modulær
-             aritmetik, fordi det hårde skridt (faktorisér n) allerede var gjort for os af
+             aritmetik, fordi det hårde skridt (faktorisér n) allerede var gjort for mig af
              opgaven selv.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{a_rsa_challenge}</span></p>

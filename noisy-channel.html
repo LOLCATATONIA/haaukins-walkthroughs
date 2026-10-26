@@ -65,7 +65,7 @@ print(m.to_bytes((m.bit_length()+7)//8, 'big'))
              <pre><code>sudo apt install -y ffmpeg
 pip install openai-whisper
 <span class="gloss" tabindex="0" data-tip="OpenAI&#x27;s tale-til-tekst-model: transskriberer lydfiler lokalt.">whisper</span> Conversation.m4a --model base   # whisper læser m4a direkte via ffmpeg</code></pre>
-             <p>(Vi kørte selv <code>nix shell nixpkgs#openai-whisper nixpkgs#ffmpeg</code>, samme resultat.
+             <p>(Jeg kørte selv <code>nix shell nixpkgs#openai-whisper nixpkgs#ffmpeg</code>, samme resultat.
              Whisper fejler STILLE, exit 0, ingen fejlmeddelelse, hvis <code>ffmpeg</code> ikke findes i
              samme shell, installér altid begge sammen.)</p>
              <p>Samtalen beder Jens om at indtaste sit nye 6-cifrede password og senere sit CPR-nummer, begge
@@ -84,7 +84,7 @@ Cifre (kendt fra RSA):               5,   2,   3,   6,   3,   5</code></pre>
              tydeligvis designet til præcis 10 cifre (0-9), men UDEN en udregnelig formel (hverken lineær
              <code>freq=base+N·step</code> eller en MIDI/semitone-skala gav et rent mønster), en bevidst
              vilkårlig/shufflet tabel.</p>
-             <p>Vi har klippet den rene password-tone-sekvens ud til dig, så du kan se/høre præcis hvordan
+             <p>Her er den rene password-tone-sekvens, så du kan se/høre præcis hvordan
              den lyder uden selv at skulle lede efter den i den fulde samtale:</p>
              <audio controls style="width:100%;max-width:420px"><source src="assets/noisy-channel-password.wav" type="audio/wav"></audio>
 <h2>CPR-vinduet: svag energi, kræver lav tærskel</h2>
@@ -107,9 +107,8 @@ for gf in grid:
              tærskel-algoritme ville have overset:</p>
              <pre><code>300,660,500,420,380,580,340,540,620,460 Hz
   9,  0,  4,  6,  1,  7,  2,  8,  3,  5   (via tabellen ovenfor)</code></pre>
-             <p>Her er vores udklippede, isolerede CPR-tone-sekvens, til samme formål som password-klippet
-             ovenfor. Opgaven handler om at AFKODE tonerne, ikke om at redigere lydfiler, så vi sparer dig
-             udklipningen:</p>
+             <p>Her er den udklippede, isolerede CPR-tone-sekvens, til samme formål som password-klippet
+             ovenfor. Opgaven handler om at AFKODE tonerne, ikke om at redigere lydfiler:</p>
              <audio controls style="width:100%;max-width:420px"><source src="assets/noisy-channel-cpr.wav" type="audio/wav"></audio>
 <h2>Flag-formatet er selv en gættekonkurrence</h2>
 <p>Hverken passwordet alene (<code>HKN{523635}</code>, <code>DDC{523635}</code> m.fl.) eller

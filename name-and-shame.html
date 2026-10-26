@@ -35,8 +35,12 @@ Kortlæg altid hele bundtet først (<code>find . -type f | sort</code>), og hold
 chatlogs og skjulte mapper (<code>.trash/</code>, <code>.backup/</code>). Halvdelen af kampen er at ramme
 <strong>flag-formatet</strong> præcist.</p>
 <h2>Find svaret</h2>
-<p>Efternavn fra <code>browser_history.txt</code> (flybooking "M. Christensen") + fornavn fra en PDF i
-       <code>.trash/</code> ("Mom's cookies for <strong>Michael</strong>").</p>
+<pre><code>grep -i christensen logs/browser_history.txt
+#  ...Flight Confirmation for M. Christensen - Copenhagen to Lisbon   (efternavn)
+ls -la .trash/ &amp;&amp; pdftotext .trash/moms-cookies.pdf - | grep -i michael
+#  "Mom's Chocolate Chunk Cookies for Michael"                        (fornavn)</code></pre>
+       <p>To kilder giver tilsammen det fulde navn: efternavn fra flybookingen i browser-historikken,
+       fornavn fra en slettet opskrift-PDF i papirkurven.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p>Flag: <span class="flag">HKN{Michael_Christensen}</span></p>
 </details>

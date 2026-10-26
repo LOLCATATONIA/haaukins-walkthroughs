@@ -45,8 +45,29 @@
     y ^= (y &lt;&lt; 15) &amp; 0xefc60000
     y ^= y &gt;&gt; 18
     return y</code></pre>
-             <p>Fordi hvert trin kun bruger XOR, shift og AND-med-konstant, kan man regne baglæns
-             ("untemper") og få det oprindelige state-ord tilbage for hvert af de 624 outputs.</p>
+             <p>Fordi hvert trin kun bruger XOR, shift og AND-med-konstant, er det inverterbart. Et
+             højreshift-XOR (<code>y ^= y &gt;&gt; s</code>) genskabes ved at genopbygge y i bidder af s bit
+             ovenfra, et venstreshift-XOR nedefra:</p>
+             <pre><code>def _undo_right(y, s):
+    r = y
+    for _ in range(32 // s + 1):
+        r = y ^ (r &gt;&gt; s)
+    return r &amp; 0xffffffff
+
+def _undo_left(y, s, mask):
+    r = y
+    for _ in range(32 // s + 1):
+        r = y ^ ((r &lt;&lt; s) &amp; mask)
+    return r &amp; 0xffffffff
+
+def untemper(y):
+    y = _undo_right(y, 18)
+    y = _undo_left(y, 15, 0xefc60000)
+    y = _undo_left(y, 7, 0x9d2c5680)
+    y = _undo_right(y, 11)
+    return y</code></pre>
+             <p>Kaldt på hvert af de 624 outputs giver <code>untemper</code> de oprindelige state-ord
+             tilbage.</p>
 <h2>Genskab generatoren og dekryptér resten</h2>
 <p>Pythons <code>random.setstate()</code> tager formatet
              <code>(version, (state_words..., index), gauss_next)</code>. Med de 624 untemprede ord kan du

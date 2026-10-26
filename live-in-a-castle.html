@@ -33,10 +33,15 @@
              i Lissabon), fra DCIS-OSINT-bundtet. <strong>Pt.1:</strong> hvor mødes forbryderen med sin ven?
              <strong>Pt.2:</strong> hvad er næste plan?</p>
 <h2>Fælden: det er IKKE bit-stego</h2>
-<p>Navnet <em>bitwise_secrecy</em> og "hiding information in pictures" skriger LSB/bit-plane-steganografi.
-             Men udtømmende afprøvning (<code><span class="gloss" tabindex="0" data-tip="Finder skjult data i PNG/BMP-billeders LSB-bits (steganografi).">zsteg</span></code>, <code><span class="gloss" tabindex="0" data-tip="Skjuler/finder data i JPEG-billeder via steganografi.">jsteg</span></code>, <code><span class="gloss" tabindex="0" data-tip="Universelt steganografi-værktøj til at skjule/udtrække data i billeder.">outguess</span></code>, EXIF, bit-planer,
-             trailing data) giver <strong>intet</strong>. Nøglen ligger <strong>synligt i selve motivet</strong>: zoom ind
-             på et vindue i den hvide bygning nederst mod midten: der står <code>pw: 41659</code>.</p>
+<p>Navnet <em>bitwise_secrecy</em> og "hiding information in pictures" skriger
+             LSB/bit-plane-steganografi. Men en udtømmende automatisk afprøvning giver <strong>intet</strong>
+             (det er et JPEG, så rene LSB/bit-plane-værktøjer som <code><span class="gloss" tabindex="0" data-tip="Finder skjult data i PNG/BMP-billeders LSB-bits (steganografi).">zsteg</span></code> gælder slet ikke her):</p>
+             <pre><code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span> bitwise_secrecy.jpeg        # intet skjult i metadata
+<span class="gloss" tabindex="0" data-tip="Finder og udtrækker indlejrede filer/filsystemer inde i en binær fil.">binwalk</span> bitwise_secrecy.jpeg         # ingen appended/trailing data
+<span class="gloss" tabindex="0" data-tip="Skjuler/finder data i JPEG-billeder via steganografi.">jsteg</span> reveal bitwise_secrecy.jpeg    # intet
+<span class="gloss" tabindex="0" data-tip="Universelt steganografi-værktøj til at skjule/udtrække data i billeder.">outguess</span> -r bitwise_secrecy.jpeg /tmp/out   # intet</code></pre>
+             <p>Nøglen ligger i stedet <strong>synligt i selve motivet</strong>: zoom ind på et vindue i den
+             hvide bygning nederst mod midten, der står <code>pw: 41659</code>.</p>
              <figure class="shot">
              <img src="assets/live-in-a-castle-pw.jpg" alt="Zoom af bybilledet: et vindue på en hvid bygning hvor der står 'pw: 41659'.">
              <figcaption>Passwordet er malet ind i et vindue i bybilledet, "hidden in plain sight", ikke i bits.</figcaption>

@@ -50,7 +50,7 @@ altid efter et foothold: hvad kører som root automatisk? Enumerering viser en U
 # */1 * * * * python3 /var/www/scripts/uptime.py >> /var/log/cron.log 2>&amp;1
 ls -la /var/www/scripts/uptime.py
 # -rw-rw-rw-  (www-data kan SKRIVE til scriptet)</code></pre>
-             <p>Scriptet køres som root hvert minut af cron, og www-data (vores webshell-bruger) kan
+             <p>Scriptet køres som root hvert minut af cron, og www-data (min webshell-bruger) kan
 overskrive det. Det er den samme logik som en skrivbar root-cron altid giver: du behøver ikke
 læse scriptet, kun kunne erstatte det, for at din kode kører som root ved næste tick.</p>
              <pre><code>import os

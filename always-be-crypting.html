@@ -35,24 +35,22 @@
              andet bogstav, konsekvent gennem hele teksten).</p>
 <h2>Crib i stedet for frekvensanalyse</h2>
 <p>Cifferteksten er ikke tilfældig, den er en standard-forklaring af, hvordan man knækker
-             netop denne type cipher ("one way to solve an encrypted message, if we know its language, is
-             to find a different plaintext of the same language long enough to..."). Det betyder du kan
-             <strong>gætte de første ord</strong> ("ONE WAY TO SOLVE...") og udvide nøglen bogstav for
-             bogstav, så længe hvert nyt gæt er konsistent med de bogstaver du allerede har låst fast:</p>
-             <pre><code># eksempel på fremgangsmåden, ikke et script du kører
-ciphertext = "VJW ZCB KV AVILW ..."
-# gæt: "ONE WAY TO SOLVE" matcher mønstret "VJW ZCB KV AVILW" i længde
-# => V=O, J=N, W=E, Z=W, C=A, B=Y, K=T, V=O (konsistent!), A=S, I=L, L=V, W=E (konsistent!)
-# udvid ordet for ord indtil hele 26-bogstavs-nøglen er låst</code></pre>
+             netop denne type cipher. Servicen starter med:</p>
+             <pre><code>VJW ZCB KV AVILW CJ WJTOBUKWN EWAACXW, YQ ZW RJVZ YKA ICJXMCXW ...</code></pre>
+             <p>Gæt at det er "ONE WAY TO SOLVE AN ENCRYPTED MESSAGE ...", og lås par fast. Hvert nyt gæt
+             skal være konsistent med de bogstaver du allerede har:</p>
+             <pre><code>VJW=ONE  -> V=O J=N W=E      ZCB=WAY -> Z=W C=A B=Y      KV=TO -> K=T  (V=O konsistent)
+AVILW=SOLVE -> A=S I=L L=V  (V=O, W=E konsistent)      WJTOBUKWN=ENCRYPTED -> T=C O=R U=P N=D
+# udvid ord for ord indtil hele 26-bogstavs-nøglen er låst</code></pre>
              <p>Hele teksten giver meningsfuldt engelsk når nøglen er færdig: det er din bekræftelse på at
-             du har ramt rigtigt, uden at skulle køre en eneste frekvenstælling.</p>
+             du har ramt rigtigt, uden en eneste frekvenstælling.</p>
 <h2>Byg flaget via serverens protokol</h2>
 <p>Serveren beder derefter om input i formatet <code>CIPHERBOGSTAV:PLAINBOGSTAV</code>
              (fx <code>A:S</code>), ét par ad gangen. Flaget bygges live som
              <code>HKN{&lt;26 bogstaver i substitutions-rækkefølge A-Z&gt;}</code> når hele nøglen er
              indtastet korrekt.</p>
-             <p><strong>Kendt kvirk:</strong> den allerførste kommando sendt lige efter de indledende
-             ja/nej-spørgsmål bliver konsekvent droppet af serveren (en race condition i dens input-læsning).
+             <p><strong>Observeret kvirk:</strong> den allerførste kommando sendt lige efter de indledende
+             ja/nej-spørgsmål blev konsekvent droppet af serveren (ser ud som en race condition i dens input-læsning).
              Send et harmløst par først (fx en du er mindre sikker på) for at absorbere dette, eller gem det
              sidste bogstav til sidst i stedet for at sende det først.</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>

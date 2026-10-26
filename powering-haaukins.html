@@ -41,13 +41,19 @@ ws = websocket.create_connection('ws://danwind.hkn/ws')
 while True:
     print(ws.recv())"</code></pre>
 <h2>Spoof med retained messages</h2>
-<p>Møllerne reagerer ikke pålideligt på <code>/cmd</code>, men du kan <strong>spoofe status-topics
-             direkte</strong>. KRITISK: publicér med <code>-r</code> (retained), ellers bliver aflæsningen stale/0.
-             Kalibrér HP ved at sætte samme Power på alle møller og se hvad WebSocket-strømmen (fra scriptet
-             ovenfor) rapporterer som HaaukinsPower for den totale effekt. Sammenhængen er lineær:
-             <code>HP% = total × (20/9) − 100</code>.</p>
+<p>Et forsøg på at starte en mølle via <code>/cmd</code> ændrede ikke dens status:</p>
+             <pre><code>mosquitto_pub -h danwind.hkn -t windmills/cph/cmd -m '{"Running":true}'
+mosquitto_sub -h danwind.hkn -t windmills/cph/status -C 1 -v   # stadig Running:false</code></pre>
+             <p>Men status-topics kan spoofes direkte. KRITISK: publicér med <code>-r</code> (retained),
+             ellers overskrives værdien og HP-aflæsningen bliver stale/0. Kalibrér ved at sætte samme Power
+             på alle 6 møller (retained) og aflæse den stabile HaaukinsPower fra WebSocket-strømmen for hver
+             total:</p>
+             <pre><code>total Power:    450    600    900   1200
+HaaukinsPower:  900%  1233%  1900%  2566%</code></pre>
+             <p>Punkterne ligger på en ret linje: <code>HP% = total × (20/9) − 100</code>. HaaukinsPower er
+             altså overskud ift. en demand på 45 enheder.</p>
 <h2>Ram target HP=100%</h2>
-<pre><code># total=90 -> 15 Power pr. mølle:
+<pre><code># HP=100 -> total=(100+100)/(20/9)=90 -> 15 Power pr. mølle:
 for m in cph tyboron esbjerg sprogo samso anholt; do
   mosquitto_pub -r -t windmills/$m/status -m '{"ID":"'$m'","Speed":50,"Running":true,"Power":15}'
 done</code></pre>

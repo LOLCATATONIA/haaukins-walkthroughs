@@ -28,20 +28,45 @@
 <div class="badges"><span class="badge cat">Forensics</span><span class="badge">Haaukins CTF</span></div>
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 
-<h2>Hvad går opgaven ud på?</h2>
-<p>En 5-delt serie (-0 til -4) på ét JPEG i en AES-krypteret zip. Den kombinerer flere teknikker.</p>
-<h2>Delene</h2>
-<ul>
-             <li><strong>-0/-1 (signaturer):</strong> JPEG starter med <code>FF D8 FF</code>, slutter med
-             <code>FF D9</code>.</li>
-             <li><strong>-2/-3 (EXIF):</strong> <code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span> carbonara.jpg</code> giver device (<code>iphone 13</code>);
-             en <em>manipuleret</em> ExifIFD-pointer gemte <code>Location: Venice</code> (det synlige "Rome" var decoy,
-             læs den rå EXIF).</li>
-             <li><strong>-4 (Baconian):</strong> 22 grupper á 5 bit efter JPEG-EOI = Baconian cipher (opgaven sagde
-             "using BACON"). Klassisk 24-bogstavs (I=J, U=V) → <code>COOKINGWATERINTHESAUCE</code>.</li>
-             <li><strong>Zip:</strong> WinZip-AES, knæk kun mod den lille fil-entry for fart
-             (<code><span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 13600</code>) → password <code>Barilla</code>; <code><span class="gloss" tabindex="0" data-tip="Arkiv-værktøj (7-Zip) der bl.a. kan udpakke password-beskyttede arkiver.">7z</span> x -pBarilla</code>.</li>
-             </ul>
+<h2>Opgaven: en 5-delt serie i én AES-zip</h2>
+<p>Serien (-0 til -4) handler alle om det samme <code>carbonara.jpg</code>, der ligger i en
+             WinZip-AES-krypteret zip sammen med et <code>instagrampostcarbonara.png</code>. -0/-1 er ren
+             viden om JPEG-signaturer, men -2/-3/-4 kræver billedet, så zip'en skal åbnes først.</p>
+<h2>Åbn zip&#x27;en (WinZip-AES)</h2>
+<p><code>unzip</code> og Pythons <code>zipfile</code> kan ikke håndtere AES-entryen. Træk
+             hashen ud med <code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code> og knæk den med hashcat-mode 13600. Vigtigt fartgreb:
+             behold KUN den lille <code>carbonara.jpg</code>-entry i hash-filen, den store PNG-entry gør
+             kørslen uendelig langsom (samme password låser hele arkivet op):</p>
+             <pre><code>zip2john spaghetti0.zip &gt; zip.hash      # WinZip-AES = hashcat-mode 13600
+# behold kun carbonara.jpg-entryen i zip.hash
+<span class="gloss" tabindex="0" data-tip="GPU-accelereret password-cracker: knækker hashes mod en wordlist.">hashcat</span> -m 13600 zip.hash rockyou.txt    # (+ regler)  ->  Barilla
+<span class="gloss" tabindex="0" data-tip="Arkiv-værktøj (7-Zip) der bl.a. kan udpakke password-beskyttede arkiver.">7z</span> x -pBarilla spaghetti0.zip</code></pre>
+<h2>-0 / -1: JPEG-signaturerne (og format-nøglen)</h2>
+<p>-0 og -1 spørger om JPEG's start- og slut-signatur: <code>FF D8 FF</code> og
+             <code>FF D9</code>. Det svære var FORMATET: <code>HKN{FFD8FF}</code>, <code>HKN{ffd8ff}</code>
+             og <code>DDC{...}</code> blev alle afvist. Kun hex med MELLEMRUM og UPPERCASE virkede:
+             <code>HKN{FF D8 FF}</code> og <code>HKN{FF D9}</code>. Den konvention styrer resten af
+             serien (se format-noten nederst).</p>
+<h2>-2 / -3: den manipulerede EXIF</h2>
+<p>Kør <code><span class="gloss" tabindex="0" data-tip="Læser (og skriver) metadata indlejret i billeder, dokumenter m.m.">exiftool</span></code>. Device-feltet (-2) står i et bevidst skævt
+             <code>Software</code>-tag, og en advarsel er selve sporet til -3:</p>
+             <pre><code>exiftool carbonara.jpg
+# Software : Adobe Photosho Device: iphone 13     (-2: device = iphone 13)
+# Warning  : Bad ExifIFD directory                &lt;-- ExifIFD-pointeren er overskrevet</code></pre>
+             <p>"Bad ExifIFD directory" betyder at ExifIFD-pointeren (tag <code>0x8769</code>) ikke peger
+             på en rigtig IFD, men er overskrevet med ren ASCII. Læs de rå bytes for at se den:</p>
+             <pre><code>xxd carbonara.jpg | less     # ved den overskrevne pointer: "Location: Venice"</code></pre>
+             <p>Lokationen (-3) er altså <code>Venice</code>, ikke "Rome, Italy" fra det synlige
+             PNG-opslag, som er en decoy.</p>
+<h2>-4: Baconian cipher efter EOI</h2>
+<p>Opgaveteksten til -4 giver nøglen ("using BACON... What an amazing CHEF"). Efter den
+             sidste <code>FF D9</code> (EOI) i <code>carbonara.jpg</code> ligger 133 bytes plantet data:
+             22 grupper á 5 bit som ASCII-nuller og -ettaller. Fem symboler i to tilstande = Baconian:</p>
+             <pre><code>00010 01101 01101 01001 01000 01100 00110 10100 ...
+#   C     O     O     K     I     N     G     W   ...</code></pre>
+             <p>Afkodet med den klassiske 24-bogstavs Baconian (I=J, U=V), fx CyberChefs
+             <em>Bacon Cipher Decode</em> (Standard, 0/1): <code>COOKINGWATERINTHESAUCE</code>, altså den
+             hemmelige ingrediens "cooking water" (pasta-kogevandet).</p>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <p><strong>Format-konventioner (vigtige):</strong> signaturer = hex m. mellemrum + uppercase; tekst-svar
         = sammenskrevet lowercase; EXIF-værdi = eksakt casing.</p>

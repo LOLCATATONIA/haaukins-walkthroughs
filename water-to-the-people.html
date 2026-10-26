@@ -29,13 +29,21 @@
 <div class="callout">🎓 <strong>Prøv selv først.</strong> Trinnene viser metoden, det konkrete flag ligger i en sammenklappelig spoiler nederst. Haaukins-flag er ofte per-instans, så det er <em>fremgangsmåden</em> der tæller.</div>
 <div class="callout">📚 <strong>Baggrund:</strong> denne opgave bygger på en fælles teknik. Læs primeren: <a href="kom-i-gang.html">Kom i gang: VPN, Hosts og lab-opsætning</a>.</div>
 <h2>Recon &amp; logik</h2>
-<p>"Modifying <strong>the bus</strong>" = Modbus. <code>water-city.hkn</code>: web (80) + Modbus (502).
-             Frontend-JS afslører: <code>{registers:[pump1,pump2], coils:[10 junctions]}</code>; begge pumper &gt;200 +
-             vand til alle huse (uden kloak) → socket.io <code>win</code> med flaget. "lose" (vand i kloak) er
-             recoverable → sikkert at eksperimentere.</p>
+<p>"Modifying <strong>the bus</strong>" = Modbus. <code>water-city.hkn</code>: web (80) +
+             Modbus (502). Frontend-JS (<code>/static/js/index.js</code>) afslører både dataformatet
+             <code>{registers:[pump1,pump2], coils:[10 junctions]}</code> og vinde-betingelsen: begge pumper
+             &gt;200 + vand til alle huse → socket.io <code>win</code> med flaget. Samme JS plus HTML-grid'et
+             viser rørnettet, og at <strong>J3, J7 og J10</strong> ligger ved kloakkerne, dem må der ikke
+             ledes vand til. "lose" (vand i kloak) lukker bare alle ventiler igen, så det er recoverable og
+             sikkert at eksperimentere.</p>
 <h2>Kritisk: adresse-offset (empirisk)</h2>
-<p>Map addr→enhed ved at skrive én ad gangen og aflæse displayet: <code>addr 0</code> og <code>11</code>
-             er ubrugte; junction <code>Jn</code> = coil <code>n</code>; pumperne = holding-register 1 og 2.</p>
+<p>Modbus-adresserne er forskudt, så kortlæg dem empirisk: skriv én coil ad gangen og se
+             hvilken junction der tænder i dashboardets <code>update_data</code>-broadcast:</p>
+             <pre><code>c.write_coil(1, True)    # -> J1 tænder i dashboardet
+c.write_coil(0, True)    # -> intet sker (addr 0 ubrugt)</code></pre>
+             <p>Resultatet: <code>addr 0</code> og <code>11</code> er ubrugte, junction <code>Jn</code> =
+             coil <code>n</code>, og pumperne er holding-register 1 og 2 (display = <code>[reg1, reg2]</code>,
+             reg0 ubrugt).</p>
 <h2>Vind-konfiguration</h2>
 <p>Brug <code><span class="gloss" tabindex="0" data-tip="Python-bibliotek til at læse/skrive Modbus/TCP-registre og -coils.">pymodbus</span></code> (<code>pip install pymodbus</code>) til selve Modbus-delen:</p>
              <pre><code>python3 -c "

